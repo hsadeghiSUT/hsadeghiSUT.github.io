@@ -2876,11 +2876,19 @@ record, and recent students are most of that group.
 **The readouts carry the numbers**, and where they carry them is a decision. On
 the skyline the count leads — the height of the block under the cursor *is* that
 number, so it is the answer to the question being asked. On the timeline it
-trails, because there the paper is what is being pointed at. And "not yet cited"
-is said on the skyline only: there it explains a block four pixels tall, where on
-the timeline it would be appended to sixty-six of a hundred and forty-eight
-entries, which is not information. The graph leaves a zero unsaid for the same
-reason.
+trails, because there the paper is what is being pointed at.
+
+**A zero is left unsaid everywhere**, the skyline included. It used to append
+"not yet cited" there, on the argument that a reader pointing at a block four
+pixels tall deserves to know why it is four pixels tall. That argument was
+wrong: the height already says it, and spelling it out turns a neutral absence
+into a verdict printed under the paper's own title — a paper published this year
+has not failed to be cited, it has not been cited *yet*, and no readout can
+carry that distinction in three words. So the count simply does not appear, the
+same as on the graph and the timeline, and the year and title still answer the
+question the readout exists to answer. The separator travels with the count
+rather than sitting between the fields, so an absent count leaves no stray "·"
+at either end.
 
 #### Without WebGL
 
@@ -2975,6 +2983,56 @@ outside it — still outside everyone else, still visible, still clickable.
 floor of 0.17 tall, which made most of the 118 people wider than they were tall,
 and a field of landscape slabs does not read as buildings however it is lit — it
 read as confetti. The widest is now 0.3 and the shortest 0.25 tall.
+
+**A tower is its own solid, and this is the second half of that fix.** Getting
+the proportions right stopped the city reading as confetti; it did not make it
+read as architecture, and it was still being reported as the ugly one of the
+four. The reason was the shading, and the reason for *that* was a solid shared
+with the wrong view.
+
+The renderer reconstructs every shape inside a billboarded quad — no geometry,
+one draw call, `uRound` in `explorer/shaders.js` choosing which. There were two
+solids: a **sphere** for the graph, and a **slab** for the timeline card. The
+city took the slab, on the reasonable-sounding grounds that a tower has a flat
+face and an edge that catches the light.
+
+But the slab is a *card*. Its distance field is hard-coded to a landscape
+rectangle, `ext = vec2(0.74, 0.44)`, and a tower is portrait and can be ten
+times taller than it is wide. Stretched to that aspect, all three of the things
+that make the slab look solid stop working at once: the corner radius smears
+into a lozenge, the offset that gives the card its visible thickness is squeezed
+to a hairline, and the bevel — a fixed distance in from a border that is now far
+away — flattens the whole face to one flat colour. What arrived on screen was a
+hundred and eighteen flat rounded rectangles: stickers scattered on a dark
+ground.
+
+So the city now has its own solid, a **round column**, built the same way the
+other two are:
+
+| | |
+|---|---|
+| the **barrel** | a cylinder seen from the side. The horizontal position across the quad *is* the normal's x, and z follows from x² + z² = 1 — the same recovery the sphere does. One line, and the left takes the key while the right falls away |
+| the **roof** | an ellipse across the top, lit as an up-facing surface. It is the brightest face on the building, so the skyline reads as a row of lit roofs — and it is what says "standing up" rather than "painted on the floor" |
+| the **foot** | darkened over the last of the height. A building meets the ground in shadow; without it a tower hovers |
+| the **rim** | a cool edge where the column turns away, so towers separate where they overlap. The spheres use the same trick and the city needs it more |
+
+Still one quad per tower: 118 towers, 118 quads, no new geometry and no second
+draw call.
+
+**And the haze was turned down for it.** The far end of the scene fades toward
+the page, which is right for the timeline — a corridor two decades deep, where
+fading *is* the depth cue — and much too strong for a disc thirteen units across
+seen from one side. The same curve was dimming the whole far half of the city to
+a third, which was most of the remaining washed-out look. The city gets its own,
+gentler fade: enough to separate front from back, no more.
+
+*A trap worth knowing about if you add a fourth solid.* The sphere test used to
+be `uRound > 0.5`, which was correct while 0 and 1 were the only values. A third
+solid at 2.0 satisfies it, so the city rendered as a field of spheres until the
+test became a range. The other trap in that file is that the whole shader is a
+JavaScript template literal — **a backtick in a GLSL comment ends the string**,
+and it surfaces as `SyntaxError: Unexpected identifier` with the explorer
+quietly absent from the page rather than as anything resembling a shader error.
 
 **The towers are short against the plan.** The stage is a letterbox, about
 3.4:1, and a tilted disc projects to very nearly that — so the plan fits the

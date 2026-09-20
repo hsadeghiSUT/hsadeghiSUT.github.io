@@ -843,17 +843,46 @@ export async function mountCopyright(host, canvas) {
      step with the first. */
   let halfTurn = 0;
 
+  /**
+   * Is the mark on screen RIGHT NOW, measured rather than remembered?
+   *
+   * `onScreen` below is a cache of the last thing the IntersectionObserver
+   * said, and an observer only speaks when the intersection CHANGES. Between
+   * the change and the callback the cache is stale, and during a page load —
+   * when the content lands and shoves the footer twenty thousand pixels down —
+   * that gap was measured at about 360ms. Anything that calls `start()` inside
+   * that gap starts the loop on a fact that stopped being true.
+   *
+   * This is the same question asked of the layout instead of the cache. It is
+   * free: `step()` already needs this rectangle to project the sword's point.
+   */
+  function markIsVisible(rect) {
+    return rect.bottom > 0 && rect.top < window.innerHeight
+        && rect.right > 0 && rect.left < window.innerWidth;
+  }
+
   function step(dt) {
+    /* Where the point ended up, in page coordinates. Projected every frame
+       because the rig is turning and the page may be scrolling: the bead has to
+       hang off the point, not off where the point was when it started. */
+    const rect = canvas.getBoundingClientRect();
+
+    /* THE GUARD, and the reason there is one here as well as on `start()`.
+       Every previous fix to this bug added another rule about WHEN the loop
+       may begin — the observer, then `visibilitychange`, then `hs:page-ready`.
+       Each was correct and each was bypassed by the next way of arriving with
+       a stale answer, because they all trust a flag set at some earlier
+       moment. This one trusts nothing: on every single frame it looks at where
+       the sword actually is, and if the sword is not on the screen then the
+       blood it sheds has no business being on the screen either.
+       README §16c.1. */
+    if (!markIsVisible(rect)) { stop(); return; }
+
     clock += dt;
 
     const turn = (clock / TURN_SECONDS) * Math.PI * 2;
     rig.rotation.y = turn;
     renderer.render(scene, camera);
-
-    /* Where the point ended up, in page coordinates. Projected every frame
-       because the rig is turning and the page may be scrolling: the bead has to
-       hang off the point, not off where the point was when it started. */
-    const rect = canvas.getBoundingClientRect();
     tipWorld.copy(tipLocal).applyEuler(rig.rotation).project(camera);
     const tipX = rect.left + (tipWorld.x * 0.5 + 0.5) * rect.width;
     const tipY = rect.top + (-tipWorld.y * 0.5 + 0.5) * rect.height - layer.top;
@@ -984,11 +1013,23 @@ export async function mountCopyright(host, canvas) {
    */
   let settled = document.documentElement.dataset.pageReady === 'yes';
   if (!settled) {
-    document.addEventListener('hs:page-ready', () => { settled = true; start(); }, { once: true });
+    document.addEventListener('hs:page-ready', () => {
+      settled = true;
+      /* Re-measure instead of trusting `onScreen`. This handler fires at the
+         precise moment the content has just landed and pushed the footer off
+         the bottom of the page, which is the moment the observer's answer is
+         most likely to still be the one from before that happened. */
+      onScreen = markIsVisible(canvas.getBoundingClientRect());
+      start();
+    }, { once: true });
   }
 
   function start() {
     if (running || document.hidden || reduced.matches || !onScreen || !settled) return;
+    /* Last word before the loop begins: the flags all said yes, so check that
+       the layout agrees. `step()` re-checks this every frame; this only avoids
+       starting, painting one frame and stopping again. */
+    if (!markIsVisible(canvas.getBoundingClientRect())) { onScreen = false; return; }
     running = true;
     last = 0;
     layer.canvas.dataset.live = 'yes';
@@ -1029,7 +1070,14 @@ export async function mountCopyright(host, canvas) {
        below the fold. The margin is off, so "the mark is visible" and "the dew
        may run" are the same statement. */
     new IntersectionObserver((entries) => {
-      onScreen = entries.some((e) => e.isIntersecting);
+      /* The LAST entry, not `entries.some(...)`. A callback can carry several
+         records for the same target — the observer queues them and delivers
+         the batch on one frame — and only the last describes the state now.
+         `some()` answered "was it ever visible during this batch", so a batch
+         of [visible, gone] latched `onScreen` to true and the dew kept running
+         with the sword long gone. Layout during a page load produces exactly
+         those batches. */
+      onScreen = entries[entries.length - 1].isIntersecting;
       if (onScreen) start();
       else stop();
     }).observe(canvas);

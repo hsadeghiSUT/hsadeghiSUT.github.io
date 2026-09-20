@@ -14,10 +14,17 @@
  *
  * Two programs and no more:
  *
- *   QUAD   every node and every card. A node is a billboarded square shaded as
- *          a SPHERE; a timeline card is a billboarded rectangle with rounded
- *          corners. One program, one uniform (`uRound`) to say which — because
- *          two nearly identical shaders would drift apart.
+ *   QUAD   every node, card and tower. THREE solids, one program, one uniform
+ *          (`uRound`) to say which — because three nearly identical shaders
+ *          would drift apart:
+ *
+ *            0  SLAB    a timeline card: a landscape rectangle with rounded
+ *                       corners and a visible thickness
+ *            1  SPHERE  a graph node
+ *            2  TOWER   an Influence-city column, with a lit elliptical roof
+ *
+ *          The city used to borrow the slab and it was the wrong solid for it
+ *          — see the tower branch below, and README §15.8.
  *
  *          The spheres are impostors: the quad still has four corners, and the
  *          fragment shader reconstructs a hemisphere's surface normal from the
@@ -80,7 +87,13 @@ varying vec3  vColor;
 varying float vState;
 varying float vDepth;
 
-uniform float uRound;     // 1 = sphere (graph nodes) · 0 = slab (timeline cards)
+uniform float uRound;     // 0 = slab (cards) · 1 = sphere (graph) · 2 = tower (city)
+/* The sphere test is a RANGE, not "> 0.5". It was "> 0.5" while there were
+   only two solids, and adding a third at 2.0 made that test swallow it --
+   the city would have rendered as a field of spheres.
+   NOTE: no backticks anywhere below this line. This whole shader is a JS
+   template literal, and a backtick in a comment ends it -- which showed up
+   as "SyntaxError: Unexpected identifier" and the explorer silently gone. */
 uniform vec3  uLit;       // colour a lit item is pushed toward
 uniform float uOpacity;   // overall strength, from the theme
 
@@ -105,7 +118,7 @@ void main() {
   float mask;
   vec3 shade = vec3(1.0);
 
-  if (uRound > 0.5) {
+  if (uRound > 0.5 && uRound < 1.5) {
     /* ---- sphere impostor --------------------------------------------------
        The quad's own coordinates are the sphere's x and y; z follows from
        x² + y² + z² = 1, which is the front hemisphere. Lighting that normal
@@ -131,6 +144,82 @@ void main() {
     float rim = pow(1.0 - normal.z, 2.4) * 0.35;
 
     shade = vec3(wrapped * 0.92 + rim) + vec3(spec * 0.9);
+  } else if (uRound > 1.5) {
+    /* ---- tower impostor ---------------------------------------------------
+       WHY THIS EXISTS. The city used to be drawn by the slab branch below, and
+       the slab is a CARD: its distance field is hard-coded to
+       ext = vec2(0.74, 0.44), a landscape rectangle. A tower is portrait and
+       can be ten times taller than it is wide, so that shape arrived stretched
+       — the corner radius smeared into a lozenge, the offset that gives a card
+       its visible thickness squeezed to a hairline, and the bevel, which is a
+       fixed distance in from a border that is now far away, flattening the
+       face into one flat colour. A hundred and eighteen of those on a dark
+       ground read as scattered stickers rather than buildings, which is
+       exactly how it was reported.
+
+       So a tower gets its own solid, reconstructed inside the quad the way the
+       other two are: a round column, lit by the same key as everything else.
+
+         - the BARREL is a cylinder seen from the side. The horizontal position
+           across the quad IS the surface normal's x, and z follows from
+           x2 + z2 = 1 — the same recovery the sphere above does. That one line
+           is what turns a flat fill into something round: the left takes the
+           key, the right falls away, and both edges darken into the background
+           so neighbouring towers separate where they overlap.
+
+         - the ROOF is an ellipse across the top, squashed to suggest the
+           camera's pitch. It is the part that says "a solid standing up"
+           rather than "a shape painted on the floor", and it is lit as an
+           up-facing surface — the brightest thing on the building — so the
+           skyline reads as a row of lit roofs.
+
+         - the FOOT darkens over the last of the height, because a building
+           meets the ground in shadow and without it a tower hovers.
+
+       One quad, no extra geometry: 118 towers still cost 118 quads. */
+    vec2 p = vCorner * 2.0;          // x across the width, y along the height
+
+    float capH = 0.17;               // how deep the roof ellipse sits
+    float bodyTop = 1.0 - capH;
+
+    // The roof ellipse, centred on the top of the barrel.
+    float ry = (p.y - bodyTop) / capH;
+    float capMask = 1.0 - (p.x * p.x + ry * ry);
+    bool onCap = p.y > bodyTop && capMask > 0.0;
+
+    // Below the roof line the silhouette is the column's full width; above it,
+    // only what falls inside the ellipse belongs to the tower.
+    float inside = p.y <= bodyTop ? 1.0 : max(capMask, 0.0);
+    mask = smoothstep(0.0, 0.06, inside) * smoothstep(1.0, 0.93, abs(p.x));
+    if (mask <= 0.003) discard;
+
+    vec3 keyDir = normalize(vec3(-0.42, 0.62, 0.66));
+    vec3 normal;
+    float tone;
+
+    if (onCap) {
+      // The roof: mostly up, tipped toward the viewer.
+      normal = normalize(vec3(p.x * 0.45, 0.82, 0.55));
+      tone = 1.18;
+    } else {
+      // The barrel: a cylinder, so z comes from x as it does on a sphere.
+      normal = vec3(p.x, 0.0, sqrt(max(0.0, 1.0 - p.x * p.x)));
+      tone = 1.0;
+    }
+
+    float key = max(dot(normal, keyDir), 0.0);
+    float wrapped = key * 0.70 + 0.34;
+    float spec = pow(max(dot(reflect(-keyDir, normal), vec3(0.0, 0.0, 1.0)), 0.0), 26.0)
+               * (onCap ? 0.30 : 0.55);
+    // A cool edge where the column turns away, so towers separate when they
+    // overlap. The spheres use the same trick; the city needs it more.
+    float rim = pow(1.0 - normal.z, 2.2) * 0.30;
+
+    // Contact shading at the foot, and a seam of light along the roof line.
+    float foot = smoothstep(-1.0, -0.62, p.y) * 0.34 + 0.66;
+    float lip = onCap ? 1.0 : (1.0 + smoothstep(bodyTop - 0.06, bodyTop, p.y) * 0.24);
+
+    shade = vec3((wrapped * tone + rim) * foot * lip) + vec3(spec);
   } else {
     /* ---- slab impostor ----------------------------------------------------
        A timeline card used to be a rounded rectangle filled with one flat
@@ -204,6 +293,13 @@ void main() {
      same fade there would just dim one side of it for no reason. */
   if (uRound < 0.5) {
     alpha *= mix(1.0, 0.3, clamp((vDepth - 15.0) / 30.0, 0.0, 1.0));
+  } else if (uRound > 1.5) {
+    /* The city gets the same idea at a fraction of the strength. The timeline
+       is a corridor two decades deep, where fading IS the depth cue; the city
+       is a disc thirteen units across seen from one side, so the timeline's
+       curve dimmed its whole far half to a third and was much of why the
+       towers looked washed out. Enough to separate front from back, no more. */
+    alpha *= mix(1.0, 0.74, clamp((vDepth - 12.0) / 16.0, 0.0, 1.0));
   }
 
   // Premultiplied — see the note in gl.js.

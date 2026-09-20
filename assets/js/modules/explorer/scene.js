@@ -855,9 +855,16 @@ export function buildInfluenceScene(graph, ground, palette, edgeColour) {
 
   return {
     kind: 'influence',
-    // Slabs, not spheres: a tower has a flat face and an edge that catches the
-    // light, and the shader draws exactly that when uRound is 0.
-    round: 0,
+    /* The tower impostor, which is this view's own: a lit round column with a
+       roof on it (`uRound > 1.5` in shaders.js).
+
+       It used to share the timeline's slab, on the reasoning that a tower has
+       a flat face and an edge that catches the light. The reasoning was right
+       and the slab was the wrong solid to get it from: that distance field is
+       a fixed landscape rectangle, so a portrait tower arrived as a stretched
+       lozenge with its bevel and its thickness squashed out of it, and a plan
+       full of them read as stickers rather than as buildings. */
+    round: 2,
     /* Louder at rest than the graph's 0.055. There are fewer lines here — 213
        rather than 345, because the ones that merely said "with the site owner"
        went with him — and they lie in a plane instead of filling a ball, so they

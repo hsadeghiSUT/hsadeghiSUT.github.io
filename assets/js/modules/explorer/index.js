@@ -940,17 +940,24 @@ export async function mountExplorer(
          it. Same data, and the order is the difference between answering the
          question and burying it. */
       const impact = scene.kind === 'impact';
-      /* "not yet cited" is said on the skyline and nowhere else. There the
-         reader is pointing at a block four pixels tall and the sentence is the
-         answer to why — without it the base course of every column is a mystery.
-         On the timeline it would be appended to sixty-six of a hundred and
-         forty-eight entries, which is not information, and the graph already
-         leaves a zero unsaid for the same reason. */
+      /* A zero is left unsaid everywhere, the skyline included.
+         The skyline used to append "not yet cited" on the argument that the
+         reader is pointing at a block four pixels tall and deserves to know
+         why. But the height already says it, and spelling it out turns a
+         neutral absence into a verdict delivered under the paper's own title —
+         which is the same reason the graph and the timeline have always left a
+         zero unsaid. The year and the title still answer "what am I pointing
+         at", which is what the readout is for. */
       const cites = paper.citedBy
         ? count(paper.citedBy) + (paper.citedBy === 1 ? ' citation' : ' citations')
-        : (impact && cited ? 'not yet cited' : '');
+        : '';
+      /* The count leads on the skyline and trails on the timeline — on the
+         skyline it is what the cursor is actually on, so it goes first. Both
+         branches now have to cope with it being absent, hence the separator
+         travelling WITH the count rather than sitting between the two: an
+         empty count must not leave a leading or a doubled "·". */
       readout.textContent = impact
-        ? cites + ' · ' + paper.year + ' · ' + paper.title
+        ? (cites ? cites + ' · ' : '') + paper.year + ' · ' + paper.title
         : paper.year + ' · ' + paper.sectionTitle + ' · ' + paper.title +
           (cites ? ' · ' + cites : '');
     }
