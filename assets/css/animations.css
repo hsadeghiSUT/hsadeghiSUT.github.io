@@ -1,0 +1,113 @@
+/* --------------------------------------------------------------------------
+   Hamed Sadeghi — personal academic website
+   Design, code and content copyright (c) 2026 Hamed Sadeghi. All rights reserved.
+   Original: http://sharif.edu/~hsadeghi/
+
+   Not licensed for reuse, redistribution or derivative works without written
+   permission. Reading this file is expected — it was sent to your browser so it
+   could be used. Republishing it is not.
+
+   build-id: hs-geotech-2026-6f3ad1
+   -------------------------------------------------------------------------- */
+/* =============================================================================
+   animations.css — icon motion
+   -----------------------------------------------------------------------------
+   The original site pulled in the whole font-awesome-animation library (13
+   effects, ~1,900 lines with vendor prefixes) and then used jQuery to add and
+   remove classes on hover.  Only seven effects were ever used, and hover is
+   something CSS does natively — so this file replaces both the library and the
+   ~200 lines of jQuery `hover()` handlers in the old script.js.
+
+   Two ways to use each effect:
+     .anim-pulse              → runs continuously
+     .hov-pulse               → runs only while the element (or its row) is hovered
+
+   `.hov-*` also fires when an ancestor marked `.hov-parent` is hovered, which is
+   how a whole sidebar link animates its icon.
+   ========================================================================== */
+
+@keyframes fa-pulse-scale {
+  0%   { transform: scale(1.1); }
+  50%  { transform: scale(0.8); }
+  100% { transform: scale(1.1); }
+}
+
+@keyframes fa-tada {
+  0%   { transform: scale(1); }
+  10%, 20% { transform: scale(0.9) rotate(-3deg); }
+  30%, 50%, 70% { transform: scale(1.1) rotate(3deg); }
+  40%, 60% { transform: scale(1.1) rotate(-3deg); }
+  80%  { transform: scale(0.9) rotate(0); }
+  100% { transform: scale(1) rotate(0); }
+}
+
+@keyframes fa-passing {
+  0%   { transform: translateX(-50%); opacity: 0; }
+  50%  { transform: translateX(0);    opacity: 1; }
+  100% { transform: translateX(50%);  opacity: 0; }
+}
+
+@keyframes fa-flash {
+  0%, 100%, 50% { opacity: 1; }
+  25%, 75%      { opacity: 0; }
+}
+
+@keyframes fa-ring {
+  0%   { transform: rotate(-15deg); }
+  2%   { transform: rotate(15deg); }
+  4%, 12% { transform: rotate(-18deg); }
+  6%, 14% { transform: rotate(18deg); }
+  8%   { transform: rotate(-22deg); }
+  10%  { transform: rotate(22deg); }
+  16%  { transform: rotate(-12deg); }
+  18%  { transform: rotate(12deg); }
+  20%, 100% { transform: rotate(0deg); }
+}
+
+@keyframes fa-horizontal {
+  0%   { transform: translateX(0); }
+  6%   { transform: translateX(5px); }
+  12%, 20%, 28% { transform: translateX(0); }
+  16%, 24% { transform: translateX(5px); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes fa-burst {
+  0%   { opacity: 0.6; }
+  50%  { transform: scale(1.8); opacity: 0; }
+  100% { opacity: 0; }
+}
+
+@keyframes fa-spin { to { transform: rotate(360deg); } }
+
+/* -----------------------------------------------------------------------------
+   Continuous variants
+   -------------------------------------------------------------------------- */
+.anim-pulse      { animation: fa-pulse-scale 2s linear infinite; }
+.anim-tada       { animation: fa-tada 2s linear infinite; }
+.anim-passing    { animation: fa-passing 3s linear infinite; }
+.anim-flash      { animation: fa-flash 2s linear infinite; }
+.anim-ring       { animation: fa-ring 2s ease infinite; }
+.anim-horizontal { animation: fa-horizontal 2s ease infinite; }
+.anim-burst      { animation: fa-burst 3s linear infinite; }
+.anim-spin       { animation: fa-spin 2s linear infinite; transform-origin: center; }
+.anim-spin-step  { animation: fa-spin 1s steps(8) infinite; transform-origin: center; }
+
+/* -----------------------------------------------------------------------------
+   Hover variants — the CSS replacement for the old jQuery `.hover()` toggles
+   -------------------------------------------------------------------------- */
+.hov-pulse:hover,      .hov-parent:hover .hov-pulse      { animation: fa-pulse-scale 2s linear infinite; }
+.hov-tada:hover,       .hov-parent:hover .hov-tada       { animation: fa-tada 2s linear infinite; }
+.hov-passing:hover,    .hov-parent:hover .hov-passing    { animation: fa-passing 3s linear infinite; }
+.hov-flash:hover,      .hov-parent:hover .hov-flash      { animation: fa-flash 2s linear infinite; }
+.hov-ring:hover,       .hov-parent:hover .hov-ring       { animation: fa-ring 2s ease infinite; }
+.hov-horizontal:hover, .hov-parent:hover .hov-horizontal { animation: fa-horizontal 2s ease infinite; }
+.hov-burst:hover,      .hov-parent:hover .hov-burst      { animation: fa-burst 3s linear infinite; }
+.hov-bounce:hover,     .hov-parent:hover .hov-bounce     { animation: fa-tada 1.5s linear infinite; }
+
+/* Every animated icon needs a box of its own to transform inside. */
+[class*="anim-"], [class*="hov-"] { display: inline-block; transform-origin: center; }
+
+@media (prefers-reduced-motion: reduce) {
+  [class*="anim-"], [class*="hov-"] { animation: none !important; }
+}

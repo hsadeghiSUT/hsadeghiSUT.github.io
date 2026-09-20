@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<!--
+  Hamed Sadeghi — personal academic website
+  Design, code and content copyright (c) 2026 Hamed Sadeghi. All rights reserved.
+  Original: https://hsadeghi.org/
+
+  Not licensed for reuse, redistribution or derivative works without written
+  permission.  build-id: hs-geotech-2026-6f3ad1
+-->
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+	<!-- Carried over from legacy_index.html: tells old IE to use its newest engine. -->
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<meta name="theme-color" content="#00CCFF">
+	<title>Projects &amp; Services &mdash; Hamed Sadeghi</title>
+	<meta name="description" content="Funded research projects, editorial and organising committee service of Dr. Hamed Sadeghi.">
+	<meta name="keywords" content="Dr., Hamed, Sadeghi, Hamed Sadeghi, Dr. Sadeghi, Dr. Hamed Sadeghi, دکتر , حامد , صادقی , حامد صادقی , دکتر صادقی , دکتر حامد صادقی , Sharif University of Technology, Civil Engineering , Civil Engineer , Department of Civil Engineering , Civil , Engineering , عمران , مهندسی عمران , شریف , مهندسی , دانشگاه صنعتی شریف , عمران شریف , مهندس , Personal Website">
+	<link rel="canonical" href="https://hsadeghi.org/services.html">
+
+	<!-- Sequential navigation, carried over from legacy_index.html, which
+	     declared <link rel="prev"> and <link rel="next"> pointing at its
+	     neighbours.  The old targets were WordPress pagination URLs that no
+	     longer exist; these point at the same pages in the same order the main
+	     navigation uses.  tools/check-trackers.mjs checks they stay. -->
+	<link rel="prev" title="Teaching" href="teaching.html">
+
+	<!-- Favicons -->
+	<link rel="icon" type="image/svg+xml" href="assets/img/favicons/HS.svg">
+	<link rel="alternate icon" href="assets/img/favicons/HS.png">
+	<link rel="mask-icon" href="assets/img/favicons/HS.svg" color="#000000">
+	<link rel="apple-touch-icon" href="assets/img/favicons/apple-touch-icon-iphone-60x60.png">
+	<link rel="apple-touch-icon" sizes="76x76" href="assets/img/favicons/apple-touch-icon-ipad-76x76.png">
+	<link rel="apple-touch-icon" sizes="120x120" href="assets/img/favicons/apple-touch-icon-iphone-retina-120x120.png">
+	<link rel="apple-touch-icon" sizes="152x152" href="assets/img/favicons/apple-touch-icon-ipad-retina-152x152.png">
+
+	<!-- Social preview -->
+	<meta property="og:title" content="Dr. Hamed Sadeghi — Projects & Services">
+	<meta property="og:type" content="website">
+	<meta property="og:url" content="https://hsadeghi.org/services.html">
+	<meta property="og:image" content="https://hsadeghi.org/assets/img/favicons/Hamed_Sadeghi.png">
+	<meta property="og:image:type" content="image/png">
+	<meta property="og:image:alt" content="Dr. Hamed Sadeghi">
+	<meta property="og:description" content="Funded research projects, editorial and organising committee service of Dr. Hamed Sadeghi.">
+	<meta property="og:site_name" content="Dr. Hamed Sadeghi's Personal Webpage">
+
+	<!-- Apply the saved colour scheme before the first paint.  This has to be
+	     inline and synchronous: anything external would load after the page has
+	     already painted, and a dark-mode visitor would see a white flash on every
+	     navigation.  Mirrors STORAGE_KEY in assets/js/modules/theme.js. -->
+	<script>
+		try {
+			var t = localStorage.getItem('hs-theme');
+			if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+		} catch (e) {}
+	</script>
+
+	<!-- Stylesheets.  All local — there is no `@import`, no CDN and no preconnect
+	     anywhere on this site.  Order matters: vendor/fonts.css declares the faces,
+	     theme.css supplies the palettes, and farsi.css is the Persian typography
+	     lock, which must stay last.  See README §7 and §9. -->
+	<link rel="stylesheet" href="assets/vendor/fonts.css">
+	<link rel="stylesheet" href="assets/css/base.css">
+	<link rel="stylesheet" href="assets/css/layout.css">
+	<link rel="stylesheet" href="assets/css/components.css">
+	<link rel="stylesheet" href="assets/css/animations.css">
+	<!-- The 3D layer: the field, the contextual highlight, page transitions and the
+	     sticky section bar.  Everything in it is an enhancement — see README §12. -->
+	<link rel="stylesheet" href="assets/css/fx.css">
+	<link rel="stylesheet" href="assets/css/theme.css">
+	<!-- Loaded last on purpose: it is the protective boundary around the Persian
+	     publication typography.  See the header of the file. -->
+	<link rel="stylesheet" href="assets/css/farsi.css">
+
+	<script type="module" src="assets/js/main.js"></script>
+
+	<!-- ==========================================================================
+	     ANALYTICS — four properties, one queue
+	     --------------------------------------------------------------------------
+	     This block MUST be byte-identical on every page.  `tools/check-trackers.mjs`
+	     fails the build if any property is missing or has drifted, so run it after
+	     editing any page head.  README §10 lists every property and how to add or
+	     remove one.
+
+	        UA-175901189-1   the original, ported verbatim from legacy_index.html
+	        G-2CEQVFDFL0     GA4
+	        G-PVGHBG4LVB     GA4
+	        G-HX1R37Y863     GA4
+
+	     ONE loader is enough for a property, but each property needs its own
+	     `gtag('config', …)`.  The four `config` calls share the single
+	     `dataLayer` and the single `gtag()` defined above — which is why the
+	     boilerplate Google gives you for each property (`dataLayer = …`,
+	     `function gtag…`, `gtag('js', …)`) is NOT repeated here.  Pasting it
+	     once per property would redefine the queue and the shim three times
+	     over, and every repeat of `gtag('js', new Date())` would push another
+	     duplicate timestamp into every session.
+
+	     This is the ONE external host the site talks to.  Every loader is `async`
+	     and non-blocking: with no network the scripts simply never arrive, the
+	     `gtag()` calls queue harmlessly into `dataLayer`, and every other part of
+	     the page renders exactly the same.  See README §9.
+	     ========================================================================== -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=UA-175901189-1"></script>
+	<script>
+		window.dataLayer = window.dataLayer || [];
+		function gtag() { dataLayer.push(arguments); }
+		gtag('js', new Date());
+		gtag('config', 'UA-175901189-1');
+		gtag('config', 'G-2CEQVFDFL0');
+		gtag('config', 'G-PVGHBG4LVB');
+		gtag('config', 'G-HX1R37Y863');
+	</script>
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-2CEQVFDFL0"></script>
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-PVGHBG4LVB"></script>
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-HX1R37Y863"></script>
+</head>
+
+<body data-page="services">
+	<a class="skip-link" href="#main">Skip to content</a>
+	<span id="top"></span>
+
+	<!-- ================= Site header ===============================
+	     The 2026 redesign moves the name into the header itself, so the bar
+	     carries brand, navigation and the theme switch in one row. -->
+	<header class="topbar">
+		<div class="topbar__inner">
+			<!-- Brand: mark, name and the Persian name.  Built by chrome.js. -->
+			<div id="brand"></div>
+
+			<nav class="mainnav" aria-label="Main">
+				<button id="nav-toggle" class="nav-toggle" type="button"
+					aria-expanded="false" aria-controls="nav-list" aria-label="Menu">
+					<span class="nav-toggle__bars" aria-hidden="true"><span></span></span>
+				</button>
+				<!-- Populated from data/site.json by assets/js/modules/chrome.js -->
+				<ul id="nav-list" class="mainnav__list" hidden></ul>
+			</nav>
+
+			<div class="topbar__end">
+				<!-- The university mark: an ordinary linked image until
+				     assets/js/modules/logo3d/ replaces it with the extruded,
+				     turning version.  The <img> is the content; the 3D is the
+				     enhancement, which is why it is here in the markup. -->
+				<div id="brandmark"></div>
+				<!-- Light / Auto / Dark switch, built by assets/js/modules/theme.js -->
+				<div id="theme-toggle"></div>
+			</div>
+		</div>
+	</header>
+
+	<div class="shell">
+
+		<header class="page-header">
+			<p class="page-header__kicker">Contribution</p>
+			<h1 class="page-header__title">Projects &amp; Services</h1>
+		</header>
+
+		<div class="layout">
+			<main id="main">
+				<article class="post">
+					<div id="content" class="entry">
+						<p class="state">Loading&hellip;</p>
+					</div>
+				</article>
+			</main>
+
+			<!-- Sidebar: built by the page module from the same data as the article. -->
+			<aside id="aside" class="aside"></aside>
+		</div>
+	</div>
+
+	<!-- Name variants kept for search engines, hidden from sighted users. -->
+	<div id="seo-aliases" class="visually-hidden" aria-hidden="true"></div>
+
+	<footer class="footer">
+		<div id="site-footer" class="footer__inner"></div>
+	</footer>
+</body>
+
+</html>

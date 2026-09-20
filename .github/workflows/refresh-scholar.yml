@@ -1,0 +1,129 @@
+# ---------------------------------------------------------------------------
+# refresh-scholar.yml — keep data/scholar.json current, without anyone running
+# anything.
+#
+# WHY THIS EXISTS
+# ---------------
+# The citation figures on this site come from `data/scholar.json`, a file in
+# this repository, not from a call to Google made by the visitor's browser.
+# README §18 is the whole argument; the short version is that Scholar sends no
+# CORS header, has no API, and is blocked in one of the two countries this site
+# is read in — so a live call would be impossible, would break the site's
+# one-external-host rule, and would fail exactly the readers it was meant to
+# serve.
+#
+# That leaves one question: who runs `node tools/fetch-scholar.mjs`, and how
+# often. The answer used to be "a person, when they remember". This is that
+# person, twice a day, on a machine that is already awake.
+#
+# WHAT IT DOES NOT DO
+# -------------------
+# It never fails loudly and it never writes a number it is unsure of. Scholar
+# answers a datacentre IP with a captcha fairly often; when it does,
+# `fetch-scholar.mjs` exits non-zero having changed nothing, this job records a
+# notice and finishes green. The failure mode stays what it always was — "the
+# numbers are a day old" — and never becomes "the numbers are wrong", "the
+# numbers vanished", or "there is a red cross on the repository again".
+#
+# That is also why it runs twice: two attempts twelve hours apart from
+# different pools of runner addresses turn a captcha into a delay rather than a
+# missed day.
+#
+# WHAT HAPPENS AFTER IT COMMITS
+# -----------------------------
+# With Pages set to "Deploy from a branch", a push to `main` rebuilds the site,
+# so the new figures are live within a minute or two. If you ever find that the
+# push lands but Pages does not rebuild, that is the known GITHUB_TOKEN
+# restriction — see README §18.2 for the two-line fix (a deploy key or a PAT).
+#
+# The sharif.edu mirror is a separate machine that nothing here can reach.
+# `tools/refresh-scholar.ps1` is the other half of this, for that copy.
+# ---------------------------------------------------------------------------
+name: Refresh the Google Scholar snapshot
+
+on:
+  schedule:
+    # Twice a day, at minutes that are not on the hour. Cron on GitHub is
+    # best-effort and the on-the-hour slots are the congested ones.
+    - cron: '17 3 * * *'
+    - cron: '43 15 * * *'
+  # So you can also press the button: Actions → this workflow → Run workflow.
+  workflow_dispatch:
+
+permissions:
+  # The one permission it needs: to push the changed data file back.
+  contents: write
+
+concurrency:
+  # Two runs writing the same file would be a merge conflict waiting to happen.
+  group: refresh-scholar
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the site
+        uses: actions/checkout@v4
+        with:
+          # Full history, not the default shallow clone: the commit step ends in
+          # `git pull --rebase`, and rebasing inside a depth-1 clone is a corner
+          # this job has no reason to stand in.
+          fetch-depth: 0
+
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Ask Google Scholar
+        id: fetch
+        run: |
+          # `if …; then` and not a bare call: a captcha is an ordinary outcome
+          # here, not a broken build. The tool has already left data/scholar.json
+          # untouched by the time it exits non-zero.
+          if node tools/fetch-scholar.mjs; then
+            echo "answered=yes" >> "$GITHUB_OUTPUT"
+          else
+            echo "answered=no" >> "$GITHUB_OUTPUT"
+            echo "::notice title=Scholar did not answer cleanly::The profile was not readable this run - a captcha, a consent page or a timeout. data/scholar.json was left exactly as it was, so the site keeps showing the figures it already had. The next scheduled run tries again."
+          fi
+
+      - name: Check what was written
+        if: steps.fetch.outputs.answered == 'yes'
+        # The same guard a person would run by hand: the file parses, the
+        # figures are figures, the snapshot is inside its age limit, and the
+        # title normaliser still agrees with the browser's copy. A fetch that
+        # wrote something this cannot vouch for must not be committed.
+        run: node tools/check-scholar.mjs
+
+      - name: Commit, if the numbers moved
+        if: steps.fetch.outputs.answered == 'yes'
+        run: |
+          if git diff --quiet -- data/scholar.json; then
+            echo "::notice title=No change::Scholar answered, and the figures are the same as yesterday's. Nothing committed."
+            exit 0
+          fi
+
+          # The figures go in the commit subject, so `git log --oneline` on this
+          # file reads as the citation history of the profile.
+          SUMMARY=$(node -e '
+            const d = require("./data/scholar.json");
+            const m = d.metrics || {};
+            process.stdout.write(
+              `${m.citations} citations, h ${m.hIndex}, i10 ${m.i10Index}` +
+              ` (${(d.papers || []).length} cited papers)`
+            );
+          ')
+
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/scholar.json
+          git commit -m "Scholar: ${SUMMARY}" -m "Refreshed by .github/workflows/refresh-scholar.yml. See README §18."
+
+          # Rebase rather than merge: this job owns one file, and a merge commit
+          # for a one-line data change is noise in a history a person reads.
+          git pull --rebase --autostash origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+
+          echo "::notice title=Updated::${SUMMARY}"

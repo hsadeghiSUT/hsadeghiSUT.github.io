@@ -1,0 +1,43 @@
+# --------------------------------------------------------------------------
+# Line endings.
+#
+# The site is edited on Windows and served from Linux, and without this Git
+# warns on every one of the ~140 text files in the repository and can show a
+# whole clean checkout as modified on the other machine.
+#
+# `text=auto` stores LF in the repository and checks out whatever the platform
+# uses. Nothing the browser reads cares either way.
+# --------------------------------------------------------------------------
+* text=auto
+
+# --------------------------------------------------------------------------
+# The exceptions, and why.
+#
+# legacy_index.html is the original site's home page, kept as the REFERENCE
+# for what the old site emitted, and README §10 states it is byte-for-byte
+# unmodified and verified by checksum. Normalising its line endings would
+# quietly break that guarantee, so it is stored exactly as supplied.
+# --------------------------------------------------------------------------
+legacy_index.html -text
+
+# Binary assets: never normalise, never diff as text.
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.JPG  binary
+*.gif  binary
+*.ico  binary
+*.woff binary
+*.woff2 binary
+*.ttf  binary
+*.otf  binary
+*.rar  binary
+*.zip  binary
+*.pdf  binary
+
+# Vendored Three.js: not this project's source, and a diff of it helps nobody.
+assets/vendor/three/** linguist-vendored
+
+# So GitHub's language stats describe the site rather than the library.
+legacy/** linguist-vendored
+legacy_index.html linguist-vendored

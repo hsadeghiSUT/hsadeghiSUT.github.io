@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<!--
+  preview-icons3d.html — every 3D icon, on one page, at a size you can see.
+
+  A workbench, not part of the site. `tools/` is excluded from the shipped
+  build (see the SKIP list in tools/check-offline.mjs), so this never ships and
+  never has to obey the site's rules about weight or external requests.
+
+  WHY IT EXISTS
+  -------------
+  The models are drawn at fourteen to twenty-two pixels on the real pages,
+  which is the correct size and a hopeless size to judge a model at. This draws
+  all of them at whatever size you choose, in both themes, with their names
+  underneath — so a wrong scale, a part left inside another part, a material
+  that vanishes on dark, or a motion that reads as a twitch is visible in one
+  look instead of being found by accident six pages later.
+
+  USAGE
+      python tools/serve.py            (or any static server at the site root)
+      open  http://localhost:8000/tools/preview-icons3d.html
+
+  It must be served over http, not opened from the disk: it loads ES modules.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3D icons — preview</title>
+<link rel="stylesheet" href="../assets/css/base.css">
+<!-- components.css carries the three rules in §5c that hide the flat glyph
+     behind an upgraded icon. Without it every cell shows the 2D sprite as well
+     as the model, which looks exactly like half the models having failed. -->
+<link rel="stylesheet" href="../assets/css/components.css">
+<link rel="stylesheet" href="../assets/css/theme.css">
+<style>
+  body { margin: 0; padding: 1.5rem; font-family: system-ui, sans-serif; }
+  .bar {
+    position: sticky; top: 0; z-index: 2; display: flex; gap: 1rem; align-items: center;
+    flex-wrap: wrap; padding: .75rem 0 1rem; background: var(--c-bg);
+    border-bottom: 1px solid var(--c-border); margin-bottom: 1.25rem;
+  }
+  .bar label { display: flex; gap: .4rem; align-items: center; font-size: .85rem; }
+  .grid {
+    display: grid; gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
+  }
+  .cell {
+    display: grid; justify-items: center; gap: .5rem; padding: .9rem .4rem;
+    border: 1px solid var(--c-border); border-radius: .75rem;
+    background: var(--c-surface); text-align: center;
+  }
+  .cell code { font-size: .68rem; color: var(--c-ink-faint); word-break: break-all; }
+  .icon { display: inline-block; fill: currentColor; color: var(--c-accent); flex: none; }
+  .miss { color: var(--c-danger); font-size: .7rem; }
+  h1 { font-size: 1.1rem; margin: 0 0 .25rem; }
+  p.note { margin: 0 0 1rem; font-size: .8rem; color: var(--c-ink-faint); max-width: 60ch; }
+</style>
+</head>
+<body>
+
+<h1>3D icons — every model in the registry</h1>
+<p class="note">
+  Hover a cell to see what that icon does under the pointer. Red text means the
+  sprite carries an id that <code>registry.js</code> has no model for, or the
+  other way round — both are a gap worth closing.
+</p>
+
+<div class="bar">
+  <label>size <input id="size" type="range" min="16" max="200" value="96"></label>
+  <span id="sizeOut">96px</span>
+  <label>colour <input id="colour" type="color" value="#00ccff"></label>
+  <label><input id="dark" type="checkbox"> dark</label>
+  <span id="count"></span>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<script type="module">
+  import { REGISTRY } from '../assets/js/modules/icons3d/registry.js';
+  import { initIcons3d, SCOPE, LIMITS } from '../assets/js/modules/icons3d/index.js';
+
+  const grid = document.getElementById('grid');
+  const size = document.getElementById('size');
+  const sizeOut = document.getElementById('sizeOut');
+  const colour = document.getElementById('colour');
+  const dark = document.getElementById('dark');
+  const SVG = 'http://www.w3.org/2000/svg';
+
+  /* Which ids the sprite actually carries, so the two lists can be compared. */
+  const sprite = await fetch('../assets/icons/icons.svg')
+    .then((r) => r.text())
+    .then((t) => [...t.matchAll(/id="([^"]+)"/g)].map((m) => m[1]))
+    .catch(() => []);
+
+  const ids = [...new Set([...Object.keys(REGISTRY), ...sprite])].sort();
+  document.getElementById('count').textContent =
+    `${Object.keys(REGISTRY).length} models · ${sprite.length} sprite symbols`;
+
+  for (const id of ids) {
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+
+    const svg = document.createElementNS(SVG, 'svg');
+    svg.setAttribute('class', 'icon preview');
+    const use = document.createElementNS(SVG, 'use');
+    use.setAttribute('href', `../assets/icons/icons.svg#${id}`);
+    svg.append(use);
+    cell.append(svg);
+
+    const name = document.createElement('code');
+    name.textContent = id;
+    cell.append(name);
+
+    if (!REGISTRY[id]) cell.append(note('no 3D model'));
+    else if (!sprite.includes(id)) cell.append(note('not in the sprite'));
+
+    grid.append(cell);
+  }
+
+  function note(text) {
+    const el = document.createElement('span');
+    el.className = 'miss';
+    el.textContent = text;
+    return el;
+  }
+
+  function apply() {
+    const px = `${size.value}px`;
+    sizeOut.textContent = px;
+    for (const svg of document.querySelectorAll('svg.preview')) {
+      svg.style.width = px;
+      svg.style.height = px;
+      svg.style.color = colour.value;
+    }
+    window.dispatchEvent(new Event('resize'));
+  }
+
+  size.addEventListener('input', apply);
+  colour.addEventListener('input', () => { apply(); reset(); });
+  dark.addEventListener('change', () => {
+    document.documentElement.setAttribute('data-theme', dark.checked ? 'dark' : 'light');
+  });
+
+  apply();
+
+  /* The preview grid is not in the site's scope list, so it is added to it
+     here rather than the list being widened for a page that never ships. */
+  SCOPE.length = 0;
+  SCOPE.push('svg.preview');
+  /* The site's ceiling is about thirty icons on its busiest page; this draws
+     every model there is, which is more than twice that. */
+  LIMITS.maxLive = 300;
+
+  let layer = await initIcons3d();
+
+  async function reset() {
+    if (layer) layer.dispose();
+    layer = await initIcons3d();
+  }
+</script>
+</body>
+</html>

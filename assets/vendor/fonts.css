@@ -1,0 +1,100 @@
+/* =============================================================================
+   vendor/fonts.css — every @font-face on the site, in one place
+   -----------------------------------------------------------------------------
+   THE SITE MAKES NO EXTERNAL REQUESTS. This file is why.
+
+   The previous version pulled Inter and Source Serif 4 from Google Fonts with
+   an `@import`, plus two `<link rel="preconnect">` hints in every page head.
+   All three are gone. Every face the site uses now lives beside this file in
+   `assets/vendor/fonts/`, and the site renders identically with the network
+   unplugged.
+
+   ── What is here and why ────────────────────────────────────────────────────
+
+   | Family  | Role                      | Licence  | Source                    |
+   |---------|---------------------------|----------|---------------------------|
+   | Caladea | headings, hero, drop cap  | OFL 1.1  | huertatipografica/Caladea |
+   | Carlito | body copy, UI, navigation | OFL 1.1  | googlefonts/carlito       |
+   | BZar    | Persian publications      | as-is    | shipped with the original |
+
+   Caladea and Carlito replace Source Serif 4 and Inter. They were chosen for
+   three reasons: both are SIL Open Font License 1.1, which explicitly permits
+   redistribution and web embedding (the licences travel with them in this
+   folder); both were designed as a pair; and both are already present on most
+   Linux distributions, so the browser often has them without downloading
+   anything at all.
+
+   BZar is unchanged and unmoved in substance — only its folder changed. It is
+   the Persian face and it is governed entirely by `assets/css/farsi.css`.
+   Nothing else may touch it.
+
+   ── Regenerating ────────────────────────────────────────────────────────────
+   The Latin files are Latin-only subsets built by `tools/build-fonts.py`, which
+   documents its own inputs and can be re-run to change coverage. The committed
+   output is what the site uses; you never need to run it just to deploy.
+
+   ── Why WOFF and not WOFF2 ──────────────────────────────────────────────────
+   WOFF2 needs the `brotli` Python module, which is not installable in this
+   restricted environment. WOFF is universally supported (IE9+, every modern
+   browser) and costs roughly 30% more bytes — about 40 KB across the four
+   faces, one time, then cached for the whole site. `tools/build-fonts.py`
+   emits WOFF2 instead if you run it somewhere `brotli` is available; add the
+   `.woff2` sources ahead of the `.woff` ones in each `src:` below.
+   ========================================================================== */
+
+/* -----------------------------------------------------------------------------
+   Caladea — the serif. Headings, the hero name, the biography drop cap.
+   -------------------------------------------------------------------------- */
+@font-face {
+  font-family: "Caladea";
+  src: url("fonts/caladea-400.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Declared as a 600–700 range rather than a flat 700. The design asks for
+   weight 600 in several places; Caladea has no 600 cut, and without this range
+   the browser would either snap to 400 or synthesise a fake bold. The range
+   maps every weight from 600 up onto the real Bold file. */
+@font-face {
+  font-family: "Caladea";
+  src: url("fonts/caladea-700.woff") format("woff");
+  font-weight: 600 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* -----------------------------------------------------------------------------
+   Carlito — the sans. Body copy, navigation, sidebar, buttons.
+   -------------------------------------------------------------------------- */
+@font-face {
+  font-family: "Carlito";
+  src: url("fonts/carlito-400.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Carlito";
+  src: url("fonts/carlito-700.woff") format("woff");
+  font-weight: 500 700;   /* 500, 600 and 700 all resolve to the real Bold */
+  font-style: normal;
+  font-display: swap;
+}
+
+/* -----------------------------------------------------------------------------
+   BZar — the Persian face.
+   Shipped whole rather than subset: it is the one face whose rendering must not
+   change, and subsetting is the kind of change that is invisible until it is
+   not. See assets/css/farsi.css.
+   -------------------------------------------------------------------------- */
+@font-face {
+  font-family: "BZar";
+  src: url("fonts/BZar.woff") format("woff"),
+       url("fonts/BZar.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}

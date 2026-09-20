@@ -1,0 +1,982 @@
+{
+  "sections": [
+    {
+      "id": "theses",
+      "title": "Theses",
+      "icon": "fas-highlighter",
+      "itemIcon": "fad-book-alt",
+      "rtl": false,
+      "lang": "en",
+      "numbered": true,
+      "items": [
+        {
+          "title": "Geomechanical characterization of natural collapsible-dispersive strata",
+          "url": null,
+          "authors": "",
+          "details": "Postdoctoral Thesis - Courtesy of the author"
+        },
+        {
+          "title": "A micro-structural study on hydro-mechanical behavior of loess",
+          "url": "https://lbezone.ust.hk/bib/b1627816",
+          "authors": "",
+          "details": "Ph.D. Thesis; <b><a href=\"https://lbezone.ust.hk/bib/b1627816\" target=\"_blank\">HKUST</a></b>, <b><a href=\"http://library.sharif.ir/parvan/resource/440023/%D9%85%D8%B7%D8%A7%D9%84%D8%B9%D9%87-%D8%A7%D8%AB%D8%B1%D8%A7%D8%AA-%D8%B1%DB%8C%D8%B2%D8%B3%D8%A7%D8%AE%D8%AA%D8%A7%D8%B1-%D8%A8%D8%B1-%D8%B1%D9%81%D8%AA%D8%A7%D8%B1-%D9%87%DB%8C%D8%AF%D8%B1%D9%88%D9%85%DA%A9%D8%A7%D9%86%DB%8C%DA%A9%DB%8C-%D8%AE%D8%A7%DA%A9-%D9%84%D8%B3/&amp;from=search&amp;&amp;query=%D8%B5%D8%A7%D8%AF%D9%82%DB%8C%D8%8C%20%D8%AD%D8%A7%D9%85%D8%AF&amp;field=authorMain&amp;count=20&amp;execute=true\" target=\"_blank\">SUT</a></b>"
+        },
+        {
+          "title": "Effect of saturation degree on dynamic properties of sand by cyclic simple shear tests",
+          "url": "http://library.sharif.ir/parvan/resource/289855/%D8%A8%D8%B1%D8%B1%D8%B3%DB%8C-%D8%A7%D8%AB%D8%B1-%D8%AF%D8%B1%D8%AC%D9%87-%D8%A7%D8%B4%D8%A8%D8%A7%D8%B9-%D8%A8%D8%B1-%D8%AE%D8%B5%D9%88%D8%B5%DB%8C%D8%A7%D8%AA-%D8%AF%DB%8C%D9%86%D8%A7%D9%85%DB%8C%DA%A9%DB%8C-%D9%85%D8%A7%D8%B3%D9%87-%D8%A8%D8%A7-%D8%A2%D8%B2%D9%85%D8%A7%DB%8C%D8%B4-%D9%87%D8%A7%DB%8C-%D8%A8%D8%B1%D8%B4-%D8%B3%D8%A7%D8%AF%D9%87-%D8%AA%D9%86%D8%A7%D9%88%D8%A8%DB%8C/&from=search&&query=%D8%B5%D8%A7%D8%AF%D9%82%DB%8C%D8%8C%20%D8%AD%D8%A7%D9%85%D8%AF&field=authorMain&count=20&execute=true",
+          "authors": "",
+          "details": "M.Phil. Thesis"
+        },
+        {
+          "title": "Seismic retrofitting of masonry buildings",
+          "url": null,
+          "authors": "",
+          "details": "B.Sc. Final Year Project - Courtesy of the author"
+        }
+      ]
+    },
+    {
+      "id": "journal-papers",
+      "title": "Peer-reviewed Journal Publications",
+      "icon": "fad-pen-alt",
+      "itemIcon": "fad-file-alt",
+      "rtl": false,
+      "lang": "en",
+      "numbered": true,
+      "items": [
+        {
+          "title": "Influence of biochar with varied pyrolysis temperatures on soil desiccation cracking under dry-wet cycles",
+          "url": "https://doi.org/10.1007/s10064-026-05181-x",
+          "authors": "Yang, S., Ni, J., Liu, Y., & <b>Sadeghi, H.</b> (2026)",
+          "details": "<b>Bulletin of Engineering Geology and the Environment</b>, 85(8), 501."
+        },
+        {
+          "title": "A multivariate investigation of land surface deformation mechanisms using remote sensing, neural networks, and field inspections: A case study of Qom Province, Iran",
+          "url": "https://doi.org/10.1016/j.rineng.2026.111199",
+          "authors": "Darzi, A. G., <b>Sadeghi, H.</b>, Zoghi, A., & Naghavi, S. S. H. (2026)",
+          "details": "<b>Results in Engineering</b>, 111199."
+        },
+        {
+          "title": "Optimized TabPFN-gradient boosting multi-model ensemble strategy for predicting soil saturated hydraulic conductivity",
+          "url": null,
+          "authors": "Yifei, L., Ni, J., & <b>Sadeghi, H.</b> (2026)",
+          "details": "<b>Journal of Southeast University</b>. Accepted on May, 2026."
+        },
+        {
+          "title": "Comparison of GRNN-MC and RF models for predicting soil hydrogeological and geotechnical profile using borehole data",
+          "url": "https://doi.org/10.1038/s41598-026-50568-1",
+          "authors": "Darzi, A. G., <b>Sadeghi, H.</b>, & Moezzi, S. M. M. (2026)",
+          "details": "<b>Scientific Reports</b>."
+        },
+        {
+          "title": "Exploring the inter-relationship between climatic conditions and heat-water transfer in deformable cracked surface strata",
+          "url": "https://doi.org/10.69631/rk5nyd57",
+          "authors": "Jabbarzadeh, M., & <b>Sadeghi, H.</b> (2026)",
+          "details": "<b>InterPore Journal</b>, 3(1), IPJ010326-2."
+        },
+        {
+          "title": "A Comparative SPH Analysis of Interaction between Viscous Debris Flow and Two Types of Barriers with Basal Clearance",
+          "url": "https://doi.org/10.69631/qkep8004",
+          "authors": "Aghagoli, A., & <b>Sadeghi, H.</b> (2026)",
+          "details": "<b>InterPore Journal</b>, 3(1), IPJ-010326."
+        },
+        {
+          "title": "Osmotically Driven Solute Transport in Tailings Dams: Modeling and Application to the Sarcheshmeh Tailings Facility, Iran",
+          "url": "https://doi.org/10.1007/s10706-026-03619-3",
+          "authors": "Anbarestani, M., <b>Sadeghi, H.</b>, & Hedayati-Azar, A. (2026)",
+          "details": "<b>Geotechnical and Geological Engineering</b>, 44(2), 119."
+        },
+        {
+          "title": "Effects of plant age on anisotropic saturated hydraulic conductivity of a synthesized rhizosphere using a cubic triaxial permeameter",
+          "url": "https://doi.org/10.1139/cgj-2025-0731",
+          "authors": "Alipanahi, P., <b>Sadeghi, H.</b>, Gholami, M., & Ni, J. (2026)",
+          "details": "<b>Canadian Geotechnical Journal</b>, 63, 1-16."
+        },
+        {
+          "title": "The influence of initial structure on the evolution of permeability functions of a lean clay for a wide range of void ratios",
+          "url": "https://doi.org/10.1139/cgj-2025-0348",
+          "authors": "Khodadadi, S., <b>Sadeghi, H.</b>, Alipanahi, P., Hasani Motlagh, A., & Song, D. (2026)",
+          "details": "<b>Canadian Geotechnical Journal</b>, 63, 1-18."
+        },
+        {
+          "title": "A machine learning assisted probabilistic framework for predicting the impact of crack characteristics on heterogeneous deformation of desiccated soils under environmental changes",
+          "url": "https://doi.org/10.1016/j.rineng.2026.110548",
+          "authors": "Kamizji, A. M., <b>Sadeghi, H.</b>, & Jabbarzadeh, M. (2026)",
+          "details": "<b>Results in Engineering</b>, 110548."
+        },
+        {
+          "title": "Dry–wet cyclic-dependent hysteretic soil-water retention and deformation behavior of a soft clay under varying pore fluid concentrations",
+          "url": "https://doi.org/10.1016/j.enggeo.2025.108490",
+          "authors": "<b>Sadeghi, H.</b>, Darzi, A. G., Nasiri, H., & Garakani, A. A. (2025)",
+          "details": "<b>Engineering Geology</b>, 108490."
+        },
+        {
+          "title": "A hybrid saturated-unsaturated framework for modeling land subsidence under the combined effects of water exploitation and environmental conditions",
+          "url": "https://doi.org/10.1016/j.enggeo.2025.108322",
+          "authors": "<b>Sadeghi, H.</b>, Darzi, A. G., Mirpanji, A., & Garakani, A. A. (2025)",
+          "details": "<b>Engineering Geology</b>, 108322."
+        },
+        {
+          "title": "Multi-physical modeling of climate-driven elasto-plastic deformation, stress redistribution, and water potential in desiccation-cracked soils of arid regions",
+          "url": "https://doi.org/10.1016/j.jrmge.2025.05.018",
+          "authors": "Jabbarzadeh, M., & <b>Sadeghi, H.</b> (2025)",
+          "details": "<b>Journal of Rock Mechanics and Geotechnical Engineering</b>."
+        },
+        {
+          "title": "Development and validation of practical membrane efficiency models for landfill liner systems",
+          "url": "https://doi.org/10.1007/s11356-025-36412-5",
+          "authors": "Hedayati-Azar, A., & <b>Sadeghi, H.</b> (2025)",
+          "details": "<b>Environmental Science and Pollution Research</b>, 32(19), 11921-11930."
+        },
+        {
+          "title": "A review of the physics of debris flows and the significance of employing the unsaturated soil conditions in estimating the erosion volume",
+          "url": "https://doi.org/10.24200/j30.2024.64086.3304",
+          "authors": "<b>Sadeghi, H.</b>, & Aghagoli, A. (2025)",
+          "details": "<b>Sharif Journal of Civil Engineering</b>."
+        },
+        {
+          "title": "Hydromechanical behavior of unsaturated sandy soils with different particle shapes under loading–unloading paths: Numerical simulation and experimental validation",
+          "url": "https://doi.org/10.1016/j.trgeo.2025.101560",
+          "authors": "Mousavi, Z., Jabbarzadeh, M., Jafarzadeh, F., & <b>Sadeghi, H.</b> (2025)",
+          "details": "<b>Transportation Geotechnics</b>, 101560."
+        },
+        {
+          "title": "Assessing the vulnerability of power transmission towers to land subsidence and forecasting future trends using multi-source datasets: insights from Moein Abad, Iran",
+          "url": "https://doi.org/10.1007/s41062-025-01958-3",
+          "authors": "Akbari Garakani, A., Tahajomi Banafshehvaragh, S., Saheb, S., & <b>Sadeghi, H.</b> (2025)",
+          "details": "<b>Innovative Infrastructure Solutions</b>, 10(4), 1-23."
+        },
+        {
+          "title": "Thermo-hydro-mechanical dynamics of a rock slope: Integrated field and numerical analysis at the Požáry test site in the Czech Republic",
+          "url": "https://doi.org/10.1016/j.jrmge.2024.09.052",
+          "authors": "Tourchi, S., Jabbarzadeh, M., Lavasan, A. A., <b>Sadeghi, H.</b>, & Racek, O. (2024)",
+          "details": "<b>Journal of Rock Mechanics and Geotechnical Engineering</b>."
+        },
+        {
+          "title": "Thermo-hydro-mechanical modelling of the heterogeneous subsidence and swelling in the desiccation cracked clayey strata",
+          "url": "https://doi.org/10.1016/j.enggeo.2024.107798",
+          "authors": "<b>Sadeghi, H.</b>, Jabbarzadeh, M., & Tourchi, S. (2024)",
+          "details": "<b>Engineering Geology</b>, 343, 107798."
+        },
+        {
+          "title": "A novel analytical-statistical-numerical hybrid framework for investigating the thermo-hydro-mechanical behavior of heterogeneous subsidence phenomena, moisture and temperature variations in cracked soils under soil-atmosphere interaction",
+          "url": "https://doi.org/10.24200/j40.2024.65047.1718",
+          "authors": "Jabbarzadeh, M., & <b>Sadeghi, H.</b> (2024)",
+          "details": "<b>Sharif Journal of Mechanical Engineering</b>."
+        },
+        {
+          "title": "Multi-directional deformation and hydraulic conductivity of expansive soils subjected to freeze-thaw cycles from three distinct initial saturation levels",
+          "url": "https://doi.org/10.1016/j.jrmge.2024.10.007",
+          "authors": "Arabchobdar, F., <b>Sadeghi, H.</b>, Gholami, M., & AliPanahi, P. (2024)",
+          "details": "<b>Journal of Rock Mechanics and Geotechnical Engineering</b>."
+        },
+        {
+          "title": "Influence of biopolymer-vegetation interaction on soil hydro-mechanical properties under climate change: A review",
+          "url": "https://doi.org/10.1016/j.scitotenv.2024.176535",
+          "authors": "Liu, Y., Ni, J., Gu, J., Liu, S., Huang, Y., & <b>Sadeghi, H.</b> (2024)",
+          "details": "<b>Science of The Total Environment</b>, 176535."
+        },
+        {
+          "title": "Anisotropic hydraulic conductivity of as-compacted, bare and vegetated soils",
+          "url": "https://doi.org/10.1680/jgeot.23.00248",
+          "authors": "Gholami, M., <b>Sadeghi, H.</b>, & Alipanahi, P. (2024)",
+          "details": "<b>Géotechnique</b>, 1-14."
+        },
+        {
+          "title": "Deep Neural Networks for Predicting the Settlement of Earth Dams Based on the InSAR Outputs",
+          "url": "https://doi.org/10.56144/igj.v3i2.102",
+          "authors": "Babaei, A., <b>Sadeghi, H.</b>, & Ghorbani, Z. (2024)",
+          "details": "<b>Indonesian Geotechnical Journal</b>, 3(2), 57-66."
+        },
+        {
+          "title": "A comparative study of environmental and economic assessment of vegetation-based slope stabilization with conventional methods",
+          "url": "https://doi.org/10.1016/j.jenvman.2024.121002",
+          "authors": "Yazdani, F., AliPanahi, P. & <b>Sadeghi, H.</b> (2024)",
+          "details": "<b>Journal of Environmental Management</b>, 359, 121002"
+        },
+        {
+          "title": "Thermo-hydraulic analysis of desiccation cracked soil strata considering ground temperature and moisture dynamics under the influence of soil-atmosphere interactions",
+          "url": "https://doi.org/10.1016/j.gete.2024.100558",
+          "authors": "Jabbarzadeh, M., <b>Sadeghi, H.</b> Tourchi, S. & Golaghaei Darzi, A. (2024)",
+          "details": "<b>Geomechanics for Energy and the Environment</b>, 38, 100558."
+        },
+        {
+          "title": "Measurement and Modeling of the Saturated Hydraulic Conductivity Functions of Collapsible and Expansive Soils",
+          "url": "https://doi.org/10.1061/IJGNAI.GMENG-8788",
+          "authors": "<b>Sadeghi, H.</b>, Hasani Motlagh, A., Golaghaei Darzi, A., AliPanahi, P., Khodadadi, S. & Song, D. (2024)",
+          "details": "<b>International Journal of Geomechanics</b>, 24 (4), 04024039"
+        },
+        {
+          "title": "Prediction of Stress-Dependent Soil Water Retention Using Machine Learning",
+          "url": "https://doi.org/10.1007/s10706-024-02767-8",
+          "authors": "Fazel Mojtahedi, S.F., Akbarpour, A., Golaghaei Darzi, A., <b>Sadeghi, H.</b> & van Genuchten, M.T. (2024)",
+          "details": "<b>Geotechnical and Geological Engineering</b>, 1-28."
+        },
+        {
+          "title": "Evaluation of plant growth and spacing effects on bioengineered slopes subjected to rainfall",
+          "url": "https://doi.org/10.1016/j.bgtech.2024.100080",
+          "authors": "Yazdani, F., <b>Sadeghi, H.</b> AliPanahi, P., Gholami, M. & Leung, A.K. (2024)",
+          "details": "<b>Biogeotechnics</b>, 100080."
+        },
+        {
+          "title": "The influence of isotropic loading and unloading on anisotropic evolution of saturated hydraulic conductivity of bentonite-sand mixtures in a cube triaxial permeameter",
+          "url": "https://doi.org/10.1016/j.enggeo.2024.107454",
+          "authors": "<b>Sadeghi, H.</b>, Gholami, M., AliPanahi, P. & Song, D. (2024)",
+          "details": "<b>Engineering Geology</b>, 107454."
+        },
+        {
+          "title": "Insights into the fluid retention and shrinkage of a lean clay under the combined influence of microstructure, solute concentration and salt species",
+          "url": "https://doi.org/10.1007/s11440-023-02206-7",
+          "authors": "<b>Sadeghi, H.</b>, Heydari, A. & Zhou, C. (2024)",
+          "details": "<b>Acta Geotechnica</b>, 1-18."
+        },
+        {
+          "title": "Impact Behavior of Dense Debris Flows Regulated by Pore‐Pressure Feedback",
+          "url": "https://doi.org/10.1029/2023JF007074",
+          "authors": "Song, D., Chen, X., <b>Sadeghi, H.</b>, Zhong, W., Hu, H. & Liu, W. (2023)",
+          "details": "<b>Journal of Geophysical Research: Earth Surface</b>, 128(12), e2023JF007074."
+        },
+        {
+          "title": "A soil-water retention model incorporating pore fluid osmotic potential",
+          "url": "https://doi.org/ 10.1061/IJGNAI/GMENG-8648",
+          "authors": "<b>Sadeghi, H.</b> & Golaghaei Darzi, A. (2023)",
+          "details": "<b>International Journal of Geomechanics</b>, 23(11), 04023209."
+        },
+        {
+          "title": "Characteristics of root-permeated soil under simple-shear and direct-shear conditions",
+          "url": "https://doi.org/10.1007/s11629-022-7722-x",
+          "authors": "Chen, J. Y., Chen, X. Q., Song, D. R., Lv, M., Guo, H. Q. & <b>Sadeghi, H.</b> (2023)",
+          "details": "<b>Journal of Mountain Science</b>, 20(8), 2422-2435."
+        },
+        {
+          "title": "Effects of solar radiation and fine roots on suction of Amorpha fruticose-vegetated soil",
+          "url": "https://doi.org/10.1007/s11629-022-7694-x",
+          "authors": "Guo, H. Q., Chen, X. Q., Song, D. R., Mu, Q. Y., <b>Sadeghi, H.</b> Jiang, H. & Lv, M. (2023)",
+          "details": "<b>Journal of Mountain Science</b>, 20(6), 1790-1804."
+        },
+        {
+          "title": "A soil-brine retention model for wetting processes considering the hysteresis effects",
+          "url": "https://doi.org/10.1016/j.trgeo.2023.101032",
+          "authors": "Golaghaei Darzi, A., <b>Sadeghi, H.</b> & Zhou, C. (2023)",
+          "details": "<b>Transportation Geotechnics</b>, 101032."
+        },
+        {
+          "title": "Assessing the vulnerability of Iran to subsidence hazard using a hierarchical FUCOM-GIS framework",
+          "url": "https://doi.org/10.1016/j.rsase.2023.100989",
+          "authors": "<b>Sadeghi, H.</b>, Golaghaei Darzi, A., Voosoghi, B., Garakani, A. A., Ghorbani, Z. & Mojtahedi, F. (2023)",
+          "details": "<b>Remote Sensing Applications: Society and Environment</b>, 31, 100989."
+        },
+        {
+          "title": "Theoretical and numerical study of contaminant transport in clayey barriers considering the dependency of membrane efficiency and hydraulic conductivity on solute concentration",
+          "url": "https://doi.org/10.1016/j.heliyon.2023.e15148",
+          "authors": "<b>Sadeghi, H.</b> & Hedayati-Azar, A. (2023)",
+          "details": "<b>Heliyon</b>, 9(5)."
+        },
+        {
+          "title": "An artificial intelligence based data-driven method for forecasting unconfined compressive strength of cement stabilized soil by deep mixing technique",
+          "url": "https://doi.org/10.1007/s10706-022-02297-1",
+          "authors": "Mojtahedi, F., Ahmadihosseini, A. & <b>Sadeghi, H.</b> (2023)",
+          "details": "<b>Geotechnical and Geological Engineering</b>, 41(1), 491-514."
+        },
+        {
+          "title": "Semi-empirical modelling of hydraulic conductivity of clayey soils exposed to deionized and saline environments",
+          "url": "https://doi.org/10.1016/j.jconhyd.2022.104042",
+          "authors": "Hedayati-Azar, A. & <b>Sadeghi, H.</b> (2022)",
+          "details": "<b>Journal of Contaminant Hydrology</b>, 249, 104042."
+        },
+        {
+          "title": "Slope stability of an unsaturated embankment with and without natural pore water salinity subjected to rainfall infiltration",
+          "url": "https://doi.org/10.16285/j.rsm.2021.00155",
+          "authors": "<b>Sadeghi, H.</b>, Kolahdooz, A. & Ahmadi, M. M. (2022)",
+          "details": "<b>Rock and Soil Mechanics</b>, 43(8), 2136."
+        },
+        {
+          "title": "A modified two-surface plasticity model for saturated and unsaturated soils",
+          "url": "https://link.springer.com/article/10.1007/s40098-022-00601-7",
+          "authors": "Vahdani, M., Hajitaheriha, M. M., Hasani Motlagh, A. & <b>Sadeghi, H.</b> (2022)",
+          "details": "<b>Indian Geotechnical Journal</b>, 1-12."
+        },
+        {
+          "title": "Optimization of critical slip surface in unsaturated slopes subjected to rain infiltration by CBO algorithm",
+          "url": "http://sjce.journals.sharif.edu/?_action=press&issue=-1&_is=Articles%20in%20Press&lang=en",
+          "authors": "Sadat Naseri, S., <b>Sadeghi, H.</b> & Garakani, A. A. (2022)",
+          "details": "<b>Sharif Journal of Civil Engineering</b>, Accepted on 24 Jan. 2022."
+        },
+        {
+          "title": "An effective stress-based parametric study on the seismic stability of unsaturated slopes with implications for preliminary microzonation",
+          "url": "https://link.springer.com/article/10.1007/s10064-021-02440-x",
+          "authors": "Garakani, A. A., Birgani, M. M. & <b>Sadeghi, H.</b> (2021)",
+          "details": "<b>Bulletin of Engineering Geology and the Environment</b>, 80(10), 7525-7549."
+        },
+        {
+          "title": "A review of research approaches to contaminant transport in saturated deformable clay under coupled hydro-chemico-mechanical processes",
+          "url": "https://dx.doi.org/10.24200/j40.2021.56928.1565",
+          "authors": "Hedayati-Azar, A. & <b>Sadeghi, H.</b> (2021)",
+          "details": "<b>Sharif Journal of Mechanical Engineering</b>, 37.3(2.2), 97-115."
+        },
+        {
+          "title": "Hysteresis of soil water retention and shrinkage behaviour for various salt concentrations",
+          "url": "https://www.icevirtuallibrary.com/doi/abs/10.1680/jgele.20.00047",
+          "authors": "<b>Sadeghi, H.</b> & Nasiri, H. (2021)",
+          "details": "<b>Géotechnique Letters</b>, 11(1), 1-9."
+        },
+        {
+          "title": "A review of different approaches to analytical modeling of soil-water retention curves",
+          "url": "https://dx.doi.org/10.24200/j30.2021.56932.2870",
+          "authors": "Golaghaei Darzi, A. & <b>Sadeghi, H.</b> (2021)",
+          "details": "<b>Sharif Journal of Civil Engineering</b>, 37.2(3.1), 111-123."
+        },
+        {
+          "title": "Optimal solution of Richards equation for slope instability analysis using an integrated enhanced version of black hole mechanics into the FEM",
+          "url": "http://ijoce.iust.ac.ir/article-1-456-en.html",
+          "authors": "Kaveh, A., Seddighian, M. R., <b>Sadeghi, H.</b> & Sadat Naseri, S. (2020)",
+          "details": "<b>International Journal of Optimization in Civil Engineering</b>, 10(4), 629-650."
+        },
+        {
+          "title": "Saturated hydraulic conductivity of problematic soils measured by a newly developed low-compliance triaxial permeameter",
+          "url": "https://www.sciencedirect.com/science/article/abs/pii/S0013795220317245",
+          "authors": "<b>Sadeghi, H.</b> & AliPanahi, P. (2020)",
+          "details": "<b>Engineering Geology</b>, 278, 105827."
+        },
+        {
+          "title": "A vacuum-refilled tensiometer for deep monitoring of in-situ pore water pressure",
+          "url": "https://dx.doi.org/10.24200/sci.2018.5052.1063",
+          "authors": "<b>Sadeghi, H.</b>, Chiu, C. F., Ng, C. W. W. & Jafarzadeh, F. (2020).",
+          "details": "<b>Scientia Iranica</b>, 27(2), 596-606."
+        },
+        {
+          "title": "Bearing capacity of shallow foundations on unsaturated soils: Analytical approach with 3D numerical simulations and experimental validations",
+          "url": "https://doi.org/10.1061/(ASCE)GM.1943-5622.0001589",
+          "authors": "Akbari Garakani, A., <b>Sadeghi, H.</b>, Saheb, S. & Lamei, A. (2020).",
+          "details": "<b>International Journal of Geomechanics</b>, 20(3), 04019181."
+        },
+        {
+          "title": "Synthesizing an artificial loess for geotechnical investigations of collapsible soil behavior",
+          "url": "https://publications.waset.org/10011603/synthesizing-an-artificial-loess-for-geotechnical-investigations-of-collapsible-soil-behavior",
+          "authors": "<b>Sadeghi, H.</b>, AliPanahi, P., Nasiri, H. & Sadeghi, M. (2020).",
+          "details": "<b>International Journal of Geotechnical and Geological Engineering</b>, 14(11), 316-320"
+        },
+        {
+          "title": "Optimisation of deep mixing technique by artificial neural network based on laboratory and field experiments",
+          "url": "https://doi.org/10.1080/17499518.2019.1612526",
+          "authors": "Ahmadi Hosseini, S. A., Mojtahedi, S. F. F. & <b>Sadeghi, H.</b> (2020).",
+          "details": "<b>Georisk: Assessment and Management of Risk for Engineered Systems and Geohazards</b>, 14(2), 142-157."
+        },
+        {
+          "title": "Effect of microstructure on shear strength and dilatancy of unsaturated loess at high suctions",
+          "url": "https://doi.org/10.1139/cgj-2018-0592",
+          "authors": "Ng, C. W. W., <b>Sadeghi, H.</b>, Jafarzadeh, F., Sadeghi, M., Zhou, C. & Baghbanrezvan, S. (2020).",
+          "details": "<b>Canadian Geotechnical Journal</b>, 57(2), 221-235."
+        },
+        {
+          "title": "Effects of initial suction and degree of saturation on dynamic properties of sand at large strain",
+          "url": "https://dx.doi.org/10.24200/sci.2019.51796.2452",
+          "authors": "Jafarzadeh, F., Ahmadinezhad, A. & <b>Sadeghi, H.</b> (2019).",
+          "details": "<b>Scientia Iranica</b>, Available Online from 06 August. DOI: <a href=\"https://dx.doi.org/10.24200/sci.2019.51796.2452\" target=\"_blank\">10.24200/SCI.2019.51796.2452</a>"
+        },
+        {
+          "title": "Geotechnical characterization and collapsibility of a natural dispersive loess",
+          "url": "https://doi.org/10.1016/j.enggeo.2019.01.015",
+          "authors": "<b>Sadeghi, H.</b>, Kiani, M., Sadeghi, M. & Jafarzadeh, F. (2019).",
+          "details": "<b>Engineering Geology</b>, 250, 89-100."
+        },
+        {
+          "title": "Combination of water head control and axis translation techniques in new unsaturated cyclic simple shear tests",
+          "url": "https://doi.org/10.1016/j.soildyn.2019.105818",
+          "authors": "Ahmadinezhad, A., Jafarzadeh, F. & <b>Sadeghi, H.</b> (2019).",
+          "details": "<b>Soil Dynamics and Earthquake Engineering</b>, 126, 105818."
+        },
+        {
+          "title": "A new method for eliminating membrane compliance in cyclic triaxial tests on gravelly soils",
+          "url": "https://dx.doi.org/10.24200/sci.2018.5076.1082",
+          "authors": "Haeri, S. M., Shahcheraghi, S. A. & <b>Sadeghi, H.</b> (2019).",
+          "details": "<b>Scientia Iranica</b>, 26(6), 3181-3195."
+        },
+        {
+          "title": "Effect of specimen preparation techniques on dynamic properties of unsaturated fine-grained soil at high suctions",
+          "url": "https://doi.org/10.1139/cgj-2016-0531",
+          "authors": "Ng, C. W. W., Baghbanrezvan, S., <b>Sadeghi, H.</b>, Zhou, C. & Jafarzadeh, F. (2017).",
+          "details": "<b>Canadian Geotechnical Journal</b>, 54(9), 1310-1319."
+        },
+        {
+          "title": "Compression and shear strength characteristics of compacted loess at high suctions",
+          "url": "https://doi.org/10.1139/cgj-2016-0347",
+          "authors": "Ng, C. W. W., <b>Sadeghi, H.</b> & Jafarzadeh, F. (2017).",
+          "details": "<b>Canadian Geotechnical Journal</b>, 54(5), 690-699."
+        },
+        {
+          "title": "Water retention and volumetric characteristics of intact and re-compacted loess",
+          "url": "https://doi.org/10.1139/cgj-2015-0364",
+          "authors": "Ng, C. W. W., <b>Sadeghi, H.</b>, Hossen, S. B., Chiu, C. F., Alonso, E. E. & Baghbanrezvan, S. (2016).",
+          "details": "<b>Canadian Geotechnical Journal</b>, 53(8), 1258-1269."
+        },
+        {
+          "title": "An unsteady state retention model for fluid desorption from sorbents",
+          "url": "https://doi.org/10.1016/j.jcis.2015.02.036",
+          "authors": "Bazargan, A., <b>Sadeghi, H.</b>, Garcia‐Mayoral, R. & McKay, G. (2015).",
+          "details": "<b>Journal of colloid and interface science</b>, 450, 127‐134."
+        },
+        {
+          "title": "Experimental study on dynamic properties of sand with emphasis on the degree of saturation",
+          "url": "https://doi.org/10.1016/j.soildyn.2011.08.003",
+          "authors": "Jafarzadeh, F. & <b>Sadeghi, H.</b> (2012).",
+          "details": "<b>Soil Dynamics and Earthquake Engineering</b>, 32(1), 26-41."
+        }
+      ]
+    },
+    {
+      "id": "keynotes",
+      "title": "Keynote Speakers / Invited Lectures",
+      "icon": "fas-pencil",
+      "itemIcon": "fad-microphone-stand",
+      "rtl": false,
+      "lang": "en",
+      "numbered": true,
+      "items": [
+        {
+          "title": "Investigating the side effects of land subsidence hazard on infrastructures and lifelines in the country scale",
+          "url": null,
+          "authors": "<b>Sadeghi, H.</b> (2025).",
+          "details": "Invited lecture in <b>Niroo Research Institute</b>. October 6, 2025, Tehran, Iran."
+        },
+        {
+          "title": "Investigating the effects of climate change on land subsidence",
+          "url": null,
+          "authors": "<b>Sadeghi, H.</b> (2024).",
+          "details": "Invited lecture in <b>Sharif Energy, Water and Environment Institute</b>. June 10, 2024, Tehran, Iran."
+        },
+        {
+          "title": "The role of bio-geotechnics to reach net zero commitment in slope engineering",
+          "url": "https://iges2023.github.io/",
+          "authors": "<b>Sadeghi, H.</b> (2023).",
+          "details": "Invited speaker in <b>The International Symposium on Innovations in Geotechnical Engineering towards Sustainability (IGES 2023)</b>. December 2, 2023, Hong Kong Polytechnic University, Hong Kong."
+        },
+        {
+          "title": "Land Subsidence—Monitoring, Modelling and Prediction",
+          "url": "https://calendar.hkust.edu.hk/events/amendment-civil-engineering-departmental-seminar-land-subsidence-monitoring-modelling-and",
+          "authors": "<b>Sadeghi, H.</b> (2023).",
+          "details": "Invited lecture in <b>Civil Engineering Departmental Seminar at The Hong Kong University of Science &amp; Technology</b>. November 30, 2023, HKUST, Hong Kong."
+        },
+        {
+          "title": "Stability analysis of an unsaturated embankment located on a saline loess stratum based on the filter paper test results",
+          "url": "http://12-ncce.ir/fa/@id=3&p=4.php",
+          "authors": "<b>Sadeghi, H.</b> (2020).",
+          "details": "Invited lecture in <b>The 12<span class=\"ordinal\">th</span> National Congress on Civil Engineering (12-NCCE)</b>, May 2020, Tabriz, Iran."
+        },
+        {
+          "title": "Geomechanical assessment of collapsible-dispersive strata occurred naturally in parts of Chabahar-Zahedan railroad",
+          "url": null,
+          "authors": "<b>Sadeghi, H.</b> (2019).",
+          "details": "Keynote speaker in <b>The Award Ceremony of the Armed Forces Elites Foundation in Recognition of the Top Five National Research Projects</b>, Feb. 2019, Tehran, Iran."
+        }
+      ]
+    },
+    {
+      "id": "patents",
+      "title": "Patents / Knowledge-based products",
+      "icon": "fas-paint-brush-alt",
+      "itemIcon": "fad-book-open",
+      "rtl": false,
+      "lang": "en",
+      "numbered": true,
+      "items": [
+        {
+          "title": "Hybrid gas and fluid permeameter for porous media",
+          "url": "https://msrt-expo.ir/",
+          "authors": "<b>Sadeghi, H.</b> & Hasani Motlagh, A. (2021).",
+          "details": "The 22<span class=\"ordinal\">nd</span> Iran Laboratory Exposition, Dec. 2021, Technology category: Silver level."
+        },
+        {
+          "title": "Low-compliance saturated flexible-wall permeameter",
+          "url": "https://msrt-expo.ir/",
+          "authors": "<b>Sadeghi, H.</b> & AliPanahi, P. (2020).",
+          "details": "The 21<span class=\"ordinal\">st</span> Iran Laboratory Exposition, Dec. 2020, Technology category: Silver level."
+        },
+        {
+          "title": "Unsaturated automatic consolidometer for soils",
+          "url": "https://msrt-expo.ir/",
+          "authors": "<b>Sadeghi, H.</b> & Nasiri, H. (2020).",
+          "details": "The 21<span class=\"ordinal\">st</span> Iran Laboratory Exposition, Dec. 2020, Technology category: Silver level."
+        },
+        {
+          "title": "Unsaturated apparatus for measuring soil-collapse, -swelling and -volume changes automatically",
+          "url": "https://ipm.ssaa.ir/Search-Result?page=1&DecNo=139750140003001948&RN=97102",
+          "authors": "<b>Sadeghi, H.</b> & Ahmadinezhad, A. (2018).",
+          "details": "Iran Intellectual Property Centre, Registration No. 97102."
+        }
+      ]
+    },
+    {
+      "id": "conferences",
+      "title": "Conference Proceedings",
+      "icon": "fad-pencil-alt",
+      "itemIcon": "far-file-alt",
+      "rtl": false,
+      "lang": "en",
+      "numbered": true,
+      "items": [
+        {
+          "title": "Experimental comparison of cubic and stepped slit barriers to the debris flow augmentation",
+          "url": "https://doi.org/10.53243/ICSMGE2026-544",
+          "authors": "Aghagoli, A., <b>Sadeghi, H.</b>, & Alipanahi, P. (2026)",
+          "details": "<b>The 21<span class=\"ordinal\">st</span> International Conference on Soil Mechanics and Geotechnical Engineering (ICSMGE 2026)</b>, 14-19 June, Vienna, Austria."
+        },
+        {
+          "title": "Image processing of desiccation crack patterns in a bentonite-sand mixture under wetting and drying cycles",
+          "url": "https://doi.org/10.53243/ICSMGE2026-545",
+          "authors": "Surmanshahi, P., Alipanahi, P., <b>Sadeghi, H.</b>, & Yazdani, F. (2026)",
+          "details": "<b>The 21<span class=\"ordinal\">st</span> International Conference on Soil Mechanics and Geotechnical Engineering (ICSMGE 2026)</b>, 14-19 June, Vienna, Austria."
+        },
+        {
+          "title": "Coupled Effects of Evaporation and Solute Concentration on Saturated–Unsaturated Flow and Stability of Tailings Dam",
+          "url": null,
+          "authors": "Anbarestani, M., & <b>Sadeghi, H.</b> (2025)",
+          "details": "<b>AGU25</b>, 15-19 December, New Orleans, LA, the United States of America."
+        },
+        {
+          "title": "Effects of freeze-thaw cycles on mechanical behavior of vegetated soils",
+          "url": null,
+          "authors": "Mahdavi Rad, M. E., & <b>Sadeghi, H.</b> (2025)",
+          "details": "<b>The 17<span class=\"ordinal\">th</span> International Conference on Geotechnical Engineering (17ICGE)</b>, 4-5 December, Lahore, Pakistan."
+        },
+        {
+          "title": "Impact of acid leaching on the mechanical properties of heap materials",
+          "url": null,
+          "authors": "Taghvaei, A., <b>Sadeghi, H.</b>, & Khoshouei, S. S. (2025)",
+          "details": "<b>The 17<span class=\"ordinal\">th</span> International Conference on Geotechnical Engineering (17ICGE)</b>, 4-5 December, Lahore, Pakistan."
+        },
+        {
+          "title": "A Simplified Analytical Framework for Probabilistic Assessment of Land Subsidence",
+          "url": null,
+          "authors": "Darzi, A. G., <b>Sadeghi, H.</b>, & Garakani, A. A. (2025)",
+          "details": "<b>International Conference on Civil and Environmental Engineering (ICCEE 2025)</b>, 24-26 October, NUACA, Yerevan, Armenia."
+        },
+        {
+          "title": "A long-term accuracy assessment of ERA5-Land soil temperature for coastal regions of Iran",
+          "url": null,
+          "authors": "Haddadi, A. H., Kamran Jabbari, S., & <b>Sadeghi, H.</b> (2025)",
+          "details": "<b>14<span class=\"ordinal\">th</span> International Congress on Civil Engineering (14ICCE)</b>, 20-22 October, Tehran, Iran."
+        },
+        {
+          "title": "Experimental Investigation of Debris Flow Interactions with Cubic Slit Barriers",
+          "url": "https://civilica.com/doc/2456471",
+          "authors": "Aghagoli, A., Alipanahi, P., & <b>Sadeghi, H.</b> (2025)",
+          "details": "<b>14<span class=\"ordinal\">th</span> International Congress on Civil Engineering (14ICCE)</b>, 20-22 October, Tehran, Iran."
+        },
+        {
+          "title": "A Simplified Analytical Framework for Probabilistic Assessment of Land Subsidence",
+          "url": null,
+          "authors": "Darzi, A. G., & <b>Sadeghi, H.</b> (2025)",
+          "details": "<b>The 9<span class=\"ordinal\">th</span> International Symposium on Geotechnical Safety and Risk</b>, 25-28 August, Oslo, Norway."
+        },
+        {
+          "title": "A machine learning based surrogate model for predicting the influence of environmental conditions on desiccation crack width",
+          "url": "https://orbilu.uni.lu/handle/10993/68195",
+          "authors": "Mohammadi Kamizji, A., Jabbarzadeh, M., & <b>Sadeghi, H.</b> (2025)",
+          "details": "<b>The 9<span class=\"ordinal\">th</span> International Symposium on Geotechnical Safety and Risk</b>, 25-28 August, Oslo, Norway."
+        },
+        {
+          "title": "Two-phase CFD investigation of the flow-barrier interaction for slit barriers",
+          "url": "https://doi.org/10.53243/ACPMG2024-39",
+          "authors": "Aghagoli, A., & <b>Sadeghi, H.</b> (2024)",
+          "details": "<b>The 4<span class=\"ordinal\">th</span> Asia-Pacific Conference on Physical Modelling in Geotechnics (ACPMG)</b>, 11-13 December, Abu Dhabi, United Arab Emirates."
+        },
+        {
+          "title": "Development of a rainfall simulator for the investigation of slope stability",
+          "url": "https://doi.org/10.53243/ACPMG2024-40",
+          "authors": "Alipanahi, P., Yazdani, F., & <b>Sadeghi, H.</b> (2024)",
+          "details": "<b>The 4<span class=\"ordinal\">th</span> Asia-Pacific Conference on Physical Modelling in Geotechnics (ACPMG)</b>, 11-13 December, Abu Dhabi, United Arab Emirates."
+        },
+        {
+          "title": "Analysis of two-phase flow in heap structures considering the effects of impurities in the pore fluid",
+          "url": null,
+          "authors": "Sheikhmiri, A., Darzi, A. G., & <b>Sadeghi, H.</b> (2024)",
+          "details": "<b>The 10<span class=\"ordinal\">th</span> Asian Young Geotechnical Engineers Conference (AYGEC)</b>, 11-13 November, Jakarta, Indonesia."
+        },
+        {
+          "title": "A Comparison of Bioengineered and Nailed Slopes in Terms of Stability Assessment and Environmental Considerations",
+          "url": null,
+          "authors": "Alipanahi, P., <b>Sadeghi, H.</b>, & Yazdani, F. (2024)",
+          "details": "<b>The 10<span class=\"ordinal\">th</span> Asian Young Geotechnical Engineers Conference (AYGEC)</b>, 11-13 November, Jakarta, Indonesia."
+        },
+        {
+          "title": "Volumetric Behavior of a Soil Column Subjected to Freeze-Thaw Cycles Under Coupled Thermo-Hydro-Mechanical Conditions",
+          "url": null,
+          "authors": "Valipour, M., Jabbarzadeh, M., <b>Sadeghi, H.</b>, & Roghangar, K. (2024)",
+          "details": "<b>GeoMontréal 2024</b>, 15-18 September, Montréal, QC, Canada."
+        },
+        {
+          "title": "Development of a cube triaxial permeameter for evaluation of anisotropic permeability of vegetated soils",
+          "url": null,
+          "authors": "Alipanahi, P., Gholami, M., <b>Sadeghi, H.</b>, & Motlagh, A. H. (2024)",
+          "details": "<b>GeoMontréal 2024</b>, 15-18 September, Montréal, QC, Canada."
+        },
+        {
+          "title": "Thermo-hydro-mechanical analysis of soil strata suffered from desiccation cracking",
+          "url": "https://doi.org/10.1201/9781003431749",
+          "authors": "Tourchi, S., Jabbarzadeh, M., & <b>Sadeghi, H.</b> (2024)",
+          "details": "In <b>Geotechnical Engineering Challenges to Meet Current and Emerging Needs of Society</b> (pp. 1362-1367). CRC Press."
+        },
+        {
+          "title": "Thermo-hydro-mechanical modelling of rock cliff-atmosphere interaction: the case of the Pozary test site in Czechia",
+          "url": "https://doi.org/10.5194/egusphere-egu24-20407",
+          "authors": "Tourchi, S., Jabbarzadeh, M., <b>Sadeghi, H.</b>, & Lavasan, A.A. (2024)",
+          "details": "Orally presented in the <b>General Assembly 2024 of the European Geosciences Union (EGU24)</b>. April 2024, Vienna, Austria."
+        },
+        {
+          "title": "The influence of different hydraulic conductivities on two-phase flow characteristics of gas-injected sand-bentonite soil considering embedded fractures",
+          "url": null,
+          "authors": "Valipour, M., Jabbarzadeh, M. & <b>Sadeghi, H.</b> (2024)",
+          "details": "Orally presented in <b>The 14<span class=\"ordinal\">th</span> National Congress on Civil Engineering (14NCCE)</b>. May 2024, Zanjan, Iran."
+        },
+        {
+          "title": "A feasibility study of monitoring dam behavior using remote sensing",
+          "url": "https://search.informit.org/doi/abs/10.3316/informit.T2024040500011601512441844",
+          "authors": "Babaei, A., <b>Sadeghi, H.</b>, Fazel Mojtahedi, S.F. & Ghorbani, Z. (2023)",
+          "details": "Orally presented in <b>Climate Smart Engineering 2023 (CSE2023)</b>. November 2023, Melbourne, Australia."
+        },
+        {
+          "title": "The role of bio-geotechnics to reach net zero commitment in slope engineering",
+          "url": null,
+          "authors": "<b>Sadeghi, H.</b>, Yazdani, F. & AliPanahi, P. (2023)",
+          "details": "Orally presented in <b>The International Symposium on Innovations in Geotechnical Engineering towards Sustainability (IGES 2023)</b>. December 2023, Hong Kong Polytechnic University, Hong Kong."
+        },
+        {
+          "title": "Assessing the risk of land subsidence hazard on gas and oil pipelines in Iran",
+          "url": null,
+          "authors": "Golaghaei Darzi, A. & <b>Sadeghi, H.</b> (2023)",
+          "details": "Orally presented in <b>The International Symposium on Innovations in Geotechnical Engineering towards Sustainability (IGES 2023)</b>. December 2023, Hong Kong Polytechnic University, Hong Kong."
+        },
+        {
+          "title": "Investigation of thermal effects on the saturated shear behaviour of a clayey sand-structure interface",
+          "url": "https://doi.org/10.1201/9781003299127-171",
+          "authors": "Cui, S. Q., Zhou, C. & <b>Sadeghi, H.</b> (2023)",
+          "details": "Orally presented in <b>The 8<span class=\"ordinal\">th</span> International Symposium on Deformation Characteristics of Geomaterials (IS-PORTO 2023)</b>. September 2023, Porto, Portugal."
+        },
+        {
+          "title": "Field reconnaissance and InSAR investigation of subsidence-induced damage to electricity dispatch centers ‒ A case study in Tehran",
+          "url": "https://doi.org/10.1201/9781003299127-171",
+          "authors": "Ghorbani, Z., Darzi, A.G., <b>Sadeghi, H.</b> & Garakani A.A. (2023)",
+          "details": "Accepted for oral presentation in <b>The 17<span class=\"ordinal\">th</span> Asian Regional Conference on Soil Mechanics and Geotechnical Engineering (17ARC)-Smart Geotechnics for Smart Societies</b>. August 2023, Astana, Kazakhstan."
+        },
+        {
+          "title": "Soil columns for the investigation of bioremediation and moisture distribution in vadose zone",
+          "url": "https://doi.org/10.1201/9781003299127-275",
+          "authors": "Rahimi, B., <b>Sadeghi, H.</b>, Moghimi, H. & Samari, P. (2023)",
+          "details": "Accepted for oral presentation in <b>The 17<span class=\"ordinal\">th</span> Asian Regional Conference on Soil Mechanics and Geotechnical Engineering (17ARC)-Smart Geotechnics for Smart Societies</b>. August 2023, Astana, Kazakhstan."
+        },
+        {
+          "title": "Numerical investigation of cyclic wetting and drying of Boom clay based on the Barcelona expansive model",
+          "url": "https://doi.org/10.3997/2214-4609.202310400",
+          "authors": "Jabbarzadeh Ghandilou, M., Tourchi, S. & <b>Sadeghi, H.</b> (2023)",
+          "details": "Poster presentation in <b>The 84<span class=\"ordinal\">th</span> EAGE Annual Conference &amp; Exhibition</b>, June 2023, Vienna, Austria."
+        },
+        {
+          "title": "Spatiotemporal deep learning approach for estimating water content profiles in soil layers",
+          "url": "https://doi.org/10.1051/e3sconf/202338222003",
+          "authors": "Fazel Mojtahedi, F., Ghaffari, M. A., Rahmati, S., Nazari, A., <b>Sadeghi, H.</b>, & Vanapalli, S. K. (2023)",
+          "details": "Orally presented in <b>The 8<span class=\"ordinal\">th</span> International Conference on Unsaturated Soils (UNSAT 2023)</b>. May 2023, Milos, Greece."
+        },
+        {
+          "title": "Numerical investigation of saturated-unsaturated flow and stability analysis of tailings dams considering the influence of saline solutions",
+          "url": "https://doi.org/10.1051/e3sconf/202338216008",
+          "authors": "Anbarestani, H., <b>Sadeghi, H.</b> & Golaghaei Darzi, A. (2023)",
+          "details": "Orally presented in <b>The 8<span class=\"ordinal\">th</span> International Conference on Unsaturated Soils (UNSAT 2023)</b>. May 2023, Milos, Greece."
+        },
+        {
+          "title": "Hydromechanical modeling of a vegetated slope subjected to rainfall",
+          "url": "https://doi.org/10.1051/e3sconf/202338213004",
+          "authors": "<b>Sadeghi, H.</b>, Yazdani BenehKohal, F., Gholami, M., AliPanahi, P. & Song, D. (2023)",
+          "details": "Orally presented in <b>The 8<span class=\"ordinal\">th</span> International Conference on Page <b class=\"fw-900\">13</b> of <b class=\"fw-900\">18</b> Unsaturated Soils (UNSAT 2023)</b>. May 2023, Milos, Greece."
+        },
+        {
+          "title": "Modeling water retention curve of GCL exposed to pore fluid with solute concentrations",
+          "url": "https://doi.org/10.1007/978-981-99-4041-7_14",
+          "authors": "Golaghaei Darzi, A., <b>Sadeghi, H.</b>, Hedayati-Azar, A. & AliPanahi, P. (2022)",
+          "details": "Orally presented in <b>The 3<span class=\"ordinal\">rd</span> International Conference on Environmental Geotechnology, Recycled Waste Materials and Sustainable Engineering</b>. September, 2022, Izmir, Turkey."
+        },
+        {
+          "title": "24. Numerical modelling of soluble contamination transport in landfills based on empirical function of membrane efficiency",
+          "url": "https://doi.org/10.1007/978-981-99-4041-7_18",
+          "authors": "Hedayati-Azar, A., <b>Sadeghi, H.</b>, Golaghaei Darzi, A. & AliPanahi, P. (2022)",
+          "details": "Orally presented in <b>The 3<span class=\"ordinal\">rd</span> International Conference on Environmental Geotechnology, Recycled Waste Materials and Sustainable Engineering</b>. September, 2022, Izmir, Turkey."
+        },
+        {
+          "title": "Mutual effects of microstructure and water salinity on compressibility and shear strength of a collapsible soil",
+          "url": "https://signal4domain.com/click?redirect=https%3A%2F%2Fyoutu.be%2FmZAuNTYov38&dID=1645552719334&linkName=https://youtu.be/mZAuNTYov38",
+          "authors": "<b>Sadeghi, H.</b>, Khodadadi, S., AliPanahi, P. & Hasani Motlagh, A. (2022)",
+          "details": "Orally presented in <b>The 20<span class=\"ordinal\">th</span> International Conference on Soil Mechanics and Geotechnical Engineering (ICSMGE 2022)</b>, May. 2022, Sydney, Australia."
+        },
+        {
+          "title": "Full-range water retention properties of a collapsible soil with focus on osmotic potential",
+          "url": "https://signal4domain.com/click?redirect=https%3A%2F%2Fyoutu.be%2FD7doOVVWGJs&dID=1645552719334&linkName=https://youtu.be/D7doOVVWGJs",
+          "authors": "<b>Sadeghi, H.</b>, Heydari, A. & Nasiri, H. (2022)",
+          "details": "Orally presented in <b>The 20<span class=\"ordinal\">th</span> International Conference on Soil Mechanics and Geotechnical Engineering (ICSMGE 2022)</b>, May. 2022, Sydney, Australia."
+        },
+        {
+          "title": "Eco-friendly Multiphase Flow Simulation Laboratory at Sharif University of Technology",
+          "url": "https://ces.um.edu.my/2022-aua-academic-conference-on-segt",
+          "authors": "<b>Sadeghi, H.</b>, AliPanahi, P., Nasiri, H., Golaghaei Darzi, A. & Hedayati-Azar, A. (2022)",
+          "details": "Orally presented in <b>The 2022 AUA Academic Conference on Sustainable Energy and Green Technology (AUA SEGT 2022)</b>, Feb. 2022, Kuala Lumpur, Malaysia."
+        },
+        {
+          "title": "Establishment of the Green Geotechnology Laboratory at Sharif University of Technology",
+          "url": "https://sdcm2022.kish.ac.ir/en/",
+          "authors": "<b>Sadeghi, H.</b>, Samari, P. & AliPanahi, P. (2022)",
+          "details": "Orally presented in <b>The First International Conference on Sustainable Design and Construction Management (SDCM 2022)</b>, Feb. 2022, Kish Island, Iran."
+        },
+        {
+          "title": "Estimation of GPM rainfall for flood occurrences based on the probability distribution of monthly precipitation: A case study in Iran",
+          "url": "https://doi.org/10.1061/9780784483688.028",
+          "authors": "Ahmadi, M. M., Kaheh, S., <b>Sadeghi, H.</b> & Jamaat, A. (2021)",
+          "details": "In <b>The ASCE Proceedings of Geo-Extreme 2021</b>, Nov. 2021, Savannah, Georgia, USA."
+        },
+        {
+          "title": "A lattice Boltzmann study of dynamic immiscible displacement mechanisms in pore doublets",
+          "url": "https://doi.org/10.1051/matecconf/202133702011",
+          "authors": "Sadeghi, M., <b>Sadeghi, H.</b> & Choi, C. E. (2021)",
+          "details": "Orally presented in <b>The 3<span class=\"ordinal\">rd</span> Pan-American Conference on Unsaturated Soils (PanAm-Unsat 2021)</b>, Jul. 2021, Rio de Janiro, Brazil."
+        },
+        {
+          "title": "Modelling of soil-water retention curve considering the effects of existing salt solution in the pore fluid",
+          "url": "https://doi.org/10.1051/matecconf/202133702001",
+          "authors": "<b>Sadeghi, H.</b> & Golaghaei Darzi, A. (2021)",
+          "details": "Orally presented in <b>The 3<span class=\"ordinal\">rd</span> Pan-American Conference on Unsaturated Soils (PanAm-Unsat 2021)</b>, Jul. 2021, Rio de Janiro, Brazil."
+        },
+        {
+          "title": "A numerical study on the effect of salinity on stability of an unsaturated railway embankment under rainfall",
+          "url": "https://www.e3s-conferences.org/articles/e3sconf/abs/2020/55/e3sconf_e-unsat2020_01004/e3sconf_e-unsat2020_01004.html",
+          "authors": "Kolahdooz, A., <b>Sadeghi, H.</b> & Ahmadi, M. M. (2020)",
+          "details": "Orally presented in <b>The 4<span class=\"ordinal\">th</span> European Conference on Unsaturated Soils (E-UNSAT 2020)</b>, Oct. 2020, Lisbon, Portugal."
+        },
+        {
+          "title": "Seismic performance of circular foundations resting on stone columns",
+          "url": "https://geovirtual2020.ca/wp-content/files/385.pdf",
+          "authors": "Sadeghi, H., Hasani Motlagh, A., <b>Sadeghi, H.</b> & Ahmadihosseini, A. (2020).",
+          "details": "Orally presented in <b>The GeoVirtual; Resilience and Innovation</b>, Sep. 2020, Calgary, Canada."
+        },
+        {
+          "title": "Impact of lead and sodium carbonate on consolidation and hydraulic properties of clayey sand",
+          "url": "https://geovirtual2020.ca/wp-content/files/384.pdf",
+          "authors": "Namadi, H. A., Hassanlourad, M., Hasani Motlagh, A., Alipanahi, P., <b>Sadeghi, H.</b> & Ahmadihosseini, A. (2020).",
+          "details": "Orally presented in <b>The GeoVirtual; Resilience and Innovation</b>, Sep. 2020, Calgary, Canada."
+        },
+        {
+          "title": "Stability analysis of an unsaturated embankment located on a saline loess stratum based on the filter paper test results",
+          "url": "https://civilica.com/doc/1120584/",
+          "authors": "Ahmadi, M. M., Kolahdooz, A. & <b>Sadeghi, H.</b> (2020).",
+          "details": "Invited lecture in the <b>12<span class=\"ordinal\">th</span> National Congress on Civil Engineering (12-NCCE)</b>, May 2020, Tabriz, Iran."
+        },
+        {
+          "title": "Dispersivity, collapsibility and microstructure of a natural dispersive loess from Iran",
+          "url": "http://140.118.105.204:9998/TGSSP/16ARC/articles/mainpage/628",
+          "authors": "<b>Sadeghi, H.</b>, Nasiri, H., Ali Panahi, P. & Sadeghi, M. (2019).",
+          "details": "Orally presented in <b>The 16<span class=\"ordinal\">th</span> Asian Regional Conference on Soil Mechanics and Geotechnical Engineering (16ARC)</b>, Oct. 2019, Taipei, Taiwan."
+        },
+        {
+          "title": "Stability analysis of a railway embankment on a collapsible-dispersive stratum under transient flow",
+          "url": "http://140.118.105.204:9998/TGSSP/16ARC/articles/mainpage/462",
+          "authors": "Ahmadi, M. M., <b>Sadeghi, H.</b> & Kolahdooz, A. (2019).",
+          "details": "Orally presented in <b>The 16<span class=\"ordinal\">th</span> Asian Regional Conference on Soil Mechanics and Geotechnical Engineering (16ARC)</b>, Oct. 2019, Taipei, Taiwan."
+        },
+        {
+          "title": "Simulation of wetting tendency of fluids with high density ratios using RK Lattice Boltzmann method",
+          "url": "http://140.118.105.204:9998/TGSSP/16ARC/articles/mainpage/607",
+          "authors": "Sadeghi, M., Pak, A. & <b>Sadeghi, H.</b> (2019).",
+          "details": "Orally presented in <b>The 16<span class=\"ordinal\">th</span> Asian Regional Conference on Soil Mechanics and Geotechnical Engineering (16ARC)</b>, Oct. 2019, Taipei, Taiwan."
+        },
+        {
+          "title": "Shear behaviour of a desiccated loess with three different microstructures",
+          "url": "http://repository.ust.hk/ir/Record/1783.1-96575",
+          "authors": "<b>Sadeghi, H.</b> & Ng, C. W. W. (2018).",
+          "details": "Orally presented in <b>The 7<span class=\"ordinal\">th</span> International Conference on Unsaturated Soils (UNSAT 2018)</b>, Aug. 2018, Hong Kong."
+        },
+        {
+          "title": "A VET-based direct shear box for testing unsaturated soils at high suctions",
+          "url": "https://ascelibrary.org/doi/abs/10.1061/9780784481684.027",
+          "authors": "<b>Sadeghi, H.</b>, Jafarzadeh, F. & Ng, C. W. W. (2017).",
+          "details": "Accepted for oral presentation in <b>PanAm-UNSAT 2017: Unsaturated Soil Mechanics for Sustainable Geotechnics</b>, Dalas, TX, USA, 258-267."
+        },
+        {
+          "title": "Effects of suction path on water retention and volumetric behavior of loess at high suctions",
+          "url": "https://ascelibrary.org/doi/abs/10.1061/9780784481684.003",
+          "authors": "Hossen, S. B., <b>Sadeghi, H.</b> & Ng, C. W. W. (2017).",
+          "details": "Accepted for orall presentation in <b>PanAm-UNSAT 2017: Unsaturated Soil Mechanics for Sustainable Geotechnics</b>, Dalas, TX, USA, 19-27."
+        },
+        {
+          "title": "Water retention curves of intact and re-compacted loess at different net stresses",
+          "url": "https://www.jstage.jst.go.jp/article/jgssp/2/4/2_HKG-04/_article/-char/ja/",
+          "authors": "<b>Sadeghi, H.</b>, Hossen, S. B., Chiu, A. C., Cheng, Q. & Ng, C. W. W. (2016).",
+          "details": "Orally presented in <b>The 15<span class=\"ordinal\">th</span> Asian Regional Conference on Soil Mechanics and Geotechnical Engineering (15ARC)</b>, Japan. Geotech. Soc. Spec. Publ., 2(4), 221-225."
+        },
+        {
+          "title": "Stiffness anisotropy for serviceability analysis of oil and gas pipelines crossing loess embankments",
+          "url": "https://repository.ust.hk/ir/Record/1783.1-77714",
+          "authors": "Baghbanrezvan, S., <b>Sadeghi, H.</b> & Ng, C. W. W. (2015).",
+          "details": "Poster presentation in <b>The 1<span class=\"ordinal\">st</span> International Conference on Geo-Energy and Geo-Environment</b>, Hong Kong, 1, 142-143."
+        },
+        {
+          "title": "A field study of stress-dependent soil-water characteristic curves and permeability functions of a loess soil for landfill covers",
+          "url": "https://repository.ust.hk/ir/Record/1783.1-77755",
+          "authors": "Liu, J., Chen, R., <b>Sadeghi, H.</b> & Ng, C. W. W. (2015).",
+          "details": "Poster presentation in <b>The 1<span class=\"ordinal\">st</span> International Conference on Geo-Energy and Geo-Environment</b>, Hong Kong, 1, 118-119."
+        },
+        {
+          "title": "Coupled effects of suction and degree of saturation on large strain shear modulus of unsaturated sands",
+          "url": "https://books.google.com/books?id=_O3MAwAAQBAJ&pg=PA1562&lpg=PA1562&dq=Coupled+effects+of+suction+and+degree+of+saturation+on+large+strain+shear+modulus+of+unsaturated+sands&source=bl&ots=aU2kLnFPVg&sig=ACfU3U0l-Dy4R-Xn4cDpklc47SPN-jXC6A&hl=en&sa=X&ved=2ahUKEwi44u-U76HrAhVxRhUIHVHGA88Q6AEwBnoECAsQAQ#v=onepage&q=Coupled%20effects%20of%20suction%20and%20degree%20of%20saturation%20on%20large%20strain%20shear%20modulus%20of%20unsaturated%20sands&f=false",
+          "authors": "Jafarzadeh, F., Ahmadinezhad, A., & <b>Sadeghi, H.</b> (2014).",
+          "details": "Accepted for oral presentation in <b>Unsaturated Soils: Research and Applications-Proceedings of the 6<span class=\"ordinal\">th</span> International Conference on Unsaturated Soils, UNSAT 2014</b>-Australia, 2, 1559-1564."
+        },
+        {
+          "title": "Dynamic properties of sand in constant-volume and constant-load tests",
+          "url": "https://scholarsmine.mst.edu/icrageesd/05icrageesd/session01/11/",
+          "authors": "Jafarzadeh, F. & <b>Sadeghi, H.</b> (2010).",
+          "details": "Orally presented in <b>The Fifth International Conference on Recent Advances in Geotechnical Earthquake Engineering and Soil Dynamics, Missouri University of Science and Technology</b>, San Diego, California."
+        },
+        {
+          "title": "Effect of water content on dynamic properties of sand in cyclic simple shear tests",
+          "url": "https://ci.nii.ac.jp/ncid/BB19925450",
+          "authors": "Jafarzadeh, F. & <b>Sadeghi, H.</b> (2009).",
+          "details": "Orally presented in <b>The International Conference on Performance-based Design in Earthquake Geotechnical Engineering (IS-Tokyo 2009)</b>, Tokyo, Japan, Paper 335."
+        }
+      ]
+    },
+    {
+      "id": "persian",
+      "title": "Publications in Persian",
+      "icon": "fad-pen-fancy",
+      "itemIcon": "far-file-alt",
+      "rtl": true,
+      "lang": "fa",
+      "numbered": true,
+      "items": [
+        {
+          "title": "مطالعه عددی اثر توزیع مکانی بارش مصنوعی بر جریان غیراشباع در شیروانی خاکی محدود",
+          "url": null,
+          "authors": "خشوعی، ث. س.، تقوائی، ا. و <b>صادقی، ح.</b> (1403).",
+          "details": "اولین همایش ملی انجمن محیط‌های متخلخل ایران، 3 و 4 مهرماه، دانشگاه تهران، تهران."
+        },
+        {
+          "title": "مدل‌سازی ترموهیدرومکانیکی بازتوزیع تنش در مجاورت ترک‌های عمیق ناشی از خشک‌شدگی خاک در مناطق گرم و خشک",
+          "url": null,
+          "authors": "جبارزاده، م.، ولی پور، م. و <b>صادقی، ح.</b> (1403).",
+          "details": "اولین همایش ملی انجمن محیط‌های متخلخل ایران، 3 و 4 مهرماه، دانشگاه تهران، تهران."
+        },
+        {
+          "title": "بررسی اثر نفوذپذیری ذاتی اولیه آبخوان تحت تزریق گاز کربن‌ دی اکسید بر روی توزیع فشار گاز در آن",
+          "url": null,
+          "authors": "ولی پور، م.، جبارزاده، م. و <b>صادقی، ح.</b> (1403).",
+          "details": "اولین همایش ملی انجمن محیط‌های متخلخل ایران، 3 و 4 مهرماه، دانشگاه تهران، تهران."
+        },
+        {
+          "title": "بررسی هدایت هیدرولیکی ناهمسان خاک‌های حاوی بنتونیت با تراواسنج سه‌محوری مکعبی",
+          "url": null,
+          "authors": "غلامی، م.، علی پناهی، پ. و <b>صادقی، ح.</b> (1403).",
+          "details": "اولین همایش ملی انجمن محیط‌های متخلخل ایران، 3 و 4 مهرماه، دانشگاه تهران، تهران."
+        },
+        {
+          "title": "مقایسه چرخه عمر‌ زیست‌محیطی شیروانی‌های پایدار شده به دو روش میخکوبی و مهاربندی",
+          "url": null,
+          "authors": "یزدانی، ف.، علی پناهی، پ. و <b>صادقی، ح.</b> (1403).",
+          "details": "اولین همایش ملی انجمن محیط‌های متخلخل ایران، 3 و 4 مهرماه، دانشگاه تهران، تهران."
+        },
+        {
+          "title": "تجزیه و تحلیل کتابشناسی در پژوهش‌های علمی در حوزه خاک‌های غیراشباع",
+          "url": null,
+          "authors": "سیف، م. ا.، ملاعباسی، ح. و <b>صادقی، ح.</b> (1403).",
+          "details": "اولین همایش ملی انجمن محیط‌های متخلخل ایران، 3 و 4 مهرماه، دانشگاه تهران، تهران."
+        },
+        {
+          "title": "بررسی تأثیر زاویه شیب بر عملکرد موانع شکاف‌دار در استهلاک انرژی جنبشی جریان‌های واریزه‌ای",
+          "url": null,
+          "authors": "آقاگلی، آ. و <b>صادقی، ح.</b> (1403).",
+          "details": "اولین همایش ملی انجمن محیط‌های متخلخل ایران، 3 و 4 مهرماه، دانشگاه تهران، تهران."
+        },
+        {
+          "title": "بررسی اثر چرخه‌های انجماد و ذوب بر تغییرات حجمی خاک متورم‌شونده",
+          "url": null,
+          "authors": "عرب، ف.، غلامی، م.، علی پناهی، پ. و <b>صادقی، ح.</b> (1402).",
+          "details": "سیزدهمین کنگره بین المللی مهندسی عمران، 25 تا 27 مهرماه، دانشگاه علم و صنعت ایران، تهران."
+        },
+        {
+          "title": "تحلیل عددی جریان غیراشباع طی فرایند فروشویی در سازه هیپ معدن میدوک",
+          "url": null,
+          "authors": "شیخ میری، ع.، گل آقائی درزی، ع. و <b>صادقی، ح.</b> (1402).",
+          "details": "پنجمین همایش ملی مهندسي ژئوتکنیک، 25 و 26 مهرماه، دانشگاه شهید مدنی آذربایجان، تبریز."
+        },
+        {
+          "title": "مدل سازی عددی رفتار حجمی خاک متورم شونده غیراشباع تحت چرخه های تر و خشک شوندگی با استفاده از مدل الاستوپلاستیک متورم شونده بارسلونا",
+          "url": null,
+          "authors": "جبارزاده قندیلو، م.، تورچی، س.، گل آقائی درزی، ع. و <b>صادقی، ح.</b> (1402).",
+          "details": "پنجمین همایش ملی مهندسي ژئوتکنیک، 25 و 26 مهرماه، دانشگاه شهید مدنی آذربایجان، تبریز."
+        },
+        {
+          "title": "مطالعه آزمایشگاهی خصوصیات واگرایی و فروریزشی و امکان سنجی تثبیت خاک بستر خطوط انتقال نیروی عبوری از مسیر دشت منظریه قم",
+          "url": null,
+          "authors": "نابی، ح.، گل آقائی درزی، ع.، اکبری گرکانی، ا. <b>صادقی، ح.</b> (1402).",
+          "details": "پنجمین همایش ملی مهندسي ژئوتکنیک، 25 و 26 مهرماه، دانشگاه شهید مدنی آذربایجان، تبریز."
+        },
+        {
+          "title": "معرفی یک مدل جدید برای هدایت هیدرولیکی اشباع خاک های ریزدانه خمیری",
+          "url": "http://www.12icce.ir/fa/",
+          "authors": "گل آقائی درزی، ع. و <b>صادقی، ح.</b> (1400).",
+          "details": "دوازدهمین کنگره بین المللی مهندسي عمران، 21 تا 23 تیر ماه، دانشگاه فردوسی مشهد."
+        },
+        {
+          "title": "ارائه‌ی رویکردی خلاقانه برای شبیه‌سازی پدیده‌ی اسمز-شیمیایی در نرم‌افزار کامسول و اهمیت آن در تحلیل فرآیندهای زیست‌محیطی",
+          "url": "http://www.12icce.ir/fa/",
+          "authors": "هدایتی آذر، آ. و <b>صادقی، ح.</b> (1400).",
+          "details": "دوازدهمین کنگره بین المللی مهندسي عمران، 21 تا 23 تیر ماه، دانشگاه فردوسی مشهد."
+        },
+        {
+          "title": "برآورد احتمال گسیختگی خاکریز راه آهن ناشی از توزیع احتمالاتی بارش مبتنی بر قابلیت اعتماد مرتبه اول",
+          "url": "https://www.confdirector.com/cfpshow.php?id=8&details",
+          "authors": "احمدی، م. م.، کاهه، ش. و <b>صادقی، ح.</b> (1399).",
+          "details": "ششمین کنفرانس بین المللی مهندسی قابلیت اطمینان و ایمنی، 29 و 30 بهمن ماه، دانشگاه شیراز."
+        },
+        {
+          "title": "مروری بر تأثیر ریزساختار بر هدایت هیدرولیکی خاک‌های غیراشباع",
+          "url": "https://www.civilica.com/Paper-GEOTEC04-GEOTEC04_083=%D9%85%D8%B1%D9%88%D8%B1%DB%8C-%D8%A8%D8%B1-%D8%AA%D8%A7%D8%AB%DB%8C%D8%B1-%D8%B1%DB%8C%D8%B2%D8%B3%D8%A7%D8%AE%D8%AA%D8%A7%D8%B1-%D8%A8%D8%B1-%D9%87%D8%AF%D8%A7%DB%8C%D8%AA-%D9%87%DB%8C%D8%AF%D8%B1%D9%88%D9%84%DB%8C%DA%A9%DB%8C-%D8%AE%D8%A7%DA%A9%D9%87%D8%A7%DB%8C-%D8%BA%DB%8C%D8%B1%D8%A7%D8%B4%D8%A8%D8%A7%D8%B9.html",
+          "authors": "حسنی مطلق، ا.، خدادادی، س. و <b>صادقی، ح.</b> (1398).",
+          "details": "چهارمین کنفرانس ملی مهندسی ژئوتکنیک ایران، 28 و 29 آبان ماه، دانشگاه شهید بهشتی."
+        },
+        {
+          "title": "تولید خاک لُس مصنوعی به منظور ارزیابی رفتار خاک‌های فروریزشی",
+          "url": "https://www.civilica.com/Paper-NCCE11-NCCE11_156=%D8%AA%D9%88%D9%84%DB%8C%D8%AF-%D8%AE%D8%A7%DA%A9-%D9%84%D8%B3-%D9%85%D8%B5%D9%86%D9%88%D8%B9%DB%8C-%D8%A8%D9%87-%D9%85%D9%86%D8%B8%D9%88%D8%B1-%D8%A7%D8%B1%D8%B2%DB%8C%D8%A7%D8%A8%DB%8C-%D8%B1%D9%81%D8%AA%D8%A7%D8%B1-%D8%AE%D8%A7%DA%A9-%D9%87%D8%A7%DB%8C-%D9%81%D8%B1%D9%88%D8%B1%DB%8C%D8%B2%D8%B4%DB%8C.html",
+          "authors": "علی پناهی، پ.، نصیری، ح. و <b>صادقی، ح.</b> (1398).",
+          "details": "یازدهمین کنگره ملی مهندسی عمران، 11 و 12 اردیبهشت ماه، دانشگاه شیراز."
+        },
+        {
+          "title": "مطالعه عددی پایداری خاکریز غیراشباع با پتانسیل واگرایی",
+          "url": "https://www.civilica.com/Paper-NCCE11-NCCE11_105=%D9%85%D8%B7%D8%A7%D9%84%D8%B9%D9%87-%D8%B9%D8%AF%D8%AF%DB%8C-%D9%BE%D8%A7%DB%8C%D8%AF%D8%A7%D8%B1%DB%8C-%D8%AE%D8%A7%DA%A9%D8%B1%DB%8C%D8%B2-%D8%BA%DB%8C%D8%B1%D8%A7%D8%B4%D8%A8%D8%A7%D8%B9-%D8%A8%D8%A7-%D9%BE%D8%AA%D8%A7%D9%86%D8%B3%DB%8C%D9%84-%D9%88%D8%A7%DA%AF%D8%B1%D8%A7%DB%8C%DB%8C.html",
+          "authors": "احمدی، م.م.، کلاهدوز، ع. و <b>صادقی، ح.</b> (1398).",
+          "details": "یازدهمین کنگره ملی مهندسی عمران، 11 و 12 اردیبهشت ماه، دانشگاه شیراز."
+        },
+        {
+          "title": "توسعه سلول دوگانه سه محوری با جدار انعطاف پذیر برای اندازه گیری نفوذپذیری خاک‌های اشباع",
+          "url": "https://www.civilica.com/Paper-GEOTEC03-GEOTEC03_016=%D8%AA%D9%88%D8%B3%D8%B9%D9%87-%D8%B3%D9%84%D9%88%D9%84-%D8%AF%D9%88%DA%AF%D8%A7%D9%86%D9%87-%D8%B3%D9%87-%D9%85%D8%AD%D9%88%D8%B1%DB%8C-%D8%A8%D8%B1%D8%A7%DB%8C-%D8%A7%D9%86%D8%AF%D8%A7%D8%B2%D9%87-%DA%AF%DB%8C%D8%B1%DB%8C-%D9%86%D9%81%D9%88%D8%B0%D9%BE%D8%B0%DB%8C%D8%B1%DB%8C-%D8%AE%D8%A7%DA%A9-%D9%87%D8%A7%DB%8C-%D8%A7%D8%B4%D8%A8%D8%A7%D8%B9.html",
+          "authors": "علی پناهی، پ. و <b>صادقی، ح.</b> (1397).",
+          "details": "سومین کنفرانس ملی مهندسی ژئوتکنیک ایران، 1 و 2 آبان ماه، دانشگاه تهران."
+        },
+        {
+          "title": "توسعه دستگاه غیراشباع تحکیم اتوماتیک برای تعیین خصوصیات هیدرومکانیکی خاک ها",
+          "url": "https://www.civilica.com/Paper-GEOTEC03-GEOTEC03_017=%D8%AA%D9%88%D8%B3%D8%B9%D9%87-%D8%AF%D8%B3%D8%AA%DA%AF%D8%A7%D9%87-%D8%BA%DB%8C%D8%B1%D8%A7%D8%B4%D8%A8%D8%A7%D8%B9-%D8%AA%D8%AD%DA%A9%DB%8C%D9%85-%D8%A7%D8%AA%D9%88%D9%85%D8%A7%D8%AA%DB%8C%DA%A9-%D8%A8%D8%B1%D8%A7%DB%8C-%D8%AA%D8%B9%DB%8C%DB%8C%D9%86-%D8%AE%D8%B5%D9%88%D8%B5%DB%8C%D8%A7%D8%AA-%D9%87%DB%8C%D8%AF%D8%B1%D9%88%D9%85%DA%A9%D8%A7%D9%86%DB%8C%DA%A9%DB%8C-%D8%AE%D8%A7%DA%A9-%D9%87%D8%A7.html",
+          "authors": "نصیری، ح. و <b>صادقی، ح.</b> (1397).",
+          "details": "سومین کنفرانس ملی مهندسی ژئوتکنیک ایران، 1 و 2 آبان ماه، دانشگاه تهران."
+        },
+        {
+          "title": "توسعه دستگاه برش ساده تناوبی برای آزمایشهای غیراشباع",
+          "url": "https://repository.uma.ac.ir/id/eprint/5509/",
+          "authors": "جعفرزاده، ف.، احمدی نژاد، ع. و <b>صادقی، ح.</b> (1392).",
+          "details": "اولین کنفرانس ملی مهندسی ژئوتکنیک ایران، 30 مهر و 1 آبان ماه، دانشگاه محقق اردبیلی."
+        },
+        {
+          "title": "بررسی خصوصیات دینامیکی ماسه در سطوح مختلف اشباع با دستگاه برش ساده تناوبی",
+          "url": "https://www.civilica.com/Paper-ICCE08-ICCE08_611=%D8%A8%D8%B1%D8%B1%D8%B3%DB%8C-%D8%AE%D8%B5%D9%88%D8%B5%DB%8C%D8%A7%D8%AA-%D8%AF%DB%8C%D9%86%D8%A7%D9%85%DB%8C%DA%A9%DB%8C-%D9%85%D8%A7%D8%B3%D9%87-%D8%AF%D8%B1-%D8%B3%D8%B7%D9%88%D8%AD-%D9%85%D8%AE%D8%AA%D9%84%D9%81-%D8%A7%D8%B4%D8%A8%D8%A7%D8%B9-%D8%A8%D8%A7-%D8%AF%D8%B3%D8%AA%DA%AF%D8%A7%D9%87-%D8%A8%D8%B1%D8%B4-%D8%B3%D8%A7%D8%AF%D9%87-%D8%AA%D9%86%D8%A7%D9%88%D8%A8%DB%8C.html",
+          "authors": "جعفرزاده، ف. و <b>صادقی، ح.</b> (1388).",
+          "details": "هشتمین کنگره بین المللی مهندسی عمران، 21 تا 23 اردیبهشت ماه، دانشگاه شیراز."
+        }
+      ]
+    }
+  ]
+}

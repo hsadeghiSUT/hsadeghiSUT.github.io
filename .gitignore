@@ -1,0 +1,35 @@
+# --------------------------------------------------------------------------
+# What does NOT belong in this repository.
+#
+# The site itself has no build step and no dependencies, so this list is short
+# by design: everything here is either a machine artefact, a local log, or an
+# archive of the folder that lives beside it. Nothing the site serves is
+# ignored — if a browser asks for it, it is committed.
+# --------------------------------------------------------------------------
+
+# Python bytecode, written whenever tools/trace-bismillah.py or
+# tools/build-fonts.py is run.
+__pycache__/
+*.py[cod]
+
+# Written by tools/refresh-scholar.ps1, one line per run. It is a record of
+# what this machine did, not of what the site is — and two machines refreshing
+# the snapshot would conflict on it for no reason. README §11.4C.
+tools/scholar-refresh.log
+
+# Playwright, if you install it to run the browser-driven guards
+# (check-ui, check-farsi, check-contrast, check-dropcap). README §11.4D.
+node_modules/
+package-lock.json
+
+# The dated .rar snapshots of this folder, and any editor or OS leavings.
+*.rar
+*.zip
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*~
+
+# Local preview configuration for the editor's dev-server launcher.
+.claude/

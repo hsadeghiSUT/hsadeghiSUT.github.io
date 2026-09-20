@@ -1,0 +1,1286 @@
+/* --------------------------------------------------------------------------
+   Hamed Sadeghi — personal academic website
+   Design, code and content copyright (c) 2026 Hamed Sadeghi. All rights reserved.
+   Original: http://sharif.edu/~hsadeghi/
+
+   Not licensed for reuse, redistribution or derivative works without written
+   permission. Reading this file is expected — it was sent to your browser so it
+   could be used. Republishing it is not.
+
+   build-id: hs-geotech-2026-6f3ad1
+   -------------------------------------------------------------------------- */
+/* =============================================================================
+   components.css — the reusable pieces the pages are assembled from
+   -----------------------------------------------------------------------------
+   2026 REDESIGN. Rewritten from scratch for the new visual language: white
+   cards on a near-white page, a single cyan accent, generous spacing, and
+   motion only where it tells the reader something.
+
+   IMPORTANT: nothing in this file may set a font family, size, line-height,
+   letter-spacing, word-spacing or direction on `.rtl` or anything inside it.
+   The Persian publications are pinned by farsi.css, which loads after this
+   file — but the discipline belongs here too, so the lock stays a safety net
+   rather than the only thing holding.
+   ========================================================================== */
+
+/* -----------------------------------------------------------------------------
+   1. Icons
+   Every icon is <svg class="icon"><use href="…#fad-book"></use></svg>. They
+   inherit colour from surrounding text and sit on the baseline like a letter.
+   -------------------------------------------------------------------------- */
+.icon {
+  width: 1em;
+  height: 1em;
+  display: inline-block;
+  vertical-align: -0.125em;
+  fill: currentColor;
+  flex: none;
+}
+.icon--2x { width: 2em;  height: 2em;  }
+.icon--3x { width: 3em;  height: 3em;  }
+
+.c-academia { color: var(--c-ink-strong); }
+.c-accent   { color: var(--c-accent); }
+.c-danger   { color: var(--c-danger); }
+
+/* The multi-coloured Google Scholar wordmark, rebuilt without extra markup.
+   Google's four brand colours sit happily on either background. */
+.gs { font-weight: 600; }
+.gs i:nth-child(1), .gs i:nth-child(4) { color: #4285f4; font-style: normal; }
+.gs i:nth-child(2), .gs i:nth-child(6) { color: #ea4335; font-style: normal; }
+.gs i:nth-child(3) { color: #fbbc05; font-style: normal; }
+.gs i:nth-child(5) { color: #34a853; font-style: normal; }
+
+/* -----------------------------------------------------------------------------
+   2. Buttons
+   Two weights: a filled primary and a quiet outline. Used in the hero and
+   anywhere an action needs to look like one.
+   -------------------------------------------------------------------------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0.625rem var(--space-4);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--c-border);
+  background: var(--c-surface);
+  color: var(--c-ink);
+  font-size: var(--t-sm);
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: background-color var(--dur) var(--ease),
+              border-color var(--dur) var(--ease),
+              transform var(--dur) var(--ease),
+              box-shadow var(--dur) var(--ease);
+}
+.btn:hover {
+  color: var(--c-ink);
+  border-color: var(--c-ink-faint);
+  transform: translateY(-1px);
+  box-shadow: var(--sh-card);
+}
+.btn:active { transform: none; }
+
+.btn--primary {
+  background: var(--c-accent);
+  border-color: var(--c-accent);
+  color: #fff;
+}
+.btn--primary:hover {
+  background: var(--c-link-hover);
+  border-color: var(--c-link-hover);
+  color: #fff;
+}
+:root[data-theme="dark"] .btn--primary,
+:root[data-theme="dark"] .btn--primary:hover { color: #04212a; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .btn--primary,
+  :root:not([data-theme]) .btn--primary:hover { color: #04212a; }
+}
+
+/* -----------------------------------------------------------------------------
+   3. Hero
+   -------------------------------------------------------------------------- */
+.hero {
+  display: grid;
+  gap: var(--space-5);
+  align-items: center;
+  padding: var(--space-6);
+  margin-top: var(--space-5);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-xl);
+  /* A soft two-stop wash rather than a flat block — enough to separate the hero
+     from the page without turning into a coloured banner. */
+  background:
+    radial-gradient(120% 140% at 12% 0%, var(--c-hero-a) 0%, transparent 55%),
+    radial-gradient(100% 120% at 100% 100%, var(--c-hero-b) 0%, transparent 60%),
+    var(--c-surface);
+  box-shadow: var(--sh-card);
+}
+
+.hero__photo {
+  width: 100%;
+  max-width: 15rem;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  object-position: center 18%;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--sh-card-hover);
+  justify-self: center;
+}
+
+.hero__body { display: grid; gap: var(--space-3); min-width: 0; }
+
+.hero__kicker {
+  font-size: var(--t-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--c-accent);
+}
+
+.hero__name {
+  font-size: var(--t-display);
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  color: var(--c-ink-strong);
+}
+
+.hero__affil {
+  color: var(--c-ink-mute);
+  font-size: var(--t-sm);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+.hero__affil .icon { color: var(--c-accent); }
+
+.hero__actions { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-2); }
+
+/* ---- Citation figures in the hero -------------------------------------------
+   Three tiles: citations, h-index, i10-index, from data/scholar.json.  README
+   §18 — and the thing to know while reading this is that the whole block is
+   ABSENT, not empty, when there is no snapshot to draw it from.  There is no
+   placeholder state to style here because there is no placeholder state.
+
+   A row of tiles rather than a sentence, because three numbers set as a
+   sentence are three numbers a reader has to parse; set as tiles they are a
+   glance.  `auto-fit` so they sit in one row at any hero width and stack only
+   when there is genuinely no room.
+   -------------------------------------------------------------------------- */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+  max-width: 26rem;
+  margin-top: var(--space-1);
+  padding: 0;
+  color: inherit;
+  border-radius: var(--radius-lg);
+  /* The whole block is one link, so it gets one focus ring rather than three. */
+  transition: transform var(--dur) var(--ease);
+}
+.stats:hover { transform: translateY(-1px); }
+
+.stat {
+  display: grid;
+  gap: 0.1rem;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius);
+  background: var(--c-surface-2);
+  text-align: center;
+  transition:
+    border-color var(--dur) var(--ease),
+    background-color var(--dur) var(--ease);
+}
+.stats:hover .stat { border-color: var(--c-accent); }
+
+.stat__value {
+  font-size: var(--t-lg);
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--c-ink-strong);
+  /* Tabular figures so 2,066 and 26 line up on their own centres rather than
+     drifting with the width of a 1. */
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+.stats:hover .stat__value { color: var(--c-accent); }
+
+.stat__label {
+  font-size: var(--t-xs);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--c-ink-faint);
+  white-space: nowrap;
+}
+
+/* The date the figures were taken.
+
+   A fourth item in the same three-column grid, spanning all of it, rather than
+   a paragraph beside the block: the whole thing is one link and one focus ring,
+   and a sibling would need its own place in the hero's flow.
+
+   Deliberately the quietest text in the hero — it is provenance, not a figure.
+   It sits under the tiles rather than over them for the same reason, and it
+   picks up the accent on hover along with everything else in the link, which is
+   what says "this line is part of that link" without a second underline. */
+.stat__asof {
+  grid-column: 1 / -1;
+  margin-top: 0.15rem;
+  font-size: calc(var(--t-xs) * 0.92);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--c-ink-faint);
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  transition: color var(--dur) var(--ease);
+}
+.stats:hover .stat__asof { color: var(--c-ink-mute); }
+
+/* Role chips — six bold stacked lines became a wrapping row of quiet pills. */
+.chips { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.chip {
+  display: inline-block;
+  padding: 0.25rem 0.7rem;
+  border-radius: var(--radius-full);
+  background: var(--c-surface-2);
+  border: 1px solid var(--c-border);
+  color: var(--c-ink-soft);
+  font-size: var(--t-xs);
+  font-weight: 500;
+  line-height: 1.5;
+}
+.chip--link { transition: border-color var(--dur) var(--ease), color var(--dur) var(--ease); }
+.chip--link:hover { border-color: var(--c-accent); color: var(--c-accent); }
+
+/* ---- Hero layout ------------------------------------------------------------
+   Two things share the hero: the portrait and the text.  Named areas rather
+   than source order, so the same markup reads correctly at every width.
+   -------------------------------------------------------------------------- */
+.hero__photo { grid-area: photo; }
+.hero__body  { grid-area: body; }
+
+.hero {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    "photo"
+    "body";
+}
+
+@media (min-width: 44rem) {
+  .hero {
+    grid-template-columns: 15rem minmax(0, 1fr);
+    grid-template-areas: "photo body";
+    gap: var(--space-6);
+    padding: var(--space-7) var(--space-6);
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   4. Section cards (home page)
+   -------------------------------------------------------------------------- */
+.cards {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+  margin-top: var(--space-6);
+  /* The bottom margin is not decoration.  On the home page `.layout` — the
+     article and the sidebar — follows this grid immediately, and with no margin
+     the first sidebar panel sits flush against the last card with the two
+     borders touching.  Matching the layout's own 2.25rem gutter keeps the
+     spacing on this page the same in both directions. */
+  margin-bottom: var(--space-6);
+}
+/* Explicit column counts rather than auto-fit: six cards divide cleanly into
+   two rows of three, where auto-fit would leave a ragged 4 + 2. */
+@media (min-width: 40rem) { .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 64rem) { .cards { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+.card {
+  display: grid;
+  align-content: start;
+  gap: var(--space-2);
+  padding: var(--space-5);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-lg);
+  background: var(--c-surface);
+  color: inherit;
+  box-shadow: var(--sh-card);
+  transition: transform var(--dur) var(--ease),
+              box-shadow var(--dur) var(--ease),
+              border-color var(--dur) var(--ease);
+}
+.card:hover {
+  color: inherit;
+  transform: translateY(-3px);
+  box-shadow: var(--sh-card-hover);
+  border-color: var(--c-accent);
+}
+
+/* The six section cards carry the largest icons on the site, and since they
+   became modelled objects (§5c) they have to be larger again. A Font Awesome
+   symbol is drawn to the edge of its viewBox; a model is fitted inside its
+   frame with room to turn in, so at the old 1.35rem the object came out
+   visibly smaller than the glyph it replaced — on the one row of icons a
+   visitor looks straight at. The tile grew with it, so the proportion of tile
+   to icon is what it was. */
+.card__icon {
+  display: grid;
+  place-items: center;
+  width: 3.2rem;
+  height: 3.2rem;
+  border-radius: var(--radius);
+  background: var(--c-accent-soft);
+  color: var(--c-accent);
+  margin-bottom: var(--space-2);
+}
+.card__icon .icon { width: 2rem; height: 2rem; }
+
+.card__title { font-size: var(--t-lg); color: var(--c-ink-strong); }
+.card__blurb { color: var(--c-ink-mute); font-size: var(--t-sm); }
+
+.card__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-top: var(--space-2);
+  color: var(--c-ink-faint);
+  font-size: var(--t-xs);
+}
+.card__count { font-weight: 700; color: var(--c-accent); font-size: var(--t-sm); }
+/* The back-to-top glyph, rotated into a "go" arrow — one sprite doing two jobs. */
+.card__arrow {
+  margin-left: auto;
+  transform: rotate(45deg);
+  transition: transform var(--dur) var(--ease);
+}
+.card:hover .card__arrow { transform: rotate(45deg) translate(2px, -2px); }
+
+/* -----------------------------------------------------------------------------
+   5. Article typography
+   -------------------------------------------------------------------------- */
+.section-title {
+  font-size: var(--t-xl);
+  color: var(--c-ink-strong);
+  margin: var(--space-6) 0 var(--space-3);
+}
+.section-title:first-child { margin-top: var(--space-4); }
+
+/* Justified, with hyphenation — and the two go together.
+   ---------------------------------------------------------------------------
+   The rest of the site's prose is already justified: every publication title,
+   author line and detail line, and the whole Persian block.  The biography was
+   the one ragged-right paragraph on the site, and §14 below already listed it
+   among the blocks that fall back to ragged-right on narrow screens — a rule
+   guarding an alignment it did not have.
+
+   `hyphens: auto` is not optional here.  Justification works by stretching the
+   spaces in a line, so the fewer break opportunities a line has, the further
+   each space has to stretch; a paragraph of long technical words justified
+   without hyphenation opens rivers of white down the column.  With hyphenation
+   the words themselves can break and the spaces barely move.  It needs
+   `lang="en"` on <html>, which every page shell has.
+
+   The measure carries it: about 74–78 characters a line at 1440–1920px, and §14
+   drops back to ragged-right below 34rem where the lines are too short for any
+   of this to work. */
+.bio p {
+  color: var(--c-ink-soft);
+  text-align: justify;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+}
+.bio__lead { font-size: var(--t-md); color: var(--c-ink); }
+
+/* The drop cap, now set in Source Serif 4 and tinted with the accent. */
+.bio__lead::first-letter {
+  float: left;
+  font-family: var(--f-drop);
+  font-weight: 600;
+  font-size: 3.4em;
+  line-height: 0.82;
+  padding: 0.06em 0.09em 0 0;
+  color: var(--c-accent);
+}
+
+.interests { display: grid; gap: var(--space-2); }
+.interests li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius);
+  background: var(--c-surface);
+  border: 1px solid var(--c-rule);
+  color: var(--c-ink-soft);
+  transition: border-color var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+.interests li:hover { border-color: var(--c-accent); transform: translateX(2px); }
+.interests .icon { color: var(--c-accent); }
+
+/* Contact list in the sidebar. */
+.contact { display: grid; gap: var(--space-2); font-size: var(--t-sm); }
+.contact li { display: flex; align-items: baseline; gap: var(--space-3); }
+.contact .icon { color: var(--c-ink-faint); }
+.contact__label { color: var(--c-ink-faint); }
+
+/* -----------------------------------------------------------------------------
+   6. Content sections
+   -------------------------------------------------------------------------- */
+.entry-section { margin-bottom: var(--space-6); }
+.entry-section > hr { display: none; }   /* the spacing does this job now */
+
+.entry-section > h3 {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: var(--t-lg);
+  color: var(--c-ink-strong);
+  padding-bottom: var(--space-3);
+  margin-bottom: var(--space-4);
+  border-bottom: 1px solid var(--c-rule);
+}
+.entry-section > h3 .icon { color: var(--c-accent); }
+
+/* -----------------------------------------------------------------------------
+   7. Publications
+   -----------------------------------------------------------------------------
+   Each entry is a hover card. Its horizontal padding is cancelled by an equal
+   negative margin so the card bleeds into the column gutter and THE TEXT
+   MEASURE IS UNCHANGED — which is what keeps every Persian line breaking on the
+   same word. Do not replace this with plain padding.
+   -------------------------------------------------------------------------- */
+.pubs > li,
+.honour,
+.project,
+.service {
+  padding: var(--space-3) var(--space-2);
+  margin-inline: calc(var(--space-2) * -1);
+  border-radius: var(--radius);
+  transition: background-color var(--dur) var(--ease);
+}
+.pubs > li:hover,
+.honour:hover,
+.project:hover,
+.service:hover { background: var(--c-hover); }
+
+/* The reversed numbering the original got from <ol reversed>. The type selector
+   outranks the `ol[class]` list-style reset in base.css. The left margin is
+   1.875rem + the card's own 0.25rem inset, so the text starts on exactly the
+   pixel it did before the redesign. */
+ol.pubs--numbered {
+  list-style: decimal;
+  margin-left: calc(1.875rem + 0.25rem);
+}
+.pubs--numbered > li::marker { color: var(--c-ink-faint); font-size: var(--t-xs); }
+
+.pub__title {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  text-align: justify;
+  font-weight: 600;
+  color: var(--c-ink);
+}
+.pub__title .icon { color: var(--c-accent); opacity: 0.75; }
+.pub__title a { color: inherit; }
+.pub__title a:hover {
+  color: var(--c-link);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.16em;
+}
+.pub__authors { text-align: justify; margin: 3px 0; color: var(--c-ink-soft); font-size: var(--t-sm); }
+.pub__details { text-align: justify; color: var(--c-ink-faint); font-size: var(--t-sm); }
+.pub__details a { color: var(--c-ink-faint); border-bottom: 1px dashed var(--c-border); }
+.pub__details a:hover { color: var(--c-link); border-bottom-color: transparent; }
+
+/* ---- "Cited by N" -----------------------------------------------------------
+   From data/scholar.json, and only on entries at or above the threshold in
+   assets/js/modules/scholar.js.  README §18.
+
+   A pill on its own line under the entry rather than something tucked into the
+   details line: it is the one piece of an entry that is not bibliography, and
+   putting it inline would have it read as part of the volume-and-page string.
+
+   `width: fit-content` keeps the pill the width of its own text inside the
+   block layout of the list item, so it does not stretch across the column.
+   -------------------------------------------------------------------------- */
+.pub__cited {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  width: fit-content;
+  margin-top: 0.3rem;
+  padding: 0.1rem 0.55rem;
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-full);
+  background: var(--c-surface-2);
+  font-size: var(--t-xs);
+  line-height: 1.7;
+  /* --c-ink-mute, not --c-ink-faint, and the difference is one WCAG line.
+
+     `--c-ink-faint` is chosen against the PAGE, where it measures 4.83:1 and
+     clears AA with room to spare — which is what its comment in theme.css says
+     and why it is safe nearly everywhere. This badge is one of the few places
+     it lands on `--c-surface-2` instead, a tinted inset, and on that it
+     measures **4.43:1**: under the 4.5 AA needs, on every one of the 86 badges
+     the Publications page draws, in the light theme only.
+
+     `--c-ink-mute` on the same inset is 5.48:1. The label goes one step darker
+     and nothing else changes; `.pub__cited-n` keeps its own, stronger colour.
+
+     `node tools/check-contrast.mjs` is what found it, and only once Playwright
+     was installed — it had been skipping silently until then. */
+  color: var(--c-ink-mute);
+  transition:
+    border-color var(--dur) var(--ease),
+    color var(--dur) var(--ease);
+}
+a.pub__cited:hover { border-color: var(--c-accent); color: var(--c-accent); }
+
+.pub__cited-label { letter-spacing: 0.02em; }
+.pub__cited-n {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--c-ink-soft);
+}
+a.pub__cited:hover .pub__cited-n { color: var(--c-accent); }
+
+/* The Persian list sets its own direction; the pill is Latin text and a Latin
+   number either way, so it is pinned to LTR rather than mirrored into
+   "۱۳ Cited by". farsi.css governs the face and size of everything else in
+   that block and deliberately does not reach in here. */
+.rtl .pub__cited { direction: ltr; }
+
+/* Persian block: direction and alignment only. Face and size come from
+   farsi.css — deliberately not repeated here. */
+.rtl { direction: rtl; text-align: right; }
+
+.ordinal { position: relative; font-size: 0.7em; vertical-align: super; }
+
+/* -----------------------------------------------------------------------------
+   8. Timeline rows — Background, Honours, Services
+   -------------------------------------------------------------------------- */
+.tl { display: grid; gap: var(--space-1); }
+
+.tl__item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  column-gap: var(--space-4);
+  align-items: baseline;
+  padding: var(--space-3) var(--space-2);
+  margin-inline: calc(var(--space-2) * -1);
+  border-radius: var(--radius);
+  transition: background-color var(--dur) var(--ease);
+}
+.tl__item:hover { background: var(--c-hover); }
+.tl__body { display: flex; align-items: baseline; gap: var(--space-3); min-width: 0; }
+.tl__body .icon { color: var(--c-accent); opacity: 0.8; }
+.tl__lead { font-weight: 600; color: var(--c-ink); }
+.tl__period {
+  font-weight: 500;
+  font-size: var(--t-sm);
+  font-variant-numeric: tabular-nums;
+  color: var(--c-ink-faint);
+  white-space: nowrap;
+  text-align: right;
+}
+
+@media (max-width: 30rem) {
+  .tl__item { grid-template-columns: 1fr; row-gap: var(--space-1); }
+  .tl__period { text-align: left; }
+}
+
+/* Honours: a bold title line, a softer organisation line, the year at the end. */
+.honour { display: grid; gap: var(--space-1); }
+.honour__title {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  font-weight: 600;
+  color: var(--c-ink);
+}
+.honour__title .icon { color: var(--c-accent); }
+.honour__meta {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  column-gap: var(--space-4);
+  font-size: var(--t-sm);
+  color: var(--c-ink-mute);
+  padding-left: 1.75rem;
+}
+.honour__year {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--c-ink-faint);
+  white-space: nowrap;
+}
+@media (max-width: 30rem) {
+  .honour__meta { grid-template-columns: 1fr; padding-left: 0; }
+}
+
+/* -----------------------------------------------------------------------------
+   9. Research team
+   -------------------------------------------------------------------------- */
+.people { display: grid; gap: var(--space-4); }
+
+.person {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-content: start;
+  gap: 0 var(--space-4);
+  padding: var(--space-4);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-lg);
+  background: var(--c-surface);
+  box-shadow: var(--sh-card);
+  transition: box-shadow var(--dur) var(--ease),
+              transform var(--dur) var(--ease),
+              border-color var(--dur) var(--ease);
+}
+.person:hover {
+  box-shadow: var(--sh-card-hover);
+  border-color: var(--c-accent);
+  transform: translateY(-2px);
+}
+
+.person__photo {
+  grid-row: 1 / span 3;
+  width: 6.5rem;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: var(--radius);
+  background: var(--c-surface-2);
+}
+
+.entry .person__name {
+  font-size: var(--t-md);
+  margin: 0 0 var(--space-2);
+  color: var(--c-ink-strong);
+}
+.person__name a { color: inherit; }
+.person__name a:hover { color: var(--c-link); }
+.person__note {
+  display: block;
+  font-family: var(--f-body);
+  font-size: var(--t-xs);
+  font-weight: 400;
+  color: var(--c-ink-faint);
+  line-height: 1.4;
+  margin-top: 2px;
+}
+
+.person__topic {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  font-size: var(--t-sm);
+  color: var(--c-ink-soft);
+  margin-bottom: var(--space-3);
+}
+.person__topic .icon { color: var(--c-accent); opacity: 0.8; }
+
+.person__date {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  align-self: start;
+  font-size: var(--t-sm);
+  color: var(--c-ink-faint);
+  font-variant-numeric: tabular-nums;
+}
+.person__status { display: inline-flex; gap: var(--space-1); }
+
+@media (max-width: 34rem) {
+  .person { grid-template-columns: minmax(0, 1fr); gap: var(--space-3); }
+  .person__photo { grid-row: auto; width: 6rem; }
+}
+
+/* -----------------------------------------------------------------------------
+   10. Teaching and simple lists
+   -------------------------------------------------------------------------- */
+.course-list { display: grid; gap: var(--space-2); }
+.course-list li {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid var(--c-rule);
+  border-radius: var(--radius);
+  background: var(--c-surface);
+  color: var(--c-ink-soft);
+  font-weight: 500;
+  transition: border-color var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+.course-list li:hover { border-color: var(--c-accent); transform: translateX(2px); }
+.course-list li .icon { color: var(--c-accent); }
+.course-list li[data-tone="warning"] { color: var(--c-danger); border-color: var(--c-danger); }
+.course-list li[data-tone="warning"] .icon { color: var(--c-danger); }
+.course-list__note { display: block; color: var(--c-ink-faint); font-weight: 400; }
+
+/* Journal names: a wrapping set of pills rather than a long single column. */
+.plain-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.plain-list li {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--c-rule);
+  border-radius: var(--radius-full);
+  background: var(--c-surface);
+  color: var(--c-ink-soft);
+  font-size: var(--t-sm);
+  transition: border-color var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.plain-list li:hover { border-color: var(--c-accent); color: var(--c-ink); }
+
+/* Service rows: role / event / place. */
+.service { display: grid; gap: 2px; }
+.service__role  { font-weight: 600; color: var(--c-ink); }
+.service__event { color: var(--c-ink-soft); font-size: var(--t-sm); }
+.service__place { color: var(--c-ink-faint); font-size: var(--t-sm); }
+
+.project { display: grid; gap: var(--space-1); }
+.project__title { font-weight: 600; color: var(--c-ink); }
+.project__meta {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  column-gap: var(--space-4);
+  color: var(--c-ink-faint);
+  font-size: var(--t-sm);
+}
+.project__period {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+@media (max-width: 30rem) { .project__meta { grid-template-columns: 1fr; } }
+
+/* -----------------------------------------------------------------------------
+   11. Lightbox
+   -------------------------------------------------------------------------- */
+.lightbox {
+  border: 0;
+  padding: 0;
+  max-width: 100vw;
+  max-height: 100vh;
+  width: 100%;
+  height: 100%;
+  background: rgb(8 10 14 / 0.92);
+  overflow: auto;
+}
+.lightbox::backdrop { background: rgb(8 10 14 / 0.92); }
+.lightbox__figure {
+  margin: 0;
+  min-height: 100%;
+  display: grid;
+  place-content: center;
+  gap: var(--space-4);
+  padding: var(--space-7) var(--space-4);
+}
+.lightbox__img {
+  max-width: min(100%, 68rem);
+  max-height: 80vh;
+  margin-inline: auto;
+  border-radius: var(--radius);
+  animation: lb-zoom var(--dur-slow) var(--ease-out);
+}
+.lightbox__caption { color: #cbd2dd; text-align: center; font-size: var(--t-sm); }
+.lightbox__close {
+  position: fixed;
+  top: var(--space-4);
+  right: var(--space-5);
+  background: none;
+  border: 0;
+  color: #e8ecf2;
+  cursor: pointer;
+  line-height: 1;
+}
+.lightbox__close:hover { color: #fff; }
+
+@keyframes lb-zoom { from { transform: scale(0.94); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* -----------------------------------------------------------------------------
+   12. Loading and error states
+   -------------------------------------------------------------------------- */
+.state { padding: var(--space-5) 0; color: var(--c-ink-faint); }
+.state--error {
+  color: var(--c-ink);
+  background: var(--c-error-bg);
+  border: 1px solid var(--c-error-line);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  margin-bottom: var(--space-4);
+}
+.state--error code {
+  background: var(--c-code-bg);
+  padding: 0.1em 0.4em;
+  border-radius: var(--radius-sm);
+  font-size: 0.95em;
+}
+
+/* -----------------------------------------------------------------------------
+   13. Motion
+   -------------------------------------------------------------------------- */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(0.75rem);
+  transition: opacity var(--dur-slow) var(--ease-out),
+              transform var(--dur-slow) var(--ease-out);
+}
+[data-reveal].is-visible { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] { opacity: 1; transform: none; }
+}
+
+/* Reading-progress line under the header. `progress.js` writes one custom
+   property per frame; the CSS turns it into a transform, which is
+   compositor-only, so the page is never re-laid-out to move the bar. */
+.progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  z-index: 60;
+  pointer-events: none;
+  background: var(--c-accent-bright);
+  transform: scaleX(var(--progress, 0));
+  transform-origin: 0 50%;
+}
+
+/* -----------------------------------------------------------------------------
+   13a. The heart in the footer
+   A modelled, beating heart on a canvas about twenty pixels across, with the
+   sprite it replaces still underneath it.  The swap happens only when
+   `heart3d.js` has a working context, so the sentence never has a hole in it.
+   -------------------------------------------------------------------------- */
+.heart3d {
+  display: inline-grid;
+  place-items: center;
+  width: 1.15em;
+  height: 1.15em;
+  vertical-align: -0.22em;
+}
+.heart3d > * { grid-area: 1 / 1; }
+
+.heart3d__canvas { display: none; width: 100%; height: 100%; }
+.heart3d[data-heart="three"] .heart3d__canvas { display: block; }
+.heart3d[data-heart="three"] .heart3d__flat { display: none; }
+
+/* The copyright mark, at the head of the same line. Larger than the heart —
+   it is a mark rather than a piece of punctuation, and the sword through it
+   needs the room to be a sword. */
+.mark3d {
+  display: inline-grid;
+  place-items: center;
+  /* Sized in rem, not em, and deliberately: the brief was "as big as the mark
+     in the top bar or the back-to-top button", and both of those are fixed
+     controls.  Tied to the footer's font size it would have been whatever that
+     happened to be. */
+  /* Wider than it is tall, on purpose. A sword lying diagonally through a ring
+     sweeps out a shape that is much wider than it is high, and a square box has
+     to be opened to the wider of the two in both directions — which draws the
+     mark two thirds the size it could be, with bands of nothing above and below
+     it. See `frame()` in copyright3d.js. */
+  width: 4rem;
+  height: 2.7rem;
+  vertical-align: -0.95em;
+  margin-inline-end: 0.1em;
+  /* The glow.  It is on the wrapper rather than in the scene because a bloom
+     pass for one object forty pixels across is an absurd amount of machinery
+     for something a drop-shadow does convincingly. */
+  filter: drop-shadow(0 0 5px rgb(34 211 238 / 0.45));
+}
+.mark3d > * { grid-area: 1 / 1; }
+
+.mark3d__canvas { display: none; width: 100%; height: 100%; }
+.mark3d[data-mark="three"] .mark3d__canvas { display: block; }
+.mark3d[data-mark="three"] .mark3d__flat { display: none; }
+
+/* -----------------------------------------------------------------------------
+   13b. Back to top
+   A control that takes a reader back to the top of a long page.  Two things are
+   worth reading before changing it: where it sits, and when it is there.
+
+   WHERE IT SITS.  The brief was "bottom right, without interfering with the
+   cards", and a fixed button in the bottom-right corner interferes with the
+   cards by definition — that is where the corner of a card is.  So the offset
+   is not a number, it is a `max()`:
+
+     .shell is `min(100% - 2rem, var(--w-page))`, centred, so on a wide screen
+     there is a gutter either side.  `50vw - 41rem` is the offset that parks a
+     2.75rem button inside that gutter with 0.75rem of daylight between it and
+     the content — beside the cards, never over them, at any scroll position.
+     Below about 84rem of viewport the gutter runs out, `max()` falls back to
+     1rem, and the button takes the corner.
+
+   WHEN IT IS THERE.  In the corner it cannot avoid the content by position, so
+   it avoids it by time: scrolling down takes it away, scrolling back up brings
+   it in.  Turning round is the only gesture that ends in wanting this button.
+   That rule is confined to the widths where the gutter has run out — above
+   that it is out of everyone's way already and can simply stay put.
+
+   WHAT IS IN IT.  A cyan bayonet — a tall four-sided pyramid on a short
+   inverted one on a stem — turning about its vertical axis inside a cyan ring,
+   with a meteor running clockwise around the outside of that ring.
+
+   The bayonet and the ring are real geometry on a canvas (`bayonet3d.js`).  The
+   meteor is CSS, and deliberately so: it is the same conic-gradient-inside-a-
+   radial-mask as the header mark's (fx.css §6), it costs nothing, and it keeps
+   running on a browser where the canvas never starts.  The sprite arrow stays
+   in the button underneath and is hidden only once `data-bayonet="three"` says
+   something has replaced it, so there is no moment with an empty button.
+
+   `backtotop.js` writes `is-shown` and `is-receding`; everything else is here.
+   -------------------------------------------------------------------------- */
+.totop {
+  position: fixed;
+  /* Below the header (50) and the progress line (60), above the field (0) and
+     the page content (1). */
+  z-index: 45;
+  bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+  right: max(1rem, calc(50vw - 41rem));
+
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border-radius: 50%;
+  /* No border: the 3D ring is the edge.  The disc behind it stays, because the
+     control has to read against a card, a photo or the page equally well, and
+     because the meteor needs something to be bright against. */
+  border: 0;
+  background: var(--c-surface);
+  color: var(--c-accent);
+  box-shadow: var(--sh-card), 0 0 0 1px var(--c-border);
+  cursor: pointer;
+
+  /* Hidden until the reader is far enough down to want it.  `visibility` as
+     well as opacity, so it is not a click target while it is invisible —
+     `backtotop.js` takes it out of the tab order at the same moment. */
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(0.5rem);
+  transition:
+    opacity var(--dur) var(--ease),
+    transform var(--dur) var(--ease),
+    visibility 0s linear var(--dur),
+    border-color var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease);
+}
+
+.totop.is-shown {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition-delay: 0s;
+}
+
+.totop:hover,
+.totop:focus-visible {
+  box-shadow: var(--sh-card-hover), 0 0 0 1px var(--c-accent);
+}
+.totop.is-shown:hover { transform: translateY(-2px); }
+
+/* Everything inside sits in the same grid cell, stacked. */
+.totop > * { grid-area: 1 / 1; }
+
+.totop__icon {
+  width: 1.35rem;
+  height: 1.35rem;
+  /* The card arrow rotates this same glyph 45 degrees to point "go".  Here it
+     points where it was drawn to point. */
+  transform: none;
+}
+
+.totop__canvas {
+  display: none;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+
+/* The swap. Only when a solid is actually turning does the arrow go. */
+.totop[data-bayonet="three"] .totop__icon { display: none; }
+.totop[data-bayonet="three"] .totop__canvas { display: block; }
+
+/* ---- the meteor -------------------------------------------------------------
+   A copy of the header mark's orbit (fx.css §6), at this size.  A conic
+   gradient rotating behind a radial mask that keeps only a hairline at the
+   edge, so what is left is a bright head with a fading tail running clockwise
+   around the rim.  `inset` is negative so it traces just outside the ring
+   rather than crossing it.
+   -------------------------------------------------------------------------- */
+.totop__ring {
+  position: absolute;
+  inset: -0.1875rem;
+  border-radius: 50%;
+  pointer-events: none;
+  background: conic-gradient(
+    from 0turn,
+    transparent 0 55%,
+    color-mix(in srgb, var(--c-brand) 25%, transparent) 74%,
+    var(--c-brand) 92%,
+    #ffffff 97%,
+    transparent 99% 100%
+  );
+  -webkit-mask: radial-gradient(closest-side, transparent calc(100% - 2px), #000 calc(100% - 2px));
+  mask: radial-gradient(closest-side, transparent calc(100% - 2px), #000 calc(100% - 2px));
+  animation: totop-orbit 3.4s linear infinite;
+}
+
+@supports not (color: color-mix(in srgb, red 50%, blue)) {
+  .totop__ring {
+    background: conic-gradient(
+      from 0turn, transparent 0 60%, var(--c-brand) 92%, #ffffff 97%, transparent 99% 100%);
+  }
+}
+
+@keyframes totop-orbit {
+  from { transform: rotate(0turn); }
+  to   { transform: rotate(1turn); }
+}
+
+/* On a phone the control is smaller. It shares the bottom of the screen with
+   the footer text, and at 2.75rem it sat close enough to be read as part of it;
+   2.25rem is still a comfortable thumb target and leaves the corner clear. */
+@media (max-width: 30rem) {
+  .totop { width: 2.25rem; height: 2.25rem; }
+  .totop__icon { width: 1.1rem; height: 1.1rem; }
+}
+
+/* Below the width where the gutter runs out, the button steps aside while the
+   page is being read forward. */
+@media (max-width: 84rem) {
+  .totop.is-shown.is-receding {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(0.75rem);
+    transition-delay: 0s, 0s, var(--dur);
+  }
+}
+
+/* Someone who asked for less motion still gets the button — they just get it
+   without the slide, and the page jumps rather than glides (handled in the
+   module). */
+@media (prefers-reduced-motion: reduce) {
+  .totop,
+  .totop.is-shown,
+  .totop.is-shown.is-receding { transform: none; }
+  .totop.is-shown:hover { transform: none; }
+  /* The light stays; the movement goes. The bayonet holds still too —
+     `bayonet3d.js` checks the same query and never starts its loop. */
+  .totop__ring { animation: none; }
+}
+
+/* -----------------------------------------------------------------------------
+   14. Narrow-screen typography
+   Justified text needs a certain measure. Below 34rem the lines are too short
+   and justification opens rivers of white space, so these blocks fall back to
+   ragged-right. The Persian block follows the same rule — restated in
+   farsi.css so the behaviour belongs to that file.
+   -------------------------------------------------------------------------- */
+@media (max-width: 34rem) {
+  .bio p,
+  .pub__title,
+  .pub__authors,
+  .pub__details,
+  .honour__title,
+  .honour__meta { text-align: left; }
+  /* And no hyphenation once it is ragged: on a 42-character measure `auto`
+     breaks a word every second or third line, which is a lot of hyphens to
+     read past for a raggedness nobody minds. */
+  .bio p { hyphens: manual; -webkit-hyphens: manual; }
+}
+
+
+/* -----------------------------------------------------------------------------
+   13a-2. The dew layer
+   The canvas the drops off the sword actually live on.  It is not in the footer
+   and it is not in the 3D scene: it is pinned to the bottom of the VIEWPORT,
+   because "falls to the bottom line of the screen" is a statement about the
+   screen and the footer canvas is forty pixels tall.
+
+   It is inert in every way that matters — no pointer events, no hit testing, no
+   place in the tab order — and it sits below the header so a falling drop can
+   never cover a control.  `copyright3d.js` creates it on demand and clears it
+   whenever the mark is off screen, so on a page nobody scrolls to the bottom of
+   it is never painted at all.
+   -------------------------------------------------------------------------- */
+.dew-layer {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  z-index: 45;
+  display: block;
+  pointer-events: none;
+  user-select: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dew-layer { display: none; }
+}
+
+
+/* -----------------------------------------------------------------------------
+   5b. Icons with depth
+   The DISPLAY icons — the ones large enough for depth to be depth rather than
+   dirt — are raised: given a thickness, lit from the upper left like every
+   other three-dimensional thing on this site, and finished with a little of
+   their own colour as glow.
+
+   WHY THIS IS A FILTER AND NOT GEOMETRY
+   -------------------------------------
+   The honest way to give an icon a thickness is to extrude its outline, and
+   there are two ways to do that here. Neither survives contact with the page.
+
+   In WebGL: a browser allows something like sixteen live contexts and the
+   Publications page already holds eight. Icons would need one canvas shared
+   between all of them, positioned over the document and kept in step with it
+   through every scroll and reflow — a second layout engine, for icons.
+
+   In SVG: the same symbol drawn several times at increasing offsets, darker
+   underneath, which is the classic layered extrusion. It works, and it costs
+   five extra <use> elements per icon. There are 196 icons on the Research Team
+   page. It also breaks quietly, because those offsets are in the symbol's own
+   viewBox units and the sprite's symbols are 384, 448, 512 and 640 units wide —
+   the same offset is a different depth in each.
+
+   A CHAIN of `drop-shadow` filters is neither. Each one shadows the alpha of
+   everything before it, so three of them at half a pixel build a solid wall
+   that follows the glyph's real silhouette — any glyph, no markup, offsets in
+   CSS pixels so every icon gets the same depth whatever its viewBox, and all of
+   it on the compositor.
+
+   WHY NOT ON EVERY ICON
+   ---------------------
+   Because most of them are twelve pixels across. Below about sixteen an
+   extrusion is not a thickness, it is a smudge on one side of a glyph that was
+   drawn to be read at that size — and there are around 190 of those on the
+   longest pages against about 30 display icons. The selector list below is the
+   whole of the scope; add to it, and anything you add gets the same treatment.
+
+   WHY THE WALL IS A TINT AND NOT A SHADOW
+   ---------------------------------------
+   Two things about this sprite decide it, and neither is obvious until you try
+   the alternative.
+
+   The icons are drawn with `<use href="icons.svg#id">` — an EXTERNAL reference,
+   which means the glyph lives in a shadow tree that this stylesheet cannot
+   reach into. `.fa-secondary { opacity: 1 }` from here does nothing at all;
+   only inherited properties like `color` cross that boundary. So the second
+   fact cannot be worked around: Font Awesome's duotone symbols draw their
+   secondary layer at `opacity: .4`, and a drop-shadow sits BEHIND what casts
+   it, so on those translucent paths the wall shows straight through the face.
+
+   With a near-black wall that is fatal — the first attempt turned a cyan stack
+   of books into a navy blob. With a wall that is a DEEPER TONE OF THE ICON'S
+   OWN COLOUR it is not: where it shows through, it reads as the shaded part of
+   the same object, which is what the shaded part of a solid actually looks
+   like; where it stands outside the glyph, it reads as the thickness.
+
+   Getting more than this needs the sprite injected into the document instead of
+   referenced from it, which would put every symbol within reach of CSS and let
+   the duotone layers be lit properly rather than merely dimmed. That is a
+   change to how every icon on the site is drawn, and it is not this one.
+   -------------------------------------------------------------------------- */
+.card__icon .icon,
+.entry-section > h3 > .icon,
+.panel__title .icon,
+.secnav__chip .icon,
+.hero__roles .icon,
+.section-head .icon {
+  /* The light comes from the upper left everywhere else on this site — the key
+     in every one of the 3D modules is at (-x, +y, +z) — so the wall falls to
+     the lower right. Getting this backwards is not subtle: the icons look
+     pressed into the page instead of standing off it. */
+  filter:
+    drop-shadow(0.5px 0.5px 0 var(--c-icon-wall))
+    drop-shadow(0.5px 0.5px 0 var(--c-icon-wall))
+    drop-shadow(0.5px 0.5px 0 var(--c-icon-wall))
+    drop-shadow(0 0 1.5px var(--c-icon-glow));
+}
+
+/* The summary cards' icons sit in a tinted tile and are the largest on the
+   site, so they take a little more of everything. */
+.card__icon .icon {
+  filter:
+    drop-shadow(0.6px 0.6px 0 var(--c-icon-wall))
+    drop-shadow(0.6px 0.6px 0 var(--c-icon-wall))
+    drop-shadow(0.6px 0.6px 0 var(--c-icon-wall))
+    drop-shadow(0.6px 0.6px 0 var(--c-icon-wall))
+    drop-shadow(0 0 2.5px var(--c-icon-glow));
+}
+
+/* -----------------------------------------------------------------------------
+   5c. Icons as solid objects
+   The half of assets/js/modules/icons3d/ that lives in CSS, and it is small on
+   purpose: a handful of rules, nearly all of them about getting out of the way.
+
+   An upgraded icon is the SAME <svg class="icon"> it always was, in the same
+   place in the document, with a <canvas> added inside it and its <use> hidden.
+   So none of the selectors above had to change, the box is the box it was, and
+   turning the layer off (README §20) restores the flat glyph by removing one
+   attribute.
+   -------------------------------------------------------------------------- */
+
+/* The flat glyph steps aside. `display: none` rather than `visibility: hidden`
+   or `opacity: 0`, because the duotone symbols are translucent and a hidden-
+   but-composited layer under a transparent render would tint it. */
+.icon[data-icon3d="on"] > use { display: none; }
+
+/* The drop-shadow wall in §5b is a drawn substitute for a thickness. This icon
+   has a thickness. Running both would put a painted shadow under a lit solid,
+   which is the one combination that looks like neither. */
+.icon[data-icon3d="on"] { filter: none; }
+
+/* Likewise the CSS keyframe animations: the object has its own motion, and the
+   two together would be an icon spinning inside a spinning box. The hover
+   variants are named too, at higher specificity than animations.css gives them,
+   so pointing at a card does not start a `tada` on a building that is already
+   turning to greet you. */
+.icon[data-icon3d="on"],
+.icon[data-icon3d="on"]:hover,
+.hov-parent:hover .icon[data-icon3d="on"],
+.hov-parent:focus-visible .icon[data-icon3d="on"] {
+  animation: none;
+  transform: none;
+}
+
+/* The canvas fills its icon exactly. `overflow: visible` lets a model's glow
+   and its bevel highlight reach the edge of the box rather than being clipped a
+   pixel short of it. */
+.icon3d { overflow: visible; }
+
+/* The canvas is a picture, not a target. Without this, a canvas that reaches
+   outside its icon — see the bleed rules below — would sit over the button
+   NEXT to it and swallow the click. Hover is listened for on the enclosing
+   link, button or card rather than on the icon (index.js §7), so taking the
+   icon out of hit-testing costs nothing anywhere. */
+.icon3d { pointer-events: none; }
+
+/* --- The ones that reach outside their box ----------------------------------
+   One icon does: the sun on the theme switch, whose flares are thrown clear of
+   the frame. `data-icon3d-bleed` is set by index.js only on those, and it does
+   the two things a canvas bigger than its element needs.
+
+   An <svg> clips to its viewport by default — that is in the browser's own
+   stylesheet, not ours — so the oversized <foreignObject> inside it would be
+   cut back to exactly the box it was supposed to escape. */
+.icon[data-icon3d-bleed] { overflow: visible; }
+
+/* And it has to paint OVER its neighbours, not under them. The three segments
+   of the theme switch are siblings in the flow, so the two after the sun paint
+   after it — including the selected one's filled pill, which would otherwise
+   cover any flare thrown to the right. Positioning the icon and lifting it one
+   layer puts it above every unpositioned sibling, whatever the order. */
+.icon[data-icon3d-bleed] { position: relative; z-index: 1; }

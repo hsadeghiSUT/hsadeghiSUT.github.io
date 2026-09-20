@@ -1,0 +1,141 @@
+{
+  "photo": "assets/img/Hamed Sadeghi.jpg",
+  "name": "Hamed Sadeghi",
+  "position": "Associate Professor",
+  "roles": [
+    {
+      "label": "Dean of International Affairs",
+      "url": null
+    },
+    {
+      "label": "Founding Director of the Green Geotechnology Lab.",
+      "url": null
+    },
+    {
+      "label": "Director of Geotechnical Group",
+      "url": null
+    },
+    {
+      "label": "Coordinator of the SUT-HKUST Ph.D. Program",
+      "url": null
+    },
+    {
+      "label": "Immediate Past Chair of Iran InterPore Chapter",
+      "url": "https://www.interpore.org/about_im/about-interpore/"
+    },
+    {
+      "label": "Immediate Past Chair of IGS TC106 – Unsat. Soils",
+      "url": "https://www.issmge.org/committees/technical-committees/fundamentals/unsaturated-soils"
+    }
+  ],
+  "affiliations": [
+    {
+      "label": "Department of Civil Engineering",
+      "url": "http://civil.sharif.edu/",
+      "icon": "fad-building"
+    },
+    {
+      "label": "Sharif University of Technology",
+      "url": "http://www.en.sharif.edu/",
+      "icon": "fas-university"
+    }
+  ],
+  "address": [
+    {
+      "label": "PO Box 11365-11155",
+      "icon": "fad-mailbox"
+    },
+    {
+      "label": "Tehran, Iran",
+      "icon": "fad-map-marker-alt"
+    }
+  ],
+  "contact": [
+    {
+      "label": "Office",
+      "value": "No. 517",
+      "icon": "fad-home"
+    },
+    {
+      "label": "Phone",
+      "value": "+98 (21) 6616-4208",
+      "href": "tel:+982166164208",
+      "icon": "fad-phone"
+    },
+    {
+      "label": "Fax",
+      "value": "+98 (21) 6601-4828",
+      "icon": "fad-fax"
+    }
+  ],
+  "emailParts": [
+    "hsadeghi",
+    "sharif.edu"
+  ],
+  "bio": [
+    "Hamed Sadeghi is an Associate Professor of Civil and Environmental Engineering at Sharif University of Technology (SUT). He serves as the Dean of International Affairs and coordinator of the SUT–HKUST Dual-Degree PhD Program, of which he was the first graduate. He earned all his academic degrees with notable educational and research distinctions recognized by Iran’s National Elites Foundation.",
+    "He is the Director of the Geotechnical Group and the Founding Director of the Green Geotechnology Laboratory, a new academic infrastructure in civil and environmental engineering established to facilitate advanced research on sustainable development and urban greenery. Over the past three decades, he has received numerous scientific and cultural awards and honors, including the KANS Honorary Diploma, recognition as a Distinguished University Research Scholar, the “Dr. Kazemi-Ashtiani” Prize in recognition of nationally distinguished young research assistant professors, the SUT Distinguished University Student Award, and the Best PhD Thesis Award in Civil and Environmental Engineering.",
+    "With approximately 130 published research articles, he has served as the Immediate Past Chair of both the Iran InterPore Chapter and Technical Committee 106 (Unsaturated Soils) of the Iranian Geotechnical Society. He has also had the honor of recruiting and supervising more than 60 elite students as research or teaching assistants.",
+    "His research team primarily focuses on advancing knowledge of the complex interactions among soil, solutes, the atmosphere, plants, and bacteria within a multidisciplinary framework. This work is pursued through the development of innovative laboratory devices, rigorous characterization, theoretical modeling, and numerical simulation."
+  ],
+  "interests": [
+    {
+      "text": "Multiphysics of natural and engineered soils",
+      "icon": "fad-search"
+    },
+    {
+      "text": "Green geotechnology and urban greenery",
+      "icon": "fad-search"
+    },
+    {
+      "text": "Bioremediation of contaminated soils",
+      "icon": "fad-search"
+    },
+    {
+      "text": "Ecohydrology of rhizosphere",
+      "icon": "fad-search"
+    },
+    {
+      "text": "Natural hazard mitigation",
+      "icon": "fad-search"
+    }
+  ],
+  "seoAliases": [
+    "Hamed Sadeghi",
+    "Dr. Hamed Sadeghi",
+    "Hamed Sadeghi Geotech",
+    "Hamed Sadeghi Geotechnics",
+    "Hamed Sadeghi Geotechnique",
+    "Hamed Sadeghi Unsaturated",
+    "Hamed Sadeghi Civil",
+    "Hamed Sadeghi Civil Engineering",
+    "Hamed Sadeghi Sharif",
+    "حامد صادقی",
+    "دکتر حامد صادقی",
+    "حامد صادقی شریف",
+    "دکتر حامد صادقی شریف",
+    "حامد صادقی صنعتی شریف",
+    "دکتر حامد صادقی صنعتی شریف",
+    "حامد صادقی ژئوتکنیک",
+    "دکتر حامد صادقی ژئوتکنیک",
+    "حامد صادقی ژئوتکنیک شریف",
+    "حامد صادقی ژئوتکنیک صنعتی شریف",
+    "دکتر حامد صادقی ژئوتکنیک شریف",
+    "دکتر حامد صادقی ژئوتکنیک صنعتی شریف",
+    "حامد صادقی مهندسی ژئوتکنیک",
+    "حامد صادقی مهندسی ژئوتکنیک شریف",
+    "حامد صادقی مهندسی ژئوتکنیک صنعتی شریف",
+    "حامد صادقی مهندسی ژئوتکنیک دانشگاه صنعتی شریف",
+    "دکتر حامد صادقی مهندسی ژئوتکنیک",
+    "دکتر حامد صادقی مهندسی ژئوتکنیک شریف",
+    "دکتر حامد صادقی مهندسی ژئوتکنیک صنعتی شریف",
+    "دکتر حامد صادقی مهندسی ژئوتکنیک دانشگاه صنعتی شریف",
+    "حامد صادقی عمران",
+    "حامد صادقی مهندسی عمران",
+    "حامد صادقی مهندسی عمران شریف",
+    "حامد صادقی دانشکده عمران شریف",
+    "حامد صادقی دانشکده عمران صنعتی شریف",
+    "حامد صادقی دانشکده مهندسی عمران صنعتی شریف",
+    "حامد صادقی دانشکده مهندسی عمران دانشگاه صنعتی شریف"
+  ]
+}

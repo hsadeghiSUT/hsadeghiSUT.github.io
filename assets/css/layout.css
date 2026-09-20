@@ -1,0 +1,527 @@
+/* --------------------------------------------------------------------------
+   Hamed Sadeghi — personal academic website
+   Design, code and content copyright (c) 2026 Hamed Sadeghi. All rights reserved.
+   Original: http://sharif.edu/~hsadeghi/
+
+   Not licensed for reuse, redistribution or derivative works without written
+   permission. Reading this file is expected — it was sent to your browser so it
+   could be used. Republishing it is not.
+
+   build-id: hs-geotech-2026-6f3ad1
+   -------------------------------------------------------------------------- */
+/* =============================================================================
+   layout.css — page shell: header, navigation, grid, sidebar, footer
+   -----------------------------------------------------------------------------
+   2026 REDESIGN. The old shell was a WordPress theme's: a dark tab strip, a
+   grey bordered sidebar and a flat grey page. This file replaces all three with
+   a translucent sticky header, white cards on a near-white page, and a lot more
+   air. Nothing here sets a font family, size or line-height on Persian content —
+   see farsi.css.
+
+   Mobile first. The base rules describe the phone; each media query only *adds*
+   what a wider screen can afford:
+
+     ≥ 40rem  (640px)  two-up section cards on the home page
+     ≥ 60rem  (960px)  the horizontal nav replaces the drawer
+     ≥ 72rem  (1152px) the sidebar moves alongside the article column
+
+   Above 1600px nothing new happens — the root font-size grows instead, so the
+   whole composition scales cleanly to 4K/5K/6K.
+   ========================================================================== */
+
+/* -----------------------------------------------------------------------------
+   1. Site header
+   Translucent, blurred, and hairline-bordered. It only gains a shadow once the
+   page has scrolled beneath it, so it sits flat at rest and reads as a layer in
+   use.
+   -------------------------------------------------------------------------- */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--c-bar);
+  border-bottom: 1px solid transparent;
+  transition: box-shadow var(--dur) var(--ease),
+              border-color var(--dur) var(--ease);
+}
+
+/* `backdrop-filter` is what makes the translucency read as glass rather than as
+   a washed-out bar. Where it is unsupported the solid fallback above applies. */
+@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+  .topbar {
+    -webkit-backdrop-filter: saturate(180%) blur(14px);
+    backdrop-filter: saturate(180%) blur(14px);
+  }
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .topbar { background: var(--c-bar-solid); }
+}
+
+.topbar.is-stuck {
+  box-shadow: var(--sh-topbar);
+  border-bottom-color: var(--c-bar-border);
+}
+
+.topbar__inner {
+  width: min(100% - 2rem, var(--w-page));
+  margin-inline: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  min-height: var(--bar-h);
+}
+
+.topbar__end {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex: none;
+  margin-left: auto;
+}
+
+/* --- Brand ------------------------------------------------------------------
+   The mark, the name, and the Persian name beneath it. The Persian name keeps
+   its `.masthead__fa` class because that is what farsi.css protects. */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex: none;
+  color: var(--c-masthead);
+  border-radius: var(--radius);
+}
+.brand:hover { color: var(--c-masthead); }
+
+/* The mark itself is built by chrome.js and everything about it — its size, the
+   meteor, the aura, the shafts, the hover — lives in fx.css §9, because all of
+   those have to agree on one box. There is nothing to set here. */
+
+.brand__text { display: grid; line-height: 1.1; }
+.brand__name {
+  font-family: var(--f-serif);
+  font-size: 1.0625rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+.masthead__fa {
+  color: var(--c-ink-faint);
+  display: block;
+}
+
+/* The name is hidden only on the very narrowest phones, where the header would
+   otherwise wrap.  Kept down to 352px so the Persian name survives on every
+   real handset. */
+@media (max-width: 22rem) {
+  .brand__text { display: none; }
+}
+
+/* --- Navigation -------------------------------------------------------------
+   Phone: a full-width sheet under the header. Desktop: a plain row of links
+   with an underline marking the current page — no tabs, no borders. */
+.nav-toggle {
+  display: inline-grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  margin-left: auto;
+  background: transparent;
+  color: var(--c-ink);
+  border: 1px solid var(--c-bar-border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background-color var(--dur) var(--ease);
+}
+.nav-toggle:hover { background: var(--c-bar-hover); }
+
+.nav-toggle__bars { width: 1.0625rem; height: 0.6875rem; position: relative; }
+.nav-toggle__bars::before,
+.nav-toggle__bars::after,
+.nav-toggle__bars span {
+  content: "";
+  position: absolute;
+  left: 0; right: 0;
+  height: 1.5px;
+  border-radius: 2px;
+  background: currentColor;
+  transition: transform var(--dur) var(--ease), opacity var(--dur) var(--ease);
+}
+.nav-toggle__bars::before { top: 0; }
+.nav-toggle__bars span    { top: 50%; margin-top: -0.75px; }
+.nav-toggle__bars::after  { bottom: 0; }
+
+[aria-expanded="true"] .nav-toggle__bars::before { transform: translateY(4.75px) rotate(45deg); }
+[aria-expanded="true"] .nav-toggle__bars span    { opacity: 0; }
+[aria-expanded="true"] .nav-toggle__bars::after  { transform: translateY(-4.75px) rotate(-45deg); }
+
+.mainnav { display: contents; }
+
+.mainnav__list {
+  position: absolute;
+  left: 0; right: 0;
+  top: 100%;
+  background: var(--c-bar-solid);
+  border-bottom: 1px solid var(--c-bar-border);
+  padding: var(--space-2) max(1rem, calc(50vw - var(--w-page) / 2)) var(--space-4);
+  display: grid;
+  gap: 2px;
+  box-shadow: var(--sh-drop);
+}
+.mainnav__list[hidden] { display: none; }
+
+.mainnav__link {
+  display: block;
+  padding: var(--space-3);
+  border-radius: var(--radius);
+  color: var(--c-bar-text);
+  font-size: var(--t-md);
+  transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.mainnav__link:hover { background: var(--c-bar-hover); color: var(--c-ink); }
+.mainnav__link[aria-current="page"] {
+  color: var(--c-accent);
+  background: var(--c-accent-soft);
+  font-weight: 600;
+}
+
+/* -----------------------------------------------------------------------------
+   2. Page shell
+   -------------------------------------------------------------------------- */
+.shell {
+  width: min(100% - 2rem, var(--w-page));
+  margin-inline: auto;
+  flex: 1 0 auto;
+  padding-bottom: var(--space-8);
+}
+
+/* --- Page header -------------------------------------------------------------
+   Every page except the home page opens with a kicker and a large serif title.
+   It replaces the old letterpressed `h2` and gives each page a clear opening. */
+.page-header {
+  padding: var(--space-7) 0 var(--space-5);
+  max-width: 46rem;
+}
+.page-header__kicker {
+  font-size: var(--t-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--c-accent);
+  margin-bottom: var(--space-2);
+}
+.page-header__title {
+  font-size: var(--t-3xl);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+/* The grid: one column on small screens, article + sidebar on large ones. */
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-6);
+  align-items: start;
+}
+
+/* -----------------------------------------------------------------------------
+   3. Article column
+   -------------------------------------------------------------------------- */
+.post { position: relative; margin-bottom: var(--space-6); }
+
+/* Secondary section titles within a page (Teaching has three). */
+.post__title {
+  font-size: var(--t-xl);
+  color: var(--c-heading);
+  padding-bottom: var(--space-3);
+  margin-bottom: var(--space-4);
+  border-bottom: 1px solid var(--c-rule);
+}
+
+/* `--pad` is the article's inner padding. It is deliberately unchanged from the
+   previous design: it, plus --w-main, is what fixes the Persian text measure. */
+.entry {
+  font-size: var(--t-base);
+  padding: 0 var(--pad);
+}
+.entry p  { margin-bottom: var(--space-4); }
+.entry ul, .entry ol { margin: 0 0 var(--space-4) 1.875rem; }
+.entry h1, .entry h2, .entry h3, .entry h4, .entry h5, .entry h6 {
+  margin-bottom: var(--space-3);
+  color: var(--c-entry-head);
+}
+.entry hr {
+  display: block;
+  border: 0;
+  border-top: 1px solid var(--c-rule);
+  margin: var(--space-6) 0 var(--space-5);
+}
+
+.entry img {
+  margin: var(--space-3) 0;
+  border-radius: var(--radius);
+}
+
+/* Legacy float helpers, kept because the content still relies on them. */
+.alignleft   { float: left;  margin: 0 var(--space-4) var(--space-3) 0; }
+.alignright  { float: right; margin: 0 0 var(--space-3) var(--space-4); }
+.aligncenter { clear: both; display: block; margin: var(--space-3) auto; }
+.clearfix::after { content: ""; display: table; clear: both; }
+
+@media (max-width: 30rem) {
+  .alignleft, .alignright { float: none; margin: var(--space-3) auto; }
+}
+
+/* -----------------------------------------------------------------------------
+   4. Sidebar
+   -------------------------------------------------------------------------- */
+.aside { display: grid; gap: var(--space-4); align-content: start; }
+
+.panel {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--sh-card);
+  overflow: hidden;
+}
+
+.panel__title {
+  color: var(--c-heading);
+  font-family: var(--f-body);
+  font-size: var(--t-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: var(--space-3) var(--space-4);
+  background: var(--c-panel-head);
+  border-bottom: 1px solid var(--c-rule);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.panel__title .icon { color: var(--c-accent); }
+
+.panel__body { padding: var(--space-2); }
+
+.panel__list { display: grid; gap: 1px; }
+.panel__list li { line-height: 1.4; }
+
+.panel__list a {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  position: relative;
+  border-radius: var(--radius-sm);
+  font-size: var(--t-sm);
+  color: var(--c-ink-soft);
+  transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.panel__list a .icon { color: var(--c-ink-faint); transition: color var(--dur) var(--ease); }
+.panel__list a:hover { background: var(--c-hover); color: var(--c-ink); }
+.panel__list a:hover .icon { color: var(--c-accent); }
+
+/* Set by assets/js/modules/scrollspy.js on the entry whose section is on screen,
+   so the sidebar doubles as a position indicator on long pages. */
+.panel__list a.is-current {
+  background: var(--c-accent-soft);
+  color: var(--c-accent);
+  font-weight: 600;
+}
+.panel__list a.is-current .icon { color: var(--c-accent); }
+
+.panel__logo {
+  margin: var(--space-4) auto var(--space-3);
+  width: 6.5rem;
+  opacity: 0.9;
+}
+
+/* Rows of research identifiers / social profiles. */
+.profile-list { display: grid; gap: 1px; padding: var(--space-2); }
+.profile-list__row a {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: var(--t-sm);
+  font-weight: 600;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  transition: background-color var(--dur) var(--ease);
+}
+.profile-list__row a:hover { background: var(--c-hover); }
+.profile-list__row img,
+.profile-list__row .icon { width: 1.15rem; height: 1.15rem; flex: none; }
+
+.aside__photo {
+  width: 100%;
+  border-radius: var(--radius);
+  cursor: zoom-in;
+  transition: opacity var(--dur) var(--ease);
+}
+.aside__photo:hover { opacity: 0.85; }
+
+/* -----------------------------------------------------------------------------
+   5. Footer
+   -------------------------------------------------------------------------- */
+.footer {
+  flex: none;
+  margin-top: var(--space-7);
+  background: var(--c-surface);
+  border-top: 1px solid var(--c-border);
+  color: var(--c-footer-text);
+  font-size: var(--t-sm);
+}
+/* A column of two things: the row of credit lines, and the notice under it.
+   The padding came down from --space-5 when the notice was added, so the bar is
+   the height it was rather than a line taller — it was already the thickest
+   thing on the page and the brief was explicit that it must not grow. */
+.footer__inner {
+  width: min(100% - 2rem, var(--w-page));
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4) 0 var(--space-3);
+}
+
+/* The two credit lines, level with each other. `align-items: center` is doing
+   the work the brief asked for: the copyright line carries a 2.7rem 3D mark and
+   the other line carries a small heart, so on their own they would sit at
+   different heights within the row. */
+.footer__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+/* ---- the terms notice ------------------------------------------------------
+   The smallest type on the site, deliberately: it is a legal line, it is long,
+   and it must not take a second row on a desktop or push the bar taller.
+
+   There is no `max-width` on it, and that is against normal typographic
+   instinct — a measure this long is not comfortable reading. It is not meant to
+   be read at length; it is meant to be there, and a cap would fold it onto a
+   second line on a desktop, which is the one thing the brief ruled out.
+
+   The right-hand padding is not decoration. Back-to-top is `position: fixed`
+   and below about 84rem of viewport it takes the bottom-right corner outright —
+   over whatever is there. Above that width it sits in the page gutter and the
+   notice can have the full measure back. See components.css §13b for the same
+   `max()` from the other side.
+   -------------------------------------------------------------------------- */
+.footer__note {
+  font-size: 0.6875rem;         /* 11px */
+  line-height: 1.55;
+  color: var(--c-footer-text);
+  padding-inline-end: 4.25rem;
+}
+
+@media (min-width: 84rem) {
+  .footer__note { padding-inline-end: 0; }
+}
+
+/* The glyph. Bold, cyan, lit, and beating — the one lit thing in a line of
+   small grey type, which is the whole point of it.
+
+   `--c-brand-ink` and not `--c-brand`: the brand cyan is 1.9:1 against the page
+   and would fail WCAG AA as text by a wide margin. This token is the same hue
+   pushed to 4.6:1, and the two text-shadows put the bright cyan back around it
+   as light rather than as ink — which is where a glow belongs anyway. */
+.footer__note-mark {
+  position: relative;
+  display: inline-block;
+  /* Its own stacking context, so the glow behind it (`z-index: -1`) is bounded
+     to this glyph. Without it the blob would go behind the FOOTER's background
+     — which is the nearest thing painting a colour — and vanish. */
+  isolation: isolate;
+  font-weight: 700;
+  /* A shade larger than the line it sits in, so it reads as a mark at the head
+     of the sentence rather than as the first character of it. */
+  font-size: 1.2em;
+  line-height: 1;
+  color: var(--c-brand-ink);
+  text-shadow: 0 0 5px rgb(0 204 255 / 0.5);
+}
+
+/* The pulse is a BLOB BEHIND THE GLYPH, not the glyph itself, and that is a
+   performance decision rather than a visual one.
+
+   The first version animated `text-shadow` on the glyph. It looked right and it
+   repaints the element on every frame of a loop that never ends — text shadows
+   cannot be composited — which on this page means competing for the main thread
+   with the field, the roster and four small WebGL marks. It was measurable: two
+   unrelated checks in `check-ui.mjs` started failing because CSS transitions
+   elsewhere were no longer finishing inside their window.
+
+   `content: ""` and not "©": there is only ever one copyright glyph here, so a
+   screen reader does not read it twice, and the contrast checker still measures
+   the real one rather than a decorative copy. Only `opacity` and `transform`
+   animate, and both of those the compositor can do without the main thread. */
+.footer__note-mark::after {
+  content: "";
+  position: absolute;
+  inset: -0.5em;
+  z-index: -1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(0 204 255 / 0.5), rgb(0 204 255 / 0) 68%);
+  pointer-events: none;
+  animation: footer-mark-beat 2.6s var(--ease) infinite;
+}
+
+@keyframes footer-mark-beat {
+  0%, 100% { opacity: 0.45; transform: scale(0.9); }
+  50%      { opacity: 1;    transform: scale(1.3); }
+}
+
+/* Reduced motion: the light stays, the beat goes. */
+@media (prefers-reduced-motion: reduce) {
+  .footer__note-mark::after { animation: none; opacity: 0.8; }
+}
+
+.footer a { color: var(--c-ink-soft); }
+.footer a:hover { color: var(--c-link); }
+
+/* -----------------------------------------------------------------------------
+   6. Breakpoints
+   -------------------------------------------------------------------------- */
+
+/* ≥ 960px — the drawer becomes a row of links in the header. */
+@media (min-width: 60rem) {
+  .nav-toggle { display: none; }
+
+  .mainnav__list,
+  .mainnav__list[hidden] {
+    display: flex;
+    position: static;
+    padding: 0;
+    gap: var(--space-1);
+    box-shadow: none;
+    background: none;
+    border: 0;
+    align-items: center;
+    margin-left: auto;
+  }
+  .mainnav__link {
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--t-sm);
+    border-radius: var(--radius-full);
+    white-space: nowrap;
+  }
+  .mainnav__link[aria-current="page"] { background: var(--c-accent-soft); }
+  .topbar__end { margin-left: var(--space-3); }
+}
+
+/* ≥ 1152px — sidebar alongside the article, at the original column widths. */
+@media (min-width: 72rem) {
+  .layout {
+    grid-template-columns: minmax(0, var(--w-main)) minmax(0, var(--w-aside));
+    justify-content: space-between;
+  }
+  .aside { position: sticky; top: calc(var(--bar-h) + var(--space-4)); }
+}
+
+/* Very wide screens: cap the shell rather than letting the column sprawl. The
+   root font-size does the scaling. */
+@media (min-width: 100rem) {
+  .shell, .topbar__inner, .footer__inner { width: min(100% - 4rem, var(--w-page)); }
+}
