@@ -18,8 +18,18 @@ __pycache__/
 tools/scholar-refresh.log
 
 # Playwright, if you install it to run the browser-driven guards
-# (check-ui, check-farsi, check-contrast, check-dropcap). README §11.4D.
+# (check-ui, check-canary, check-farsi, check-contrast, check-dropcap).
+# README §11.4D has the one-line install.
+#
+# package.json is ignored too, deliberately. `npm i -D playwright` writes a
+# three-line manifest whose only content is that optional dev dependency, and
+# committing it would turn a folder you can upload to any static host into an
+# npm project — including on the university server, where it means nothing.
+# The site itself still has no build step and no dependencies, which is the
+# claim §1 and §11 make and the one worth keeping true. Install Playwright
+# when you want to run the guards; nothing about the site needs it.
 node_modules/
+package.json
 package-lock.json
 
 # The dated .rar snapshots of this folder, and any editor or OS leavings.

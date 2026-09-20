@@ -1437,10 +1437,26 @@ node tools/check-dropcap.mjs     # the drop cap
 node tools/check-ui.mjs          # the full browser pass
 ```
 
-`check-farsi`, `check-contrast`, `check-dropcap` and `check-ui` drive a real
-browser and are skipped with a message when Playwright is not installed, which
-is deliberate: editing a JSON file should not require a browser automation
-library. To run them, `npm i -D playwright && npx playwright install chromium`.
+`check-canary`, `check-farsi`, `check-contrast`, `check-dropcap` and `check-ui`
+drive a real browser. They are **skipped with a message** when Playwright is not
+installed rather than failing, which is deliberate: editing a JSON file should
+not require a browser automation library. A skip is not a pass — if you have
+changed anything visual, install it and run them properly:
+
+```powershell
+npm i -D playwright
+npx playwright install chromium
+```
+
+Two separate lines on purpose. Windows PowerShell 5.1 — still the default on
+Windows — does not accept `&&` as a statement separator and answers a chained
+version with `The token '&&' is not a valid statement separator`. PowerShell 7
+(`pwsh`) and bash both take `&&` happily; two lines work everywhere.
+
+That installs about 19 MB of package and a private copy of Chromium. Neither is
+committed: `node_modules/`, `package.json` and `package-lock.json` are all in
+`.gitignore`, so the repository stays a folder you can upload to any static host
+and the site keeps having no dependencies at all.
 
 ---
 
