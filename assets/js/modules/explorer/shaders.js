@@ -167,11 +167,19 @@ void main() {
            key, the right falls away, and both edges darken into the background
            so neighbouring towers separate where they overlap.
 
-         - the ROOF is an ellipse across the top, squashed to suggest the
-           camera's pitch. It is the part that says "a solid standing up"
-           rather than "a shape painted on the floor", and it is lit as an
-           up-facing surface — the brightest thing on the building — so the
-           skyline reads as a row of lit roofs.
+         - the TOP is cut flat, square across the column. It was an ellipse
+           at first -- a lit roof, on the argument that seeing the top face is
+           what says "a solid standing up" rather than "a shape painted on the
+           floor". It did say that, and it also gave every tower a domed head
+           on a narrow shaft, which at 118 towers was an unfortunate silhouette
+           and was reported as such. The barrel shading alone carries the
+           roundness, so the cap is gone and the top is a clean horizontal cut
+           with a bright lip along it.
+
+         - the LIP is a narrow band of light along that cut. It is what stops
+           the flat top reading as a shape that has simply been clipped: a
+           column cut square catches the key on its top edge, and the band is
+           where the side wall meets the cut.
 
          - the FOOT darkens over the last of the height, because a building
            meets the ground in shadow and without it a tower hovers.
@@ -179,47 +187,29 @@ void main() {
        One quad, no extra geometry: 118 towers still cost 118 quads. */
     vec2 p = vCorner * 2.0;          // x across the width, y along the height
 
-    float capH = 0.17;               // how deep the roof ellipse sits
-    float bodyTop = 1.0 - capH;
-
-    // The roof ellipse, centred on the top of the barrel.
-    float ry = (p.y - bodyTop) / capH;
-    float capMask = 1.0 - (p.x * p.x + ry * ry);
-    bool onCap = p.y > bodyTop && capMask > 0.0;
-
-    // Below the roof line the silhouette is the column's full width; above it,
-    // only what falls inside the ellipse belongs to the tower.
-    float inside = p.y <= bodyTop ? 1.0 : max(capMask, 0.0);
-    mask = smoothstep(0.0, 0.06, inside) * smoothstep(1.0, 0.93, abs(p.x));
+    // A plain column: full width all the way up, cut square at the top. The
+    // vertical mask is a hard edge at each end rather than a curve, because a
+    // curve at the top is a dome and a dome is the thing being avoided.
+    mask = smoothstep(1.0, 0.93, abs(p.x)) * smoothstep(1.005, 0.985, abs(p.y));
     if (mask <= 0.003) discard;
 
     vec3 keyDir = normalize(vec3(-0.42, 0.62, 0.66));
-    vec3 normal;
-    float tone;
-
-    if (onCap) {
-      // The roof: mostly up, tipped toward the viewer.
-      normal = normalize(vec3(p.x * 0.45, 0.82, 0.55));
-      tone = 1.18;
-    } else {
-      // The barrel: a cylinder, so z comes from x as it does on a sphere.
-      normal = vec3(p.x, 0.0, sqrt(max(0.0, 1.0 - p.x * p.x)));
-      tone = 1.0;
-    }
+    // The barrel: a cylinder, so z comes from x as it does on a sphere. This
+    // one line is the whole of the roundness.
+    vec3 normal = vec3(p.x, 0.0, sqrt(max(0.0, 1.0 - p.x * p.x)));
 
     float key = max(dot(normal, keyDir), 0.0);
     float wrapped = key * 0.70 + 0.34;
-    float spec = pow(max(dot(reflect(-keyDir, normal), vec3(0.0, 0.0, 1.0)), 0.0), 26.0)
-               * (onCap ? 0.30 : 0.55);
+    float spec = pow(max(dot(reflect(-keyDir, normal), vec3(0.0, 0.0, 1.0)), 0.0), 26.0) * 0.55;
     // A cool edge where the column turns away, so towers separate when they
     // overlap. The spheres use the same trick; the city needs it more.
     float rim = pow(1.0 - normal.z, 2.2) * 0.30;
 
-    // Contact shading at the foot, and a seam of light along the roof line.
+    // Contact shading at the foot; a band of light along the cut at the top.
     float foot = smoothstep(-1.0, -0.62, p.y) * 0.34 + 0.66;
-    float lip = onCap ? 1.0 : (1.0 + smoothstep(bodyTop - 0.06, bodyTop, p.y) * 0.24);
+    float lip = 1.0 + smoothstep(0.86, 1.0, p.y) * 0.34;
 
-    shade = vec3((wrapped * tone + rim) * foot * lip) + vec3(spec);
+    shade = vec3((wrapped + rim) * foot * lip) + vec3(spec);
   } else {
     /* ---- slab impostor ----------------------------------------------------
        A timeline card used to be a rounded rectangle filled with one flat

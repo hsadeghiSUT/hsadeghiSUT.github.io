@@ -28,9 +28,25 @@ tools/scholar-refresh.log
 # The site itself still has no build step and no dependencies, which is the
 # claim §1 and §11 make and the one worth keeping true. Install Playwright
 # when you want to run the guards; nothing about the site needs it.
+#
+# If you do install it, add "type": "module" to that package.json. Its mere
+# existence without a type field makes Node print a MODULE_TYPELESS warning
+# over every tool run, because the tools are ESM and it cannot tell:
+#     npm pkg set type=module
 node_modules/
 package.json
 package-lock.json
+
+# The author-linking worksheets. tools/authors-export.mjs regenerates them
+# from publications.json whenever they are wanted, and the DECISIONS they
+# collect live permanently in data/author-aliases.json, which is committed.
+# Keeping a half-filled worksheet in the history would just invite someone to
+# edit the stale copy. README §15.9.
+author-links.csv
+author-links.json
+author-links.xlsx
+author-latin.csv
+author-latin-pairs.csv
 
 # The dated .rar snapshots of this folder, and any editor or OS leavings.
 *.rar

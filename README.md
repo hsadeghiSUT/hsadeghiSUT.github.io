@@ -97,6 +97,12 @@ icons.
 │   │                          transitions and the explorer — the smoke test
 │   ├── check-authors.mjs      reports how the author names parsed, and who
 │   │                          might be the same person twice (§15)
+│   ├── authors-export.mjs     writes that question out as worksheets, one
+│   │                          row per unlinked name, with a suggestion (§15.9)
+│   ├── authors-link.mjs       reads the answers back into
+│   │                          data/author-aliases.json (§15.9)
+│   ├── authors-xlsx.py        the same worksheet as Excel, with dropdowns.
+│   │                          Optional; needs openpyxl (§15.9)
 │   ├── fetch-scholar.mjs      refreshes data/scholar.json from the Google
 │   │                          Scholar profile — the ONLY thing that talks to
 │   │                          Google; the site itself never does (§18)
@@ -1455,6 +1461,7 @@ two needs the network:
 
 ```bash
 node tools/check-authors.mjs     # the co-author names agree across the data
+                                 # (if it names unmerged people, see §15.9)
 node tools/check-canary.mjs      # the copy canary knows both hostnames (§19)
 node tools/check-farsi.mjs       # the Persian typography lock (§7)
 node tools/check-contrast.mjs    # text contrast in both themes
@@ -3304,6 +3311,144 @@ show; this is not — it is a second view of a list directly underneath it on th
 same page. Without Three or WebGL the panel is simply not built and the roster
 below is untouched, which is a real fallback that needed no second
 implementation. `window.__roster` reports what happened.
+
+---
+
+### 15.9 One person, two names — the author-linking worksheet
+
+A co-author who publishes in both languages is written two ways, and nothing
+in the data says they are the same human:
+
+    Sadeghi, H.        on an English paper
+    صادقی، ح.          on a Persian one
+
+The graph has no way to know. It draws **two nodes**, splits the papers between
+them, halves their degree in the Collaboration view, and — because the
+Influence city's height is citations — gives them **two short towers instead of
+one tall one**. The same thing happens within a single script when a compound
+surname is abbreviated: "Golaghaei Darzi, A." one year, "Darzi, A.G." the next.
+
+`data/author-aliases.json` is where that is repaired. Every entry says *the
+person on the left is the person on the right*, in the graph's internal key
+form — surname, a pipe, initials, lower-cased with spaces and stops removed:
+
+```json
+{
+  "گلآقائیدرزی|ع": "golaghaeidarzi|a",
+  "darzi|ag": "golaghaeidarzi|a"
+}
+```
+
+**Nothing guesses.** Two people who share a surname are usually two people, and
+a wrong merge is the worst kind of error here: it is a false claim about who
+wrote what, and it is invisible once made, because the graph simply shows one
+node where there were two and looks perfectly correct. So the decision always
+belongs to a person who knows the field, and the tools only ever prepare it.
+
+#### The three tools
+
+| | |
+|---|---|
+| `tools/check-authors.mjs` | reports who is still unmerged. Run this first and last |
+| `tools/authors-export.mjs` | writes the question out as worksheets, with a suggested match per row |
+| `tools/authors-link.mjs` | reads the answers back and rewrites `data/author-aliases.json` |
+| `tools/authors-xlsx.py` | *optional* — the same worksheet as an Excel file with dropdowns |
+
+#### The round trip
+
+```bash
+node tools/authors-export.mjs
+```
+
+writes three worksheets beside `index.html`:
+
+- **`author-links.csv`** — one row per name that appears *only* in Persian,
+  with its paper count, the titles it appears on, a suggested English match,
+  and an empty `latin_key` column to fill in;
+- **`author-latin-pairs.csv`** — pairs of English names that may be one person,
+  with an empty `fold_a_into_b` column;
+- **`author-latin.csv`** — every English author, as the list to choose from.
+
+Fill in the empty column — the English key, or `NONE` for someone who really
+does publish only in Persian — and then:
+
+```bash
+node tools/authors-link.mjs --dry-run
+```
+
+```bash
+node tools/authors-link.mjs
+```
+
+```bash
+node tools/check-authors.mjs
+```
+
+The dry run prints what would change, including how many people the graph
+loses. **A key it cannot resolve stops the whole run and names the row**;
+nothing is written unless every answer resolved, because a half-applied merge
+is harder to notice than an unapplied one.
+
+`NONE` is worth using rather than leaving the row blank. Blank means *not
+decided yet* and the row comes back next time; `NONE` is a decision, and it is
+the right answer for a good few of these — three of the twelve Persian-only
+names on this data have no English counterpart anywhere in the publication
+list.
+
+#### The Excel version
+
+Typing a key like `yazdanibenehkohal|f` by hand, 115 times, is how one letter
+goes wrong and a merge silently fails. So there is a workbook where each answer
+is picked from a **dropdown of every English author key**:
+
+```bash
+pip install openpyxl
+```
+
+```bash
+python tools/authors-xlsx.py
+```
+
+`author-links.xlsx` has four sheets: the Persian names to decide, the English
+pairs to decide, every English author for reference, and the links already in
+place so they can be checked too. Fill in the yellow columns, save each sheet
+back over its CSV (**File → Save As → CSV UTF-8**), and run
+`tools/authors-link.mjs`.
+
+This is the one tool in the repository that needs something installed, and it
+is optional for exactly that reason — the CSV route above does the same job
+with nothing but Node. Nothing here ships to a browser and the site still has
+no dependencies.
+
+#### The suggestions, and how much to trust them
+
+Each row carries a guess and a plain-language verdict rather than only a
+number, because a reader deciding these should not have to learn what 0.73
+means. The matcher transliterates the Persian surname and then scores it four
+ways, taking the best: the letters as written, the **consonant skeleton**, a
+prefix match, and an exact skeleton match.
+
+The skeleton is the one that matters. Persian does not write its short vowels,
+so "ملاعباسی" transliterates to `mlaabasi` where the author spells themselves
+`molaabasi`, and "خشوعی" to `khshvai` against `khoshouei`. Comparing the
+letters as written scores a true pair about as low as a false one — which is
+how the first version of this tool proposed *Nasiri, H.* for *ملاعباسی، ح.*
+Stripping both sides to their consonants first fixes it, as long as the
+digraphs `kh`, `sh`, `gh`, `ch`, `zh` are collapsed to one character before the
+vowels go, or `khosh` becomes `ks` and three different surnames merge.
+
+It is still only a suggestion. On this data the verdicts came out as:
+
+| Verdict | What it meant here |
+|---|---|
+| **very likely** | six rows, all correct — `Gholami, M.`, `Aghagoli, A.`, `Sheikhmiri, A.`, `Taghvaei, A.`, `Yazdani, F.`, `Jabbarzadeh, M.` |
+| **likely** | one row, correct — `Khoshouei, S.S.` |
+| **possible** | three rows, **one of them wrong**: `نابی، ح.` was offered `Anbarestani, H.` on two shared consonants, and there is no English "Nabi" here at all |
+| **unlikely** / none | two rows, both genuinely Persian-only |
+
+Which is the useful summary: the top band saves the typing, and the bottom two
+bands are the ones to read the paper titles for. The titles are in the last
+column for that reason.
 
 ---
 
