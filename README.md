@@ -1792,7 +1792,7 @@ factors is `premultipliedAlpha` on the MATERIAL, not on the renderer** — the
 renderer's flag only describes the canvas. Setting the renderer's and leaving the
 material's at its default `false` changes nothing at all, which is a quiet way to
 spend an afternoon. The same defect was in the publications explorer and is fixed
-the same way there; its 345 edges were about eight times fainter than the numbers
+the same way there; its 330 edges were about eight times fainter than the numbers
 in its shader said, which is why they had to be re-balanced downward afterwards.
 
 `check-ui.mjs` §5a-2 now guards both halves: it reads `BLEND_SRC_RGB` off the
@@ -2556,7 +2556,7 @@ different every visit, so you could never say "look at the cluster on the left"
 to a colleague. It is seeded from each node's index rather than from
 `Math.random()`, so **the same data always produces the same picture**.
 
-Repulsion is O(n²) — 7,021 pairs at 119 people. A Barnes-Hut tree would make it
+Repulsion is O(n²) — 5,565 pairs at 106 people. A Barnes-Hut tree would make it
 O(n log n) and would be the right call at a few thousand nodes; at this size it
 would be more code, more places to be wrong, and no faster in wall-clock terms.
 
@@ -2951,8 +2951,8 @@ and the picture becomes the one worth drawing: **which of his collaborators the
 cited work was done with.**
 
 The edges go the same way, and that is the better half of the bargain. 132 of
-the 345 co-authorships are simply "with him": true, and uninformative. Removing
-them leaves the **213 collaborations between his co-authors**, which is the
+the 330 co-authorships are simply "with him": true, and uninformative. Removing
+them leaves the **203 collaborations between his co-authors**, which is the
 structure of the groups he works through rather than the star that structure
 hangs from. Two people lose their only edge and stand alone, which is also true
 of them.
@@ -2982,12 +2982,12 @@ separating it was always there to do.
 **The plan is normalised on the 95th percentile, not the furthest node.**
 Without the site owner, two people have no co-authorship at all and nothing
 pulls them back from the rim; they settle about 1.3× further out than the 90th
-percentile. Scaling on them would shrink the 112 people who *are* clustered in
+percentile. Scaling on them would shrink the 99 people who *are* clustered in
 order to frame four who are not. The few beyond the mark are reeled back to just
 outside it — still outside everyone else, still visible, still clickable.
 
 **Every tower is portrait.** The first version ran up to 0.78 wide against a
-floor of 0.17 tall, which made most of the 118 people wider than they were tall,
+floor of 0.17 tall, which made most of the 105 people wider than they were tall,
 and a field of landscape slabs does not read as buildings however it is lit — it
 read as confetti. The widest is now 0.3 and the shortest 0.25 tall.
 
@@ -3023,7 +3023,7 @@ other two are:
 | the **foot** | darkened over the last of the height. A building meets the ground in shadow; without it a tower hovers |
 | the **rim** | a cool edge where the column turns away, so towers separate where they overlap. The spheres use the same trick and the city needs it more |
 
-Still one quad per tower: 118 towers, 118 quads, no new geometry and no second
+Still one quad per tower: 105 towers, 105 quads, no new geometry and no second
 draw call.
 
 **And the haze was turned down for it.** The far end of the scene fades toward
@@ -3328,7 +3328,9 @@ Influence city's height is citations — gives them **two short towers instead o
 one tall one**. The same thing happens within a single script when a compound
 surname is abbreviated: "Golaghaei Darzi, A." one year, "Darzi, A.G." the next.
 
-`data/author-aliases.json` is where that is repaired. Every entry says *the
+`data/author-aliases.json` is where that is repaired. **35 links are in place
+and the graph is clean**: `check-authors.mjs` reports no likely duplicates
+left, and 141 raw spellings resolve to 106 people. Every entry says *the
 person on the left is the person on the right*, in the graph's internal key
 form — surname, a pipe, initials, lower-cased with spaces and stops removed:
 
@@ -3437,18 +3439,54 @@ Stripping both sides to their consonants first fixes it, as long as the
 digraphs `kh`, `sh`, `gh`, `ch`, `zh` are collapsed to one character before the
 vowels go, or `khosh` becomes `ks` and three different surnames merge.
 
-It is still only a suggestion. On this data the verdicts came out as:
+#### How the suggestions actually scored
 
-| Verdict | What it meant here |
-|---|---|
-| **very likely** | six rows, all correct — `Gholami, M.`, `Aghagoli, A.`, `Sheikhmiri, A.`, `Taghvaei, A.`, `Yazdani, F.`, `Jabbarzadeh, M.` |
-| **likely** | one row, correct — `Khoshouei, S.S.` |
-| **possible** | three rows, **one of them wrong**: `نابی، ح.` was offered `Anbarestani, H.` on two shared consonants, and there is no English "Nabi" here at all |
-| **unlikely** / none | two rows, both genuinely Persian-only |
+The twelve rows were answered on 2026-09-21, which makes this a measured
+result rather than a hope:
 
-Which is the useful summary: the top band saves the typing, and the bottom two
-bands are the ones to read the paper titles for. The titles are in the last
-column for that reason.
+| Verdict | Rows | Accepted | Rejected |
+|---|---|---|---|
+| **very likely** | 6 | 6 | 0 |
+| **likely** | 1 | 1 | 0 |
+| **possible — check the titles** | 3 | 2 | **1** |
+| **unlikely** | 1 | 0 | 1 |
+| no match found | 1 | — | — |
+
+The one rejected "possible" is the instructive one. `نابی، ح.` was offered
+`Anbarestani, H.`, on nothing more than both skeletons starting `nb`, and
+there is no English "Nabi" in this publication list at all. The one
+"unlikely" was `ملاعباسی، ح.` → `Nasiri, H.`, which is the pair that prompted
+the consonant-skeleton work in the first place and is still wrong.
+
+So: the top two bands took the typing out of seven rows and got all seven
+right, and every error the matcher made landed in the bottom two bands, where
+the instruction is to read the titles. That is the behaviour to preserve if
+the scoring is ever touched — **a matcher that is confidently wrong is worse
+than one that shrugs**, because the confident answer is the one that gets
+accepted without checking.
+
+Three of the twelve were genuinely Persian-only and are recorded as such:
+`سیف، م.ا.`, `ملاعباسی، ح.` and `نابی، ح.` These are not unfinished business;
+they are people who have not published in English here.
+
+#### What the merge changed
+
+| | Before | After |
+|---|---|---|
+| aliases | 22 | **35** |
+| people in the graph | 119 | **106** |
+| co-authorship edges | 345 | **330** |
+| edges without the site owner | 213 | **203** |
+| towers in the Influence city | 118 | **105** |
+| likely duplicates reported | 4 pairs + 12 names | **none** |
+
+Thirteen people stopped being two people each. The visible effect is in the
+Influence city, where height is citations: a person split across two spellings
+had their record split with them and stood as two short towers. `Jabbarzadeh,
+M.` was four spellings — two Persian, two English — and is now one person with
+17 papers.
+
+The three Persian-only names are the remainder and are correct as they stand.
 
 ---
 

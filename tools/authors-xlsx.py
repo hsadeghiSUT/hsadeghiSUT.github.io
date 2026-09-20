@@ -1,47 +1,28 @@
 #!/usr/bin/env python3
 """authors-xlsx.py -- the author-linking worksheet as an Excel workbook.
 
-OPTIONAL, AND THE ONLY THING HERE THAT NEEDS INSTALLING.
+OPTIONAL, AND THE ONLY THING IN THIS REPOSITORY THAT NEEDS INSTALLING.
 
-authors-export
-  people in the graph, unmerged   141
-  people after aliases            119
-  Persian-script names            26
-  Latin-script names              115
-  rows needing a decision         12
-
-  wrote author-links.csv, author-latin.csv, author-latin-pairs.csv, author-links.json
-  Fill in the latin_key column, then run: node tools/authors-link.mjs already writes the same questions as CSV, and
-authors-link
-  aliases before      22
-  aliases after       22
-  people before       119
-  people after        119
-
-  no new links — nothing in the worksheets was filled in.
-
-  wrote data/author-aliases.json
-  Now run: node tools/check-authors.mjs reads CSV back, so the whole round trip works with
+tools/authors-export.mjs already writes the same questions as CSV and
+tools/authors-link.mjs reads CSV back, so the whole round trip works with
 nothing but Node. This adds the version that is pleasant to actually fill in:
-one dropdown per row, holding all 115 English author keys, so the answer is
+one dropdown per row holding all 115 English author keys, so the answer is
 picked rather than typed -- and a typed key with one letter wrong is the most
 likely way this task goes quietly wrong.
 
     pip install openpyxl
-    python tools/authors-xlsx.py
+    python tools/authors-xlsx.py            # write the workbook
+    python tools/authors-xlsx.py --read     # read the answers back to CSV
 
-Writes author-links.xlsx beside the CSVs. Fill in the yellow column on sheets
-1 and 2, save as CSV over author-links.csv / author-latin-pairs.csv, and run
-authors-link
-  aliases before      22
-  aliases after       22
-  people before       119
-  people after        119
+--read is the return leg, and it exists because Excel's Save As CSV writes
+only the ACTIVE sheet. By hand that means saving sheet 1 over
+author-links.csv, switching to sheet 2, saving that over
+author-latin-pairs.csv, and getting neither the order nor the encoding wrong.
+This does both in one step; then
 
-  no new links — nothing in the worksheets was filled in.
+    node tools/authors-link.mjs
 
-  wrote data/author-aliases.json
-  Now run: node tools/check-authors.mjs.
+applies them to data/author-aliases.json.
 
 The site itself still has no dependencies; nothing here ships to a browser.
 """
@@ -51,6 +32,118 @@ from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.worksheet.datavalidation import DataValidation
 from openpyxl.utils import get_column_letter
+
+# --------------------------------------------------------------------------
+# --read: the filled workbook back into the two CSVs
+# --------------------------------------------------------------------------
+#
+# WHY THIS REBUILDS THE CSVs RATHER THAN EDITING THEM.
+#
+# The obvious implementation reads the workbook and writes each answer into
+# the matching row of the existing author-links.csv. It broke the first time
+# it was used, and for a reason worth keeping written down: the person filling
+# the workbook in had ALSO done the sensible-looking thing and saved sheet 1
+# over author-links.csv from Excel. That file then held the sheet's own
+# layout -- four rows of instructions, then the human-readable column titles
+# -- and nothing that a tool expecting persian_key could match against.
+#
+# So the CSVs are regenerated from author-links.json, the inventory that
+# authors-export.mjs writes and nothing else edits, and the answers are
+# matched by the Persian display NAME. That survives the CSVs having been
+# overwritten, reordered or saved from Excel in between, which is the normal
+# condition of a file a human has been working in.
+# --------------------------------------------------------------------------
+if '--read' in sys.argv:
+    import csv
+    import json
+    from openpyxl import load_workbook
+
+    src = 'author-links.xlsx'
+    inv = json.load(io.open('author-links.json', encoding='utf-8'))
+    wb = load_workbook(src, data_only=True)
+
+    # Sheet 1: Persian display name -> the English key chosen for it.
+    ws = wb['1 Persian to English']
+    chosen = {}
+    for row in ws.iter_rows(min_row=7, values_only=True):
+        if not row[0]:
+            continue
+        answer = str(row[5] or '').strip()
+        if answer:
+            chosen[str(row[0]).strip()] = answer
+
+    valid = {p['key'] for p in inv['latin']}
+    filled = persian_only = 0
+    unknown = []
+    missing = []
+
+    link_head = ['persian_key', 'persian_name', 'papers', 'translit', 'suggested',
+                 'suggested_name', 'verdict', 'confidence', 'alt1', 'alt2',
+                 'latin_key', 'currently_linked', 'titles']
+    link_rows = []
+    for r in inv['rows']:
+        answer = chosen.get(r['persian_name'].strip(), '')
+        if answer.lower().startswith('none'):
+            answer = 'NONE'
+            persian_only += 1
+        elif answer:
+            if answer not in valid:
+                unknown.append((r['persian_name'], answer))
+            else:
+                filled += 1
+        else:
+            missing.append(r['persian_name'])
+        link_rows.append([
+            r['persian_key'], r['persian_name'], r['papers'], r['translit'],
+            r['suggested'], r['suggested_name'], r['verdict'], r['confidence'],
+            r.get('alt1', ''), r.get('alt2', ''), answer,
+            r.get('currently_linked', ''), r['titles'],
+        ])
+
+    if unknown:
+        print('These answers are not English author keys -- nothing written:')
+        for name, answer in unknown:
+            print('   %s  ->  "%s"' % (name, answer))
+        sys.exit(1)
+
+    with io.open('author-links.csv', 'w', encoding='utf-8-sig', newline='') as fh:
+        w = csv.writer(fh, quoting=csv.QUOTE_ALL)
+        w.writerow(link_head)
+        w.writerows(link_rows)
+
+    # Sheet 2 carries both keys on the row, so it is matched on the keys.
+    ws2 = wb['2 English spelt twice']
+    keep = {}
+    for row in ws2.iter_rows(min_row=5, values_only=True):
+        if row[1] and row[7]:
+            keep[(str(row[1]).strip(), str(row[4]).strip())] = str(row[7]).strip()
+
+    pair_head = ['key_a', 'name_a', 'papers_a', 'key_b', 'name_b', 'papers_b',
+                 'why', 'fold_a_into_b']
+    pair_rows = []
+    pairs_written = 0
+    for pr in inv['pairs']:
+        answer = keep.get((pr['a'], pr['b']), '')
+        if answer:
+            pairs_written += 1
+        pair_rows.append([pr['a'], pr['aName'], pr['aCount'],
+                          pr['b'], pr['bName'], pr['bCount'], pr['why'], answer])
+
+    with io.open('author-latin-pairs.csv', 'w', encoding='utf-8-sig', newline='') as fh:
+        w = csv.writer(fh, quoting=csv.QUOTE_ALL)
+        w.writerow(pair_head)
+        w.writerows(pair_rows)
+
+    print('read %s' % src)
+    print('  links to make          %d' % filled)
+    print('  marked Persian-only    %d' % persian_only)
+    print('  English pairs to merge %d' % pairs_written)
+    if missing:
+        print('  left blank             %d (they will come back next time)' % len(missing))
+    print('')
+    print('  wrote author-links.csv, author-latin-pairs.csv')
+    print('  Now run: node tools/authors-link.mjs --dry-run')
+    sys.exit(0)
 
 ROOT = sys.argv[1] if len(sys.argv) > 1 else '.'
 OUT = sys.argv[2] if len(sys.argv) > 2 else 'author-links.xlsx'

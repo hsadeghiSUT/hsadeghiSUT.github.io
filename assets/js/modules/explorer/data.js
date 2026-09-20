@@ -368,7 +368,7 @@ export function attachCitations(graph, counts) {
  * work was done with.
  *
  * The edges go the same way, and that is the better half of the bargain. He is
- * on every paper, so 132 of the 345 co-authorships are simply "with him" — true
+ * on every paper, so 127 of the 330 co-authorships are simply "with him" — true
  * and uninformative. Removing them leaves the 213 that are collaborations
  * *between* his co-authors, which is the structure of the groups he works
  * through rather than the star that structure hangs from. Two people lose their

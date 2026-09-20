@@ -171,7 +171,7 @@ void main() {
            at first -- a lit roof, on the argument that seeing the top face is
            what says "a solid standing up" rather than "a shape painted on the
            floor". It did say that, and it also gave every tower a domed head
-           on a narrow shaft, which at 118 towers was an unfortunate silhouette
+           on a narrow shaft, which at 105 towers was an unfortunate silhouette
            and was reported as such. The barrel shading alone carries the
            roundness, so the cap is gone and the top is a clean horizontal cut
            with a bright lip along it.
@@ -184,7 +184,7 @@ void main() {
          - the FOOT darkens over the last of the height, because a building
            meets the ground in shadow and without it a tower hovers.
 
-       One quad, no extra geometry: 118 towers still cost 118 quads. */
+       One quad, no extra geometry: 105 towers still cost 105 quads. */
     vec2 p = vCorner * 2.0;          // x across the width, y along the height
 
     // A plain column: full width all the way up, cut square at the top. The

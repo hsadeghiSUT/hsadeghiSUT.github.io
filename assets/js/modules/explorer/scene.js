@@ -679,7 +679,7 @@ const TOWER_FLOOR = 0.25;
  *
  * NARROW, AND THAT IS THE WHOLE DIFFERENCE BETWEEN A CITY AND A MOSAIC. The
  * first version ran up to 0.78 against a tower floor of 0.17, which made most
- * of the 118 people wider than they were tall — and a field of landscape slabs
+ * of the 105 people wider than they were tall — and a field of landscape slabs
  * lying on a plane does not read as buildings however it is lit. It read, in
  * the word that eventually got it fixed, as confetti.
  *
@@ -756,7 +756,7 @@ export function buildInfluenceScene(graph, ground, palette, edgeColour) {
      leaves two people with no co-authorship at all and a handful with one, and
      nothing pulls those back toward the middle except gravity — so they settle
      on the rim, about 1.3× further out than the 90th percentile. Scaling on the
-     furthest of them would shrink the 112 people who are actually clustered by
+     furthest of them would shrink the 99 people who are actually clustered by
      that factor, to frame four who are not.
 
      The few beyond the mark are pulled back to just outside it. They are drawn
@@ -866,7 +866,7 @@ export function buildInfluenceScene(graph, ground, palette, edgeColour) {
        full of them read as stickers rather than as buildings. */
     round: 2,
     /* Louder at rest than the graph's 0.055. There are fewer lines here — 213
-       rather than 345, because the ones that merely said "with the site owner"
+       rather than 330, because the ones that merely said "with the site owner"
        went with him — and they lie in a plane instead of filling a ball, so they
        overlap far less. A hairball is not the risk; being unable to make out
        the ground the towers stand on is. */
