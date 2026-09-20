@@ -1106,8 +1106,11 @@ tree and are not part of this one. Opening it will render unstyled. That is
 expected; its job is to be the record of what the original emitted, and it is
 what `tools/check-trackers.mjs` reads.
 
-If you want the old *page* addresses to keep working, that is the `legacy/`
-folder — see §11.
+If you want the old *page* addresses to keep working, that is a handful of
+redirect stubs you write yourself — the template and the old-to-new mapping are
+in §11, under *"Keeping old links working"*. There used to be a `legacy/` folder
+in this repository holding ready-made copies; it was never wired into anything,
+never deployed, and is gone.
 
 ---
 
@@ -1174,7 +1177,7 @@ does not appear in the final address once the custom domain is on.
 
 *Without Git.* On the new repository's page click **uploading an existing
 file**, then drag in **the contents of the site folder** — `index.html`, the
-other six `.html` files, and the `assets`, `data`, `tools` and `legacy` folders.
+other six `.html` files, and the `assets`, `data` and `tools` folders.
 Not the folder itself: GitHub must see `index.html` at the top of the
 repository. Scroll down, write "first upload", **Commit changes**.
 

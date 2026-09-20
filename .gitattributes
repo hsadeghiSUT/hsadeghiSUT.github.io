@@ -38,6 +38,6 @@ legacy_index.html -text
 # Vendored Three.js: not this project's source, and a diff of it helps nobody.
 assets/vendor/three/** linguist-vendored
 
-# So GitHub's language stats describe the site rather than the library.
-legacy/** linguist-vendored
+# So GitHub's language stats describe the site rather than the reference copy
+# of the old home page.
 legacy_index.html linguist-vendored
