@@ -1099,12 +1099,34 @@ point are reported normally.
 
 ### legacy_index.html
 
-Kept **byte-for-byte unmodified** — verified by checksum against the copy you
-supplied. It is a reference document, not a live page: it points at
-`./files/css/style.css` and `./files/js/all.min.js`, which belong to the old
-tree and are not part of this one. Opening it will render unstyled. That is
-expected; its job is to be the record of what the original emitted, and it is
-what `tools/check-trackers.mjs` reads.
+Kept **unmodified except for one deliberate line**, described below. It is a
+reference document, not a live page: it points at `./files/css/style.css` and
+`./files/js/all.min.js`, which belong to the old tree and are not part of this
+one. Opening it will render unstyled. That is expected; its job is to be the
+record of what the original emitted, and it is what `tools/check-trackers.mjs`
+reads.
+
+**The one change: `<meta name="robots" content="noindex, nofollow">`**, added on
+2026-09-20 directly under the `theme-color` tag, with a comment beside it saying
+what it is. Nothing links to this file, but it is published at
+`https://hsadeghi.org/legacy_index.html` along with everything else, and an
+unstyled 2020 page that still says "Hamed Sadeghi" in its `<title>` is exactly
+the kind of thing a crawler finds and a reader then arrives at from a search
+result, wondering why the site looks broken. The tag costs nothing and prevents
+that.
+
+It is worth being precise about what this does and does not disturb. The file
+was previously byte-identical to the copy supplied, and that claim is now
+retired — it is 38,047 bytes rather than 37,559. What the file is *for* is
+untouched: `check-trackers.mjs` still reads `UA-175901189-1` out of it and still
+compares all seven identity meta tags against it, and the check passes. None of
+the tags the guard reads were altered, reordered or removed; one was added, and
+`robots` is not in any list the guard consults. `.gitattributes` still marks the
+file `-text`, so Git will not rewrite its line endings either.
+
+If you would rather have the original bytes back, delete those eight lines —
+the guard does not depend on them, and the only consequence is that search
+engines may index the page again.
 
 If you want the old *page* addresses to keep working, that is a handful of
 redirect stubs you write yourself — the template and the old-to-new mapping are
@@ -2238,7 +2260,8 @@ check that stopped looking too early.
 ## 14. Parity with the original
 
 Every round of this rebuild has been checked against `legacy_index.html`, which
-is kept byte-for-byte unmodified (§10). The last audit compared the legacy text
+is kept unmodified but for one added `robots` meta tag (§10) — nothing that
+carries content, so the comparison below is unaffected. The last audit compared the legacy text
 chunk-by-chunk against all eight JSON files and all seven pages, with Persian
 normalised for the ي/ی, ك/ک and ZWNJ variants before comparing.
 

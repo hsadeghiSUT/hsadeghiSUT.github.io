@@ -14,9 +14,11 @@
 # The exceptions, and why.
 #
 # legacy_index.html is the original site's home page, kept as the REFERENCE
-# for what the old site emitted, and README §10 states it is byte-for-byte
-# unmodified and verified by checksum. Normalising its line endings would
-# quietly break that guarantee, so it is stored exactly as supplied.
+# for what the old site emitted. It carries exactly one deliberate edit — a
+# `robots` noindex tag, README §10 — and is otherwise as supplied, LF endings
+# included. Normalising those endings would rewrite all 314 of them and change
+# every line of a file whose whole value is being the record of what the old
+# site sent, so it is stored byte-for-byte as it sits on disk.
 # --------------------------------------------------------------------------
 legacy_index.html -text
 
