@@ -1,0 +1,72 @@
+# ---------------------------------------------------------------------------
+# Deploy hsadeghi.org
+# ---------------------------------------------------------------------------
+# This replaces the branch build GitHub Pages used to do on its own. The only
+# thing it adds is one step — `tools/fingerprint.mjs` — and that step is the
+# whole reason the workflow exists.
+#
+# GitHub Pages serves `assets/**` with `Cache-Control: max-age=14400` and will
+# not let you change that header. While every asset URL stayed the same from one
+# deploy to the next, a returning visitor kept running the code they already
+# had, for up to four hours. Worse, a hard reload did not reliably fix it: the
+# publications explorer is reached through an `import()` fired after the page
+# has loaded, and a request made that late falls back to the ordinary cache.
+#
+# The fingerprint step rewrites every stylesheet, script and import specifier to
+# carry `?v=<commit>`, so a deploy produces URLs no browser has ever seen. It
+# fails the build rather than deploy a half-stamped module graph — see the
+# header of the script for what it does and does not touch.
+#
+# Nothing in the repository is rewritten. What is served is a stamped copy,
+# built here, in `_site/`.
+# ---------------------------------------------------------------------------
+name: Deploy the site
+
+on:
+  push:
+    branches: [main]
+  # So you can redeploy without a commit: Actions → this workflow → Run workflow.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  # One deploy at a time, and let a running one finish: cancelling half way
+  # through leaves the live site on the previous build with no sign of why.
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # The version comes from GITHUB_SHA, so every commit — including the
+      # twice-daily Scholar refresh — produces its own set of URLs.
+      - name: Stamp the asset URLs
+        run: node tools/fingerprint.mjs
+
+      - uses: actions/configure-pages@v5
+
+      # `_site/` carries CNAME, so the custom domain survives the deploy.
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

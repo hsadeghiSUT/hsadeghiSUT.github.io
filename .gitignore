@@ -59,3 +59,7 @@ desktop.ini
 
 # Local preview configuration for the editor's dev-server launcher.
 .claude/
+
+# The stamped copy tools/fingerprint.mjs builds for deployment. Generated on
+# every deploy from what is already in the repository; never committed.
+_site/

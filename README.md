@@ -116,6 +116,10 @@ icons.
 │   │                          judge it at (§20.6)
 │   ├── serve.py               a local preview server that does NOT cache —
 │   │                          read the note in it before using anything else
+│   ├── fingerprint.mjs        builds _site/: the same site with ?v=<commit> on
+│   │                          every stylesheet, script and import specifier, so
+│   │                          a deploy can never be shadowed by a cached copy
+│   │                          of the last one. Run by .github/workflows/deploy.yml
 │   ├── check-canary.mjs       runs the site on three hostnames and checks a
 │   │                          copy reports itself while the original does not (§19)
 │   ├── trace-logo.py          turns logo.png into the outlines the 3D mark
@@ -1339,9 +1343,11 @@ git pull --rebase       # replays your commit on top of the robot's
 git push
 ```
 
-To confirm it went out: the repository's **Actions** tab shows a `pages build
-and deployment` run, and `https://hsadeghi.org/` is current a minute after it
-goes green.
+To confirm it went out: the repository's **Actions** tab shows a `Deploy the
+site` run — it stamps the asset URLs with `tools/fingerprint.mjs`, then hands
+the stamped copy to Pages — and `https://hsadeghi.org/` is current a minute
+after it goes green. Because the URLs change with the commit, "current" means
+current for everyone, including a visitor who was on the page an hour ago.
 
 ---
 
@@ -1497,7 +1503,8 @@ and the site keeps having no dependencies at all.
 | Symptom | What it is | What to do |
 |---|---|---|
 | `git push` rejected, "fetch first" | the robot committed `data/scholar.json` while you were working | `git pull --rebase`, then push |
-| The push landed, the site did not change | Pages build still running, or a cached page | check **Actions**, then hard-reload (Ctrl-F5) |
+| The push landed, the site did not change | the `Deploy the site` run has not finished | check **Actions**; once it is green the page is current, and no reload trick is needed — every stylesheet, script and import carries `?v=<commit>` |
+| An old version of the JavaScript is running | a deploy that predates `tools/fingerprint.mjs`, still in the visitor's cache | it ages out; nothing deployed since carries an unstamped URL. Ctrl-F5 does **not** cure this on its own — the explorer is reached through an `import()` fired after load, which a forced reload does not cover |
 | The push landed, Pages never rebuilt | the known `GITHUB_TOKEN` restriction | §18.2 — swap in a deploy key or a fine-grained PAT |
 | The mirror shows old citation figures | nobody carried `data/scholar.json` across | §11.4C, second half |
 | The mirror is broken, `hsadeghi.org` is fine | almost always an absolute path | `node tools/check-offline.mjs` |
