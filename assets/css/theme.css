@@ -1,0 +1,605 @@
+/* --------------------------------------------------------------------------
+   Hamed Sadeghi — personal academic website
+   Design, code and content copyright (c) 2026 Hamed Sadeghi. All rights reserved.
+   Original: http://sharif.edu/~hsadeghi/
+
+   Not licensed for reuse, redistribution or derivative works without written
+   permission. Reading this file is expected — it was sent to your browser so it
+   could be used. Republishing it is not.
+
+   build-id: hs-geotech-2026-6f3ad1
+   -------------------------------------------------------------------------- */
+/* =============================================================================
+   theme.css — the light and dark colour schemes, and the toggle control
+   -----------------------------------------------------------------------------
+   This is the only file that knows what colour anything is.  Every other
+   stylesheet refers to tokens (`var(--c-ink)`, `var(--sh-title)`), so a new
+   scheme is a matter of adding one more block here — no other file changes.
+
+   Layout, spacing, fonts and text styling are deliberately NOT themed: the two
+   schemes are the same design in different clothes.
+
+   ── How a theme gets applied ────────────────────────────────────────────────
+   `assets/js/modules/theme.js` writes one attribute on the <html> element:
+
+       <html data-theme="light">   forced light
+       <html data-theme="dark">    forced dark
+       <html>                      (no attribute) follow the operating system
+
+   So there are three rule sets below:
+
+     1. `:root`                                 the light scheme — also the
+                                                fallback for very old browsers
+     2. `@media (prefers-color-scheme: dark)`   dark, when following the OS and
+        `:root:not([data-theme])`               the user has not chosen
+     3. `:root[data-theme="dark"]`              dark, chosen explicitly
+
+   Rules 2 and 3 carry the same values.  CSS has no way to give one declaration
+   block two unrelated selectors *and* keep the media query, so the dark palette
+   appears twice; the pair is marked and kept adjacent so they stay in step.
+
+   ── Adding a colour ─────────────────────────────────────────────────────────
+   1. Add `--c-something: <light value>;` to the `:root` block.
+   2. Add `--c-something: <dark value>;` to the `%dark` block.
+   3. Use `var(--c-something)` in base/layout/components.css.
+   Nothing else is needed — the transition and the toggle pick it up for free.
+   ========================================================================== */
+
+/* -----------------------------------------------------------------------------
+   1. Light scheme — the original palette, value for value
+   -------------------------------------------------------------------------- */
+:root {
+  color-scheme: light;
+
+  /* ── Surfaces ──────────────────────────────────────────────────────────────
+     A near-white page with genuinely white cards on top.  The old design had it
+     the other way round — grey panels on a grey page — which is most of why it
+     read as heavy. */
+  --c-page:        #fafafb;
+  --c-surface:     #ffffff;   /* cards, panels, the header                */
+  --c-surface-2:   #f4f5f7;   /* insets, tinted headers                   */
+  --c-panel:       var(--c-surface);
+  --c-bar:         rgb(255 255 255 / 0.82);   /* translucent sticky header */
+  --c-bar-solid:   #ffffff;
+  --c-bar-item:    transparent;
+  --c-bar-hover:   #f1f2f5;
+  --c-bar-border:  #e5e7eb;
+
+  /* ── Ink ──────────────────────────────────────────────────────────────────
+     A slightly blue-black rather than #333, which reads crisper against white. */
+  --c-ink:         #14171f;
+  --c-ink-soft:    #3d4451;
+  --c-ink-mute:    #5b6472;   /* 5.9:1 on the page                        */
+  --c-ink-faint:   #6b7280;   /* 4.9:1 on the page                        */
+  --c-ink-strong:  #05070c;
+  --c-heading:     #14171f;
+  --c-entry-head:  #1d2230;
+  --c-masthead:    #14171f;
+  --c-bar-text:    #3d4451;
+  --c-footer-text: #5b6472;
+
+  /* ── Lines ── */
+  --c-rule:        #e8eaee;
+  --c-border:      #dfe2e8;
+  --c-hairline-hi: transparent;   /* the old letterpress highlight is gone */
+
+  /* ── Accents ──────────────────────────────────────────────────────────────
+     The site's identity is the cyan in the logo and the favicon.  That exact
+     hue is too light for text, so the ramp keeps it for decoration and uses
+     deeper steps of the same family for links. */
+  --c-brand:       #00ccff;   /* the original mark colour, decoration only */
+  /* The same cyan, at a value that can carry TEXT. --c-brand is 1.9:1 on the
+     page — fine behind a glow or on a canvas, and unreadable as a letter. This
+     is 4.6:1, which is the darkest the brand can be pushed and still read as
+     cyan rather than as teal. The copyright glyph in the footer notice uses it,
+     and its glow is the bright cyan on top. */
+  --c-brand-ink:   #087f9e;
+
+  /* The wall and the glow of a raised icon — see components.css §5b. A deep
+     tone of the palette rather than a neutral black, because on this sprite the
+     wall is partly visible THROUGH the icon and a black one turns every duotone
+     glyph to mud. */
+  --c-icon-wall:   rgb(8 60 78 / 0.5);
+  --c-icon-glow:   rgb(8 145 178 / 0.35);
+  /* The accent doubles as a text colour — kickers, counts, the current nav
+     item — so it has to clear 4.5:1 on the page, on white cards AND on
+     --c-accent-soft.  #0891b2 only manages 3.3:1; this step down the same ramp
+     gets 4.8-5.4:1 everywhere.  --c-accent-bright keeps the lighter tone for
+     things that are purely graphic. */
+  --c-accent:        #0e7490;
+  --c-accent-bright: #0891b2;
+  --c-accent-soft: #e0f5fb;   /* accent washes                             */
+  --c-link:        #0e7490;   /* 5.6:1 on the page                         */
+  --c-link-hover:  #155e75;
+  --c-focus:       #0891b2;
+  --c-danger:      #be123c;
+
+  /* Error panel */
+  --c-error-bg:    #fff5f6;
+  --c-error-line:  #f4cdd4;
+  --c-code-bg:     #f1f2f5;
+
+  /* ── Text shadows ─────────────────────────────────────────────────────────
+     The letterpress effect is deliberately retired — it is the single most
+     dated thing in the old theme.  The tokens stay so nothing breaks. */
+  --sh-title:       none;
+  --sh-panel-title: none;
+  --sh-masthead:    none;
+  --sh-hi:          none;
+  --sh-bar:         none;
+
+  /* ── Depth ── */
+  --sh-drop:       0 1rem 2.5rem rgb(16 24 40 / 0.16);
+  --sh-card:       0 1px 2px rgb(16 24 40 / 0.04), 0 1px 3px rgb(16 24 40 / 0.06);
+  --sh-card-hover: 0 4px 8px rgb(16 24 40 / 0.05), 0 12px 28px rgb(16 24 40 / 0.10);
+  --sh-topbar:     0 1px 0 rgb(16 24 40 / 0.06), 0 8px 24px rgb(16 24 40 / 0.06);
+
+  --c-hover:      rgb(16 24 40 / 0.035);
+  --c-panel-head: rgb(16 24 40 / 0.022);
+
+  /* The hero's background wash. */
+  --c-hero-a:     #e6f7fd;
+  --c-hero-b:     #f3f0fb;
+
+  /* ── The 3D field ──────────────────────────────────────────────────────────
+     The lattice drawn behind every page (assets/js/modules/fx/).  Its colours
+     live here, beside the rest of the palette, so that recolouring the site
+     relights the field in the same edit and the JavaScript never needs to know
+     which scheme is on.
+
+       --fx-base     the resting colour of the lattice.  A dimmed cyan in BOTH
+                     schemes, not a neutral grey: the field is the site's own
+                     light, and giving it a hue means a star at rest is a faint
+                     cyan spark rather than a smudge.  It was slate once, and on
+                     the dark page slate over near-black was invisible — the
+                     field appeared to exist only in light mode.
+       --fx-tint     what it drifts back to when nothing is highlighted
+       --fx-opacity  overall strength.  This is the dial to turn down first if
+                     the effect is ever too much; 0 switches it off visually
+                     while leaving everything else working.
+       --fx-hue-0…5  the section palette.  A section's index picks one, every
+                     item inside it lights that colour, and the same value is
+                     handed to the element's own border and glow — so the light
+                     behind the page and the edge on the entry always agree.
+                     Chosen to stay distinguishable side by side and to sit at
+                     similar lightness, so no section shouts louder than another.
+     ------------------------------------------------------------------------ */
+  --fx-base:    #2f9fb8;
+  --fx-tint:    #0891b2;
+  --fx-opacity: 0.92;
+
+  --fx-hue-0: #0891b2;   /* teal    */
+  --fx-hue-1: #7c3aed;   /* violet  */
+  --fx-hue-2: #d97706;   /* amber   */
+  --fx-hue-3: #059669;   /* green   */
+  --fx-hue-4: #e11d48;   /* rose    */
+  --fx-hue-5: #2563eb;   /* blue    */
+
+  /* ── Extruded type (fx.css §8) ─────────────────────────────────────────────
+     The stack of hard shadows under the Summary page's headings, and the soft
+     one the whole word casts.  On the light scheme the light is above, so the
+     extrusion runs down into a cool grey and the cast shadow is a soft blue-
+     grey rather than black — black under coloured type reads as dirt. */
+  --c-extrude:      #dde4ec;
+  --c-extrude-deep: #c7d1dc;
+  --c-extrude-cast: rgb(16 24 40 / 0.16);
+
+  /* The lip: the ridge of material standing up around a letter that has been
+     pressed proud of the sheet.  It sits ABOVE the glyph, catching the light
+     that the letter's own walls are turned away from — this is the edge that
+     makes the name read as raised rather than merely shadowed.  On a pale page
+     the lip is white; there is nothing brighter available. */
+  --c-lip: #ffffff;
+
+  /* The footer heart (components.css §13a). A warm red on the light page. */
+  --c-heart: #e11d48;
+  /* The wide, faint pool the whole word drops on the card, well below the hard
+     contact shadow.  Half the strength of --c-extrude-cast and several times
+     its blur. */
+  --c-extrude-cast-soft: rgb(16 24 40 / 0.10);
+
+  /* The selected segment of the theme switch. */
+  --c-switch-on:     #ffffff;
+  --c-switch-on-ink: #14171f;
+
+  --brand-plate: transparent;
+  --brand-plate-pad: 0;
+}
+
+/* -----------------------------------------------------------------------------
+   2. Dark scheme
+   Written once, applied twice — explicitly via the attribute, and implicitly
+   when the visitor has expressed no preference but their system is dark.
+   -------------------------------------------------------------------------- */
+:root[data-theme="dark"],
+:root[data-theme="dark"] :is(.lightbox) {
+  color-scheme: dark;
+
+  --c-page:        #0c0f14;
+  --c-surface:     #141922;
+  --c-surface-2:   #1b2230;
+  --c-panel:       var(--c-surface);
+  --c-bar:         rgb(12 15 20 / 0.78);
+  --c-bar-solid:   #0c0f14;
+  --c-bar-item:    transparent;
+  --c-bar-hover:   #1b2230;
+  --c-bar-border:  #232c3a;
+
+  --c-ink:         #e3e8f0;
+  --c-ink-soft:    #c2cad8;
+  --c-ink-mute:    #9aa5b6;
+  --c-ink-faint:   #8b96a8;
+  --c-ink-strong:  #f4f7fb;
+  --c-heading:     #eef2f8;
+  --c-entry-head:  #dbe2ec;
+  --c-masthead:    #eef2f8;
+  --c-bar-text:    #c2cad8;
+  --c-footer-text: #9aa5b6;
+
+  --c-rule:        #232c3a;
+  --c-border:      #2b3545;
+  --c-hairline-hi: transparent;
+
+  --c-brand:       #22d3ee;
+  --c-brand-ink:   #22d3ee;   /* 9.8:1 here — the dark scheme needs no darkening */
+  --c-icon-wall:   rgb(11 74 94 / 0.8);
+  --c-icon-glow:   rgb(34 211 238 / 0.4);
+  --c-accent:        #22d3ee;
+  --c-accent-bright: #22d3ee;
+  --c-accent-soft: #0d2b34;
+  --c-link:        #67d3ee;
+  --c-link-hover:  #a5e8f7;
+  --c-focus:       #22d3ee;
+  --c-danger:      #fb7185;
+
+  --c-error-bg:    #2a161c;
+  --c-error-line:  #5c2b36;
+  --c-code-bg:     #1b2230;
+
+  --sh-title:       none;
+  --sh-panel-title: none;
+  --sh-masthead:    none;
+  --sh-hi:          none;
+  --sh-bar:         none;
+
+  --sh-drop:       0 1rem 2.5rem rgb(0 0 0 / 0.65);
+  --sh-card:       0 1px 2px rgb(0 0 0 / 0.45);
+  --sh-card-hover: 0 4px 10px rgb(0 0 0 / 0.5), 0 16px 32px rgb(0 0 0 / 0.4);
+  --sh-topbar:     0 1px 0 rgb(255 255 255 / 0.05), 0 8px 24px rgb(0 0 0 / 0.55);
+
+  --c-hover:      rgb(255 255 255 / 0.05);
+  --c-panel-head: rgb(255 255 255 / 0.03);
+
+  --c-hero-a:     #10222b;
+  --c-hero-b:     #171a2c;
+
+  /* The field, dark scheme.  A brighter base and more strength: on a dark page
+     the lattice is the only thing lighting the background, where on a light one
+     it is drawing on top of an already-bright surface. */
+  --fx-base:    #4ec3db;
+  --fx-tint:    #22d3ee;
+  --fx-opacity: 0.62;
+
+  --fx-hue-0: #22d3ee;
+  --fx-hue-1: #a78bfa;
+  --fx-hue-2: #fbbf24;
+  --fx-hue-3: #34d399;
+  --fx-hue-4: #fb7185;
+  --fx-hue-5: #60a5fa;
+
+  /* On the dark scheme the extrusion has to be LIGHTER than the surface, not
+     darker.  The first attempt reasoned that shadows are dark and used #10161f
+     — darker than the #141922 card it sits on — and the effect vanished
+     completely.  What is actually being drawn is the SIDE of a raised letter,
+     and on a dark page a raised side catches light; only the shadow it casts
+     is dark.  So the sides are slate, stepping down as they go back, and the
+     cast shadow underneath is black. */
+  --c-extrude:      #3b4859;
+  --c-extrude-deep: #232d3b;
+  --c-extrude-cast: rgb(0 0 0 / 0.6);
+
+  /* The lip has to be lighter than --c-extrude, not lighter than the page: on
+     a dark card the walls are already slate, so a white ridge would read as a
+     second letter above the first.  This is one step up from the wall. */
+  --c-lip: #6d7f96;
+  /* Brighter on the dark page: a deep red on near-black reads as brown. */
+  --c-heart: #fb5c78;
+  --c-extrude-cast-soft: rgb(0 0 0 / 0.42);
+
+  --c-switch-on:     #2b3545;
+  --c-switch-on-ink: #f4f7fb;
+
+  --brand-plate: #eef1f5;
+  --brand-plate-pad: 2px;
+}
+
+/* Same palette again for visitors who have chosen nothing and whose system is
+   dark.  `:not([data-theme])` keeps an explicit light choice winning. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    color-scheme: dark;
+
+    --c-page:        #0c0f14;
+    --c-surface:     #141922;
+    --c-surface-2:   #1b2230;
+    --c-panel:       var(--c-surface);
+    --c-bar:         rgb(12 15 20 / 0.78);
+    --c-bar-solid:   #0c0f14;
+    --c-bar-item:    transparent;
+    --c-bar-hover:   #1b2230;
+    --c-bar-border:  #232c3a;
+
+    --c-ink:         #e3e8f0;
+    --c-ink-soft:    #c2cad8;
+    --c-ink-mute:    #9aa5b6;
+    --c-ink-faint:   #8b96a8;
+    --c-ink-strong:  #f4f7fb;
+    --c-heading:     #eef2f8;
+    --c-entry-head:  #dbe2ec;
+    --c-masthead:    #eef2f8;
+    --c-bar-text:    #c2cad8;
+    --c-footer-text: #9aa5b6;
+
+    --c-rule:        #232c3a;
+    --c-border:      #2b3545;
+    --c-hairline-hi: transparent;
+
+    --c-brand:       #22d3ee;
+    --c-brand-ink:   #22d3ee;
+    --c-icon-wall:   rgb(11 74 94 / 0.8);
+    --c-icon-glow:   rgb(34 211 238 / 0.4);
+    --c-accent:      #22d3ee;
+    --c-accent-soft: #0d2b34;
+    --c-link:        #67d3ee;
+    --c-link-hover:  #a5e8f7;
+    --c-focus:       #22d3ee;
+    --c-danger:      #fb7185;
+
+    --c-error-bg:    #2a161c;
+    --c-error-line:  #5c2b36;
+    --c-code-bg:     #1b2230;
+
+    --sh-title:       none;
+    --sh-panel-title: none;
+    --sh-masthead:    none;
+    --sh-hi:          none;
+    --sh-bar:         none;
+
+    --sh-drop:       0 1rem 2.5rem rgb(0 0 0 / 0.65);
+    --sh-card:       0 1px 2px rgb(0 0 0 / 0.45);
+    --sh-card-hover: 0 4px 10px rgb(0 0 0 / 0.5), 0 16px 32px rgb(0 0 0 / 0.4);
+    --sh-topbar:     0 1px 0 rgb(255 255 255 / 0.05), 0 8px 24px rgb(0 0 0 / 0.55);
+
+    --c-hover:      rgb(255 255 255 / 0.05);
+    --c-panel-head: rgb(255 255 255 / 0.03);
+
+    --c-hero-a:     #10222b;
+    --c-hero-b:     #171a2c;
+
+    --fx-base:    #4ec3db;
+    --fx-tint:    #22d3ee;
+    --fx-opacity: 0.62;
+
+    --fx-hue-0: #22d3ee;
+    --fx-hue-1: #a78bfa;
+    --fx-hue-2: #fbbf24;
+    --fx-hue-3: #34d399;
+    --fx-hue-4: #fb7185;
+    --fx-hue-5: #60a5fa;
+
+    --c-extrude:      #3b4859;
+    --c-extrude-deep: #232d3b;
+    --c-extrude-cast: rgb(0 0 0 / 0.6);
+
+    --c-lip: #6d7f96;
+    --c-heart: #fb5c78;
+    --c-extrude-cast-soft: rgb(0 0 0 / 0.42);
+
+    --c-switch-on:     #2b3545;
+    --c-switch-on-ink: #f4f7fb;
+
+    --brand-plate: #eef1f5;
+    --brand-plate-pad: 2px;
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   2b. The field on small screens
+   On a desktop the field mostly shows in the margins either side of the article.
+   On a phone there are no margins — it shares the screen with the text — so it
+   is turned down to roughly two thirds of its strength.  The highlight still
+   reads clearly, because most of a halo's presence comes from its contrast with
+   an almost-invisible resting field.
+   -------------------------------------------------------------------------- */
+@media (max-width: 44rem) {
+  :root                      { --fx-opacity: 0.62; }
+  :root[data-theme="dark"]   { --fx-opacity: 0.42; }
+}
+@media (max-width: 44rem) and (prefers-color-scheme: dark) {
+  :root:not([data-theme])    { --fx-opacity: 0.42; }
+}
+
+/* -----------------------------------------------------------------------------
+   3. The cross-fade
+   Colour transitions are switched on only for the moment of the change.  If
+   they were always on, every hover would fade lazily instead of responding, and
+   the first paint of the page would visibly wash in.  theme.js adds
+   `.theme-anim` to <html>, flips the attribute, and removes the class when the
+   transition ends.
+   -------------------------------------------------------------------------- */
+.theme-anim,
+.theme-anim *,
+.theme-anim *::before,
+.theme-anim *::after {
+  transition:
+    background-color 0.35s var(--ease),
+    border-color     0.35s var(--ease),
+    color            0.35s var(--ease),
+    fill             0.35s var(--ease),
+    box-shadow       0.35s var(--ease) !important;
+  transition-delay: 0s !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-anim, .theme-anim *, .theme-anim *::before, .theme-anim *::after {
+    transition: none !important;
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   4. Per-element dark adjustments
+   Things a colour swap alone cannot fix: artwork with baked-in colours, and the
+   white photo mounts that are part of the original design.
+   -------------------------------------------------------------------------- */
+
+/* Research-identifier and social marks (Scopus, Publons, Academia, …) — see the
+   --brand-plate note above.  In light mode the plate is transparent, so this
+   rule is inert. */
+.profile-list__row img {
+  background: var(--brand-plate);
+  padding: var(--brand-plate-pad);
+  border-radius: 3px;
+  box-sizing: content-box;
+}
+
+/* The Sharif crest is dark navy line-art on transparency.  On the dark panel it
+   would all but disappear, so it gets the same light chip, rounded to match. */
+:root[data-theme="dark"] .panel__logo {
+  background: #e9edf2;
+  border-radius: 50%;
+  padding: 0.35rem;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .panel__logo {
+    background: #e9edf2;
+    border-radius: 50%;
+    padding: 0.35rem;
+  }
+}
+
+/* Photographs keep their mount, but the mount takes the surface colour rather
+   than staying stubbornly white. */
+.entry img,
+.profile__photo,
+.person__photo { background: var(--c-surface); }
+
+/* -----------------------------------------------------------------------------
+   5. The toggle control
+   A three-way segmented switch: Light / Auto / Dark.  "Auto" is the default and
+   means "whatever this device is set to", which is why it exists as a real
+   option rather than being implied by the absence of a choice.
+
+   Markup (built by theme.js):
+
+     <div class="theme-switch" role="radiogroup" aria-label="Colour theme">
+       <button role="radio" aria-checked="true" data-theme-value="light">…</button>
+       …
+     </div>
+
+   It lives in the top bar next to the logo, so it is in the same place on every
+   page and at every screen size.
+   -------------------------------------------------------------------------- */
+.theme-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-full);
+  background: var(--c-surface-2);
+  flex: none;
+}
+
+.theme-switch__btn {
+  display: inline-grid;
+  place-items: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--c-ink-faint);
+  cursor: pointer;
+  line-height: 1;
+  transition: background-color var(--dur) var(--ease),
+              color var(--dur) var(--ease),
+              box-shadow var(--dur) var(--ease);
+}
+.theme-switch__btn .icon { width: 0.95rem; height: 0.95rem; }
+.theme-switch__btn:hover { color: var(--c-ink); }
+
+/* The selected segment. `aria-checked` is the single source of truth — the
+   styling follows the accessibility state rather than duplicating it in a
+   class, so the two can never disagree. */
+.theme-switch__btn[aria-checked="true"] {
+  background: var(--c-switch-on);
+  color: var(--c-switch-on-ink);
+  box-shadow: var(--sh-card);
+}
+
+.theme-switch__btn:focus-visible {
+  outline: 2px solid var(--c-focus);
+  outline-offset: 2px;
+}
+
+/* The flourish when a segment is picked: the sun/moon spins into place. Pure
+   CSS, triggered by a class theme.js adds for one animation cycle. */
+@keyframes theme-pop {
+  0%   { transform: rotate(-90deg) scale(0.6); opacity: 0.4; }
+  60%  { transform: rotate(10deg)  scale(1.15); opacity: 1; }
+  100% { transform: none; }
+}
+.theme-switch__btn.is-picked .icon { animation: theme-pop var(--dur-slow) var(--ease-out); }
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-switch__btn.is-picked .icon { animation: none; }
+}
+
+@media (max-width: 26rem) {
+  .theme-switch__btn { width: 1.7rem; height: 1.7rem; }
+}
+
+/* -----------------------------------------------------------------------------
+   6. Brand colours in dark mode
+   The identifier wordmarks are set in each service's own brand colour.  Several
+   of those (Publons navy, SciExplore teal, Mendeley crimson) are dark by design
+   and fail contrast against a dark panel, so each is lifted to the nearest
+   lighter tint of the *same* hue — recognisably the brand, comfortably legible.
+   -------------------------------------------------------------------------- */
+:root[data-theme="dark"] {
+  --brand-scopus:     #ff9147;
+  --brand-orcid:      #b7dd52;
+  --brand-orcid-grey: #c2c7cd;
+  --brand-rgate:      #2ae3c4;
+  --brand-linkedin:   #4aa8e0;
+  --brand-mendeley:   #ef5f6c;
+  --brand-publons:    #6ea3d8;
+  --brand-sciexplore: #4fb6d8;
+  --brand-scholar:    #b0b7c0;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --brand-scopus:     #ff9147;
+    --brand-orcid:      #b7dd52;
+    --brand-orcid-grey: #c2c7cd;
+    --brand-rgate:      #2ae3c4;
+    --brand-linkedin:   #4aa8e0;
+    --brand-mendeley:   #ef5f6c;
+    --brand-publons:    #6ea3d8;
+    --brand-sciexplore: #4fb6d8;
+    --brand-scholar:    #b0b7c0;
+  }
+}
+
+/* Light values are the defaults; the fallback in each var() is what light mode
+   uses, so no second block is needed. */
+.c-scopus     { color: var(--brand-scopus,     #f36d21); }
+.c-orcid      { color: var(--brand-orcid,      #a5cd39); }
+.c-orcid-grey { color: var(--brand-orcid-grey, #a6a8ab); }
+.c-rgate      { color: var(--brand-rgate,      #00d0af); }
+.c-linkedin   { color: var(--brand-linkedin,   #0073b0); }
+.c-mendeley   { color: var(--brand-mendeley,   #a81c26); }
+.c-publons    { color: var(--brand-publons,    #326395); }
+.c-sciexplore { color: var(--brand-sciexplore, #007398); }
+.gs span      { color: var(--brand-scholar,    #6b6b6b); }

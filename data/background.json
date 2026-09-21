@@ -1,0 +1,226 @@
+{
+  "sections": [
+    {
+      "id": "profession",
+      "title": "Professional Background",
+      "icon": "fad-cog",
+      "iconClass": "fa-spin",
+      "items": [
+        {
+          "lead": "Associate Professor",
+          "body": "<a href=\"http://www.en.sharif.edu/\" target=\"_blank\"> Sharif University of Technology</a>",
+          "period": "2023 – Now"
+        },
+        {
+          "lead": "Visiting Assistant Professor",
+          "body": "<a href=\"https://www.polyu.edu.hk/en/\" target=\"_blank\"> Hong Kong Polytechnic University</a>",
+          "period": "2022 – 2023"
+        },
+        {
+          "lead": "Assistant Professor",
+          "body": "<a href=\"http://www.en.sharif.edu/\" target=\"_blank\"> Sharif University of Technology</a>",
+          "period": "2018 – 2023"
+        },
+        {
+          "lead": "Visiting Assistant Professor",
+          "body": "<a href=\"http://www.en.sharif.edu/\" target=\"_blank\"> Sharif University of Technology</a>",
+          "period": "2017 – 2018"
+        },
+        {
+          "lead": "Senior Research Fellow",
+          "body": "<a href=\"https://connect.isti.ir/\" target=\"_blank\">National Elites Foundation</a>",
+          "period": "2016 – 2018"
+        },
+        {
+          "lead": "Research Assistant Professor",
+          "body": "<a href=\"http://www.en.sharif.edu/\" target=\"_blank\"> Sharif University of Technology</a>",
+          "period": "2017 – 2018"
+        },
+        {
+          "lead": "Postdoctoral Research Fellow",
+          "body": "<a href=\"http://www.en.sharif.edu/\" target=\"_blank\"> Sharif University of Technology</a>",
+          "period": "2016 – 2017"
+        }
+      ]
+    },
+    {
+      "id": "education",
+      "title": "Educational Background",
+      "icon": "fad-user-graduate",
+      "iconClass": "",
+      "items": [
+        {
+          "lead": "Dual-Degree PhD",
+          "body": "<a href=\"https://www.ust.hk/home\" target=\"_blank\"> Hong Kong University of Science and Technology</a>",
+          "period": "2012 – 2016"
+        },
+        {
+          "lead": "Dual-Degree PhD",
+          "body": "<a href=\"http://www.en.sharif.edu/\" target=\"_blank\"> Sharif University of Technology</a>",
+          "period": "2009 – 2016"
+        },
+        {
+          "lead": "MPhil",
+          "body": "<a href=\"http://www.en.sharif.edu/\" target=\"_blank\"> Sharif University of Technology</a>",
+          "period": "2006 – 2008"
+        },
+        {
+          "lead": "BSc",
+          "body": "<a href=\"https://uk.ac.ir/en/home\" target=\"_blank\"> Shahid Bahonar University of Kerman</a>",
+          "period": "2001 – 2005"
+        }
+      ]
+    },
+    {
+      "id": "administrative",
+      "title": "Administrative Background",
+      "icon": "fad-user-crown",
+      "iconClass": "",
+      "items": [
+        {
+          "lead": "",
+          "body": "Dean of International Affairs | <a href=\"http://www.en.sharif.edu/\" target=\"_blank\">Sharif University of Technology</a>",
+          "period": "2025 – Now"
+        },
+        {
+          "lead": "",
+          "body": "University Deputy in the National Committee of International Students Recruitments",
+          "period": "2025 – Now"
+        },
+        {
+          "lead": "",
+          "body": "Faculty Recruitment and Evaluation Committee | Department of Civil Engineering",
+          "period": "2025 – 2027"
+        },
+        {
+          "lead": "",
+          "body": "Executive Secretary of University Graduation Ceremony",
+          "period": "2025"
+        },
+        {
+          "lead": "",
+          "body": "University Council Member of the Islamic Development Bank Loan",
+          "period": "2024 – Now"
+        },
+        {
+          "lead": "",
+          "body": "Member of the Reconstruction Committee of Advanced Geotech. Lab.",
+          "period": "2023 – Now"
+        },
+        {
+          "lead": "",
+          "body": "Coordinator of the Dual-Degree PhD Program with the HKUST",
+          "period": "2023 – Now"
+        },
+        {
+          "lead": "",
+          "body": "Director of the Geotechnical Group",
+          "period": "2023 – Now"
+        },
+        {
+          "lead": "",
+          "body": "Scientific Member of the Subsidence Committee of Tavanir Co.",
+          "period": "2022 – Now"
+        },
+        {
+          "lead": "",
+          "body": "Board of Directors of Iran InterPore Chapter",
+          "period": "2022 – Now"
+        },
+        {
+          "lead": "",
+          "body": "Research Committee Member of Tehran Urban Planning & Research Center",
+          "period": "2022 – Now"
+        },
+        {
+          "lead": "",
+          "body": "Member of the Department Laboratories Council",
+          "period": "2022 – Now"
+        },
+        {
+          "lead": "",
+          "body": "Director of the Green Geotechnology Laboratory",
+          "period": "2022 – Now"
+        },
+        {
+          "lead": "",
+          "body": "Chair of the Iran Chapter of TC106 Unsaturated Soils | ISSMGE",
+          "period": "2021 – Now"
+        },
+        {
+          "lead": "",
+          "body": "Head of the Department Mentorship Program for the New UG Students",
+          "period": "2021 – Now"
+        },
+        {
+          "lead": "",
+          "body": "Member of the Laboratories Development Council",
+          "period": "2019 – Now"
+        },
+        {
+          "lead": "",
+          "body": "Adjunct member of the Hydraulic Structures Group",
+          "period": "2019 – Now"
+        },
+        {
+          "lead": "",
+          "body": "Member of the Educational Council",
+          "period": "2019 – Now"
+        },
+        {
+          "lead": "",
+          "body": "One of the six advisors in the Mentorship Program of the New UG Students",
+          "period": "2019 – 2020"
+        },
+        {
+          "lead": "",
+          "body": "Executive Chairman of the 5<span class=\"ordinal\">th</span> National Geowall Competition",
+          "period": "2018 – 2019"
+        }
+      ]
+    },
+    {
+      "id": "membership",
+      "title": "Membership",
+      "icon": "fad-user",
+      "iconClass": "",
+      "items": [
+        {
+          "lead": "",
+          "body": "<b>International Society for Porous Media, </b><a href=\"https://www.interpore.org/about_im/about-interpore/\" target=\"_blank\">InterPore</a>",
+          "period": "2022 – Now"
+        },
+        {
+          "lead": "",
+          "body": "<b>Tehran Urban Planning &amp; Research Center, </b><a href=\"https://rpc.tehran.ir/Default.aspx?tabid=343\" target=\"_blank\">TURPC</a>",
+          "period": "2022 – Now"
+        },
+        {
+          "lead": "",
+          "body": "<b>American Society of Civil Engineers, </b><a href=\"https://www.asce.org/\" target=\"_blank\">ASCE</a>",
+          "period": "2021 – Now"
+        },
+        {
+          "lead": "",
+          "body": "<b>International Society for Soil Mechanics &amp; Geotechnical Engineering, </b><a href=\"https://www.issmge.org/\" target=\"_blank\">ISSMGE</a>",
+          "period": "2016 – Now"
+        },
+        {
+          "lead": "",
+          "body": "<b>Hong Kong Geotechnical Society, </b><a href=\"http://www.hkges.org/home.vbhtml\" target=\"_blank\">HKGES</a>",
+          "period": "2019 – Now"
+        },
+        {
+          "lead": "",
+          "body": "<b>Iranian Geotechnical Society, </b><a href=\"http://www.igs.ir/index.php/fa/\" target=\"_blank\">IGS</a>",
+          "period": "2016 – Now"
+        },
+        {
+          "lead": "",
+          "body": "<b>Iranian Society of Engineering Education, </b><a href=\"http://www.isee.ir/en\" target=\"_blank\">ISEE</a>",
+          "period": "2018 – Now"
+        }
+      ]
+    }
+  ]
+}
