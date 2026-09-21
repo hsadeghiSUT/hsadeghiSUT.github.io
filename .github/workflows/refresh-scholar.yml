@@ -116,8 +116,10 @@ jobs:
             );
           ')
 
-          git config user.name  "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # Commit as the repository owner, not as the bot: a bot identity here
+          # adds github-actions[bot] to the Contributors list on GitHub.
+          git config user.name  "HKULegend"
+          git config user.email "msadeghi@connect.hku.hk"
           git add data/scholar.json
           git commit -m "Scholar: ${SUMMARY}" -m "Refreshed by .github/workflows/refresh-scholar.yml. See README §18."
 
