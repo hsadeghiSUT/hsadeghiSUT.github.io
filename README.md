@@ -1196,6 +1196,7 @@ The site is published twice:
 | | Address | Served by | Who it is for |
 |---|---|---|---|
 | **The domain** | `https://hsadeghi.org/` | GitHub Pages, behind Cloudflare | everyone outside Iran |
+| **The second domain** | `https://hamedsadeghi.org/` | Cloudflare Pages, same repository (§11.6) | the same people, by the longer name |
 | **The mirror** | `http://sharif.edu/~hsadeghi/` | the university's own server | inside Iran, where the .org may be unreachable |
 
 They are **the same files**, uploaded to two places. Nothing is built
@@ -1617,6 +1618,76 @@ and upload the contents of `_site/` rather than the folder itself — query stri
 on static files work on any ordinary web server.
 
 ---
+
+### 11.6 The second domain — hamedsadeghi.org
+
+`hamedsadeghi.org` serves **the same site, from the same repository**, and does
+not redirect. It is a second front door, not a second site.
+
+#### Why not a second repository
+
+Because GitHub Pages allows exactly one custom domain per repository — that is
+what `CNAME` is — the obvious route is a second repo holding a copy, with a step
+in `deploy.yml` pushing the built site into it. That works, and it costs a
+deploy key or a PAT held as a secret, a second place for a deploy to fail, and a
+mirror that is only as current as the last time the copy step ran.
+
+**Cloudflare Pages allows many custom domains on one project**, and the domain
+was bought there anyway. So the second address is a Cloudflare Pages project
+pointed at this same repository:
+
+```
+Build command:      node tools/fingerprint.mjs
+Build output dir:   _site
+Custom domains:     hamedsadeghi.org, www.hamedsadeghi.org
+```
+
+One repository, one source of truth, no copy step, and the same fingerprinted
+build (§11.5) on both addresses. `hsadeghi.org` goes on being served by GitHub
+Pages exactly as before; nothing about that path changed.
+
+`tools/fingerprint.mjs` reads the commit from `git rev-parse HEAD` and falls
+back to `GITHUB_SHA`, then to **`CF_PAGES_COMMIT_SHA`** — that last one is
+Cloudflare's, for a builder that checks out without a usable git directory.
+
+#### hsadeghi.org stays the canonical address
+
+Every page carries `<link rel="canonical" href="https://hsadeghi.org/…">` and a
+matching `og:url`, and **that is left alone on purpose**. Both domains therefore
+tell a search engine that the real address is `hsadeghi.org`, which is what
+stops two identical sites competing with each other and splitting the ranking
+between them. `hamedsadeghi.org` is a way to arrive, not a second identity.
+
+If that ever changes — if the longer name becomes the one on the business card
+— then `baseUrl` in `data/site.json`, the `canonical` link and the `og:url` in
+all seven pages move together, and `hsadeghi.org` becomes the secondary
+address. It is a single decision with one consequence, and it should be made
+once rather than drifted into.
+
+#### The copy canary had to be told
+
+This is the part that bites, and it is easy to miss until the console says
+something alarming. `modules/canary.js` compares the hostname it was served
+from against `baseUrl` plus `origins` in `data/site.json` (§19). A hostname not
+on that list is, as far as the site is concerned, somebody else's server: it
+fires a GA4 `unlicensed_origin` event and prints *"this page is a copy"* into
+the console.
+
+So the new domain is on the list:
+
+```json
+"origins": [
+  "hsadeghi.org", "www.hsadeghi.org",
+  "hamedsadeghi.org", "www.hamedsadeghi.org",
+  "sharif.edu", "www.sharif.edu", "en.sharif.edu"
+]
+```
+
+`tools/check-canary.mjs` runs the site under each of those hostnames and asserts
+it stays quiet, and under `copycat.test` and asserts it does not. Both new
+hostnames are in that table now. **Any future address — a staging copy, a
+preview URL, a third domain — needs the same two edits**, and the check is what
+tells you when one was forgotten.
 
 ### Keeping old links working
 

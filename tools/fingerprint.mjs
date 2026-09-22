@@ -113,18 +113,23 @@ const problems = [];
 /**
  * The commit actually being built.
  *
- * Read from the checked-out tree, NOT from GITHUB_SHA. For a scheduled run that
- * commits and then deploys — which is what the Scholar refresh does — the
- * event's SHA is the head from before that commit, and trusting it would stamp
- * a build with the version of the tree it replaces.
+ * Read from the checked-out tree first, NOT from an environment variable. For a
+ * scheduled run that commits and then deploys — which is what the Scholar
+ * refresh does — the event's SHA is the head from before that commit, and
+ * trusting it would stamp a build with the version of the tree it replaces.
+ *
+ * The fallbacks are for builders that check out without a usable git directory.
+ * `CF_PAGES_COMMIT_SHA` is Cloudflare Pages, which builds this same repository
+ * for the second domain (§11.6).
  */
 function version() {
   try {
     return execFileSync('git', ['rev-parse', '--short=10', 'HEAD'], { cwd: ROOT })
       .toString().trim();
   } catch {
-    if (process.env.GITHUB_SHA) return process.env.GITHUB_SHA.slice(0, 10);
-    throw new Error('no git checkout and no GITHUB_SHA: cannot version this build');
+    const env = process.env.GITHUB_SHA || process.env.CF_PAGES_COMMIT_SHA;
+    if (env) return env.slice(0, 10);
+    throw new Error('no git checkout and no commit in the environment: cannot version this build');
   }
 }
 

@@ -42,6 +42,8 @@ const CASES = [
   { host: 'copycat.test', expect: true, why: 'somebody else’s server' },
   { host: 'hsadeghi.org', expect: false, why: 'the site’s own domain' },
   { host: 'www.hsadeghi.org', expect: false, why: 'the same domain, with www' },
+  { host: 'hamedsadeghi.org', expect: false, why: 'the second domain, same site' },
+  { host: 'www.hamedsadeghi.org', expect: false, why: 'the second domain, with www' },
   { host: 'sharif.edu', expect: false, why: 'the university mirror' },
   { host: 'localhost', expect: false, why: 'local development' },
 ];
