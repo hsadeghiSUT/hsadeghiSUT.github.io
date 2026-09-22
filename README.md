@@ -1656,6 +1656,14 @@ its own `.git` and no remote — which meant the thing most likely to be uploade
 to Sharif was the one copy of the site nothing kept current. It is now a build
 output folder and nothing else. §11.4B.
 
+**`--out` empties the folder without deleting it**, and that is not a detail.
+The obvious `rm(OUT, { recursive: true })` fails with **`EBUSY`** on a
+OneDrive-synced folder: Windows will not remove a directory something else has
+open, and OneDrive's sync engine always has that one open. Deleting the
+*children* never fails. So the script removes the contents and keeps the root —
+which also means you can leave a terminal sitting in the folder while it
+rebuilds.
+
 ---
 
 ### 11.6 The second domain — hamedsadeghi.org
