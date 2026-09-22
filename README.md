@@ -1702,6 +1702,10 @@ long are hard to keep your place in. So:
 - The entry under the pointer takes a **ring and a glow in its section's
   colour**, lifts a few pixels toward you, and tilts very slightly to follow the
   pointer — a real 3D rotation, not a shadow trick.
+  **One element opts out of the rotation: the roster card** (§15b). It grew a
+  panel that opens to a publication list and a WebGL canvas, and tilting that
+  toward the pointer tilts a canvas drawing its own 3D. It keeps the ring, the
+  glow and the lift of the surface; it does not turn.
 - The **field behind the page lights up around it** — a cloud of small stars
   gathers along the entry's outline, flaring and swirling, and its colour travels
   to the same hue over about 300 ms. The colour transition is the point: light
@@ -3024,6 +3028,15 @@ the skyline the count leads — the height of the block under the cursor *is* th
 number, so it is the answer to the question being asked. On the timeline it
 trails, because there the paper is what is being pointed at.
 
+**The readout is a pill rather than bare text**, and that is not decoration. It
+sits over the stage, and on the skyline the year markers are drawn along the
+bottom of that same stage — so "10 citations · 2021 · A review of different
+approaches…" printed itself straight across "2021 · 26" and neither could be
+read. It now carries the bar's own background, sized to its content and centred,
+so it occludes the label it lands on instead of blending into it. The collision
+is worst in the scoped views on the roster cards, where the stage is half the
+height, but it was always there.
+
 **A zero is left unsaid everywhere**, the skyline included. It used to append
 "not yet cited" there, on the argument that a reader pointing at a block four
 pixels tall deserves to know why it is four pixels tall. That argument was
@@ -3499,14 +3512,18 @@ spaces.
 
 #### The card says it opens, and holds still while it does
 
-Two things about the button were wrong when the panel first landed, and both
-were about the card having changed size rather than about the button itself.
+Three things about the card were wrong once it could expand, and all three were
+about it having changed size rather than about anything being broken before.
 
 **The caret.** `25 publications · 231 citations` reads as a label. It is a
 button, it has a border and a hover state, and people still did not click it,
 because nothing on it said there was anything behind it. A caret now points
 right when the panel is shut and down when it is open, and the button carries
 `title="Show this person's publications"` as well as `aria-expanded`.
+
+It was 0.7em first, which is the size of the text beside it and turned out to
+be the size of something nobody notices — technically present, which is the
+same as absent. It is 1.1em and in the accent colour.
 
 It **swaps between two symbols** — `fas-caret-right` and `fas-caret-down` —
 rather than rotating one, and that is worth knowing before writing
@@ -3518,13 +3535,63 @@ book icon beside it turned as expected. Rather than keep guessing at an engine
 quirk on a cosmetic detail, the caret stopped depending on being turned. Two
 symbols cannot be got wrong, and the swap is one attribute.
 
-**The card no longer lifts.** `.person:hover` used to include
-`transform: translateY(-2px)`. On a card the size of a business card that is a
-pleasant response to the pointer; on one that can open to a publication list, a
-row of faces and a WebGL canvas, it is the whole panel twitching every time the
-cursor crosses it. The light and the border still answer the pointer — the card
-itself holds still, and `transform` is off its transition list so nothing about
-position animates at all.
+**The card no longer tilts, and the reason is not where it was first looked
+for.** A roster card leant and lifted as the pointer crossed it, like a panel
+floating in space. The obvious suspect was `.person:hover` in components.css,
+which carried `transform: translateY(-2px)`; that came out, and the card went on
+moving, because the lift was never what was doing it.
+
+It was §12.1 — the contextual highlight. `fx.css` gives anything carrying
+`data-fx` a real 3D rotation toward the pointer, and `.person` carries it:
+
+```css
+transform:
+  perspective(900px)
+  rotateX(var(--fx-rx, 0deg))
+  rotateY(var(--fx-ry, 0deg))
+  translateZ(var(--fx-lift, 0px));
+```
+
+That was right while a person card was a photograph and three lines: a small
+object leaning toward you reads as the card answering the pointer. It stopped
+being right when the card could open to eight hundred pixels holding a
+publication list, a row of faces and a WebGL canvas — which was then drawing its
+own 3D **on a plane that was itself turning**.
+
+So `.person[data-fx].is-lit` sets `transform: none`. Only the rotation and the
+lift go, and only for roster cards: the glow, the border and the lifted surface
+stay, because they are what says "this is the thing under your cursor" and none
+of them moves anything. A publication entry or an honour card is still a small
+object, and still tilts.
+
+**Opening a card no longer moves it.** Opening one closes the last, and when the
+last was *above* this one that removes several hundred pixels from above the
+thing the reader just clicked — the page appeared to jump several cards down and
+they had to scroll back. The button's position on screen is measured before the
+toggle and again after, and the scroll is corrected by the difference:
+
+```js
+const before = button.getBoundingClientRect().top;
+// … close the other panel, open this one …
+const shift = button.getBoundingClientRect().top - before;
+if (Math.abs(shift) > 1) window.scrollBy({ top: shift, behavior: 'instant' });
+```
+
+Measured on the live site: **0 px of drift**, where the same sequence used to
+move the clicked button about 830.
+
+#### When there is no graph to draw
+
+`mountExplorer` removes its own host when the subset has fewer than three
+people in it. That is the right call for the canvas — two nodes and one edge is
+not a collaboration graph — and the wrong ending for the panel: the card stopped
+mid-thought and looked broken beside its neighbours, which is exactly what
+Mohammad Erfan Mahdavi Rad's card did, his one paper having been written with
+the site owner alone.
+
+The panel now says so, in one line: *"Only one co-author here, so there is no
+graph to draw."* The list and the faces above it are unchanged, because they
+were never the problem.
 
 #### Why one card at a time
 
@@ -4385,6 +4452,30 @@ than the fill in making a liquid read as a liquid.
 After five landings the depth **stops**. A later drop lands, throws its wave and
 dissolves into the surface, and the volume does not change; that is the
 difference between joining a pool and pouring into a glass.
+
+**The pool is painted differently in the two themes, because it is not the same
+job.** On white it is read by its own darkness: the body gradient falls away to
+a near-black crimson, the page behind it is bright, and the eye gets depth for
+free — a shallow dish of something heavy. On black that same gradient *is* the
+page. The bottom of the pool disappears into the footer, the only thing left
+with any contrast is the bright line along the meniscus, and seven pixels of
+liquid read as a red line ruled across the screen — which is exactly what it
+looked like until 2026-09-22.
+
+So on a dark page the pool is lit from inside instead. It never goes darker than
+the crimson it is made of, the glow around it is widened and filled twice, and
+the soft pass of the rim is brighter:
+
+| | light | dark |
+|---|---|---|
+| deepest tone | `rgb(82,7,15)` | `rgb(161,13,30)` — 1.9× the luminance |
+| glow blur | 10 | 20, filled twice |
+| soft rim alpha | 0.30 | 0.45 |
+
+The light theme's numbers are exactly what they were. `pageIsDark()` mirrors the
+inline script in every page head — an explicit `data-theme` wins, and with no
+choice the system preference decides — and it is read per frame, so switching
+themes with the footer on screen changes the pool as you watch.
 
 **The size** is set in rem and not em: the brief was "as big as the mark in the
 top bar or the back-to-top button", and both of those are fixed controls.
