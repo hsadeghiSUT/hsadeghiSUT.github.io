@@ -309,7 +309,7 @@ its `<body data-page="…">`, and add a matching controller in
 
 ### Adding an icon
 
-The sprite holds 69 icons — the ones the site uses, plus a few spares
+The sprite holds 71 icons — the ones the site uses, plus a few spares
 (`fad-award`, `fad-crown`, `fad-graduation-cap`, `fad-industry-alt`,
 `fad-user-cowboy`, `fas-microphone-stand`, `fas-school`). To use one, just
 reference its id, e.g. `"icon": "fad-award"`.
@@ -324,6 +324,25 @@ others:
 Naming convention is `<style>-<name>`: `fas-` solid, `far-` regular, `fal-`
 light, `fad-` duotone, `fab-` brands. Duotone symbols hold two paths, the first
 with `opacity=".4"`. Any page can use the new id immediately.
+
+**Two things about a new symbol that are easy to get wrong**, both learned by
+getting them wrong on 2026-09-22:
+
+*Give it a square `viewBox` unless you mean otherwise.* `.icon` is sized as a
+square, and `preserveAspectRatio` fits a glyph inside that box by its longest
+side. Font Awesome's own `caret-right` is `0 0 192 512`, so pasted in unaltered
+it drew about three pixels wide in an eight-pixel box — present in the DOM,
+correct in every respect, and invisible on the page. Both carets in the sprite
+are now drawn in `0 0 512 512`.
+
+*The sprite is not a stable asset, so the build versions it.* Adding a symbol
+changes the file, and until 2026-09-22 nothing changed its URL — so every
+visitor holding the four-hour-old copy got an empty box where the new icon
+should be. `tools/fingerprint.mjs` now stamps it with a hash of its contents
+(§11.5). Nothing to do when you add an icon; it is handled. But if you ever
+write the sprite's path somewhere new, import `SPRITE` from `modules/icons.js`
+rather than typing the path again — a second copy would be a second URL, and an
+unstamped one.
 
 A new symbol is flat everywhere until it is given a 3D model as well — which is
 one builder and one line in `registry.js`, and is entirely optional. §20.7.
@@ -2701,8 +2720,8 @@ one spelling onto another:
 ```
 
 Keys are the graph's internal author keys — surname, a pipe, initials, lower-cased
-with spaces and full stops removed. The file currently merges 22 spellings, which
-takes 103 nodes down to 81.
+with spaces and full stops removed. The file currently merges **36 spellings**,
+which is what takes the graph to its 106 people.
 
 #### The owner's two spellings left two edges
 
@@ -3442,8 +3461,9 @@ because `research-team.json` does not know: the publications are in a second
 file and the citation counts in a third.
 
 `modules/teamwork.js` joins the three at mount and puts a button on every card
-where the join found something — **31 of the 55**, which is exactly the people
-who have published rather than only written a thesis:
+where the join found something — **33 of the 55 rows**, which is exactly the
+people who have published rather than only written a thesis. (Rows, not people:
+somebody listed in two groups has two cards, and both open.)
 
 ```
 📖  25 publications · 231 citations
@@ -3476,6 +3496,35 @@ The subset is renumbered, so its entry ids are not the ids of the full list, and
 its citation counts are therefore re-joined by title rather than carried across.
 That is one line here and the alternative to teaching the graph about two id
 spaces.
+
+#### The card says it opens, and holds still while it does
+
+Two things about the button were wrong when the panel first landed, and both
+were about the card having changed size rather than about the button itself.
+
+**The caret.** `25 publications · 231 citations` reads as a label. It is a
+button, it has a border and a hover state, and people still did not click it,
+because nothing on it said there was anything behind it. A caret now points
+right when the panel is shut and down when it is open, and the button carries
+`title="Show this person's publications"` as well as `aria-expanded`.
+
+It **swaps between two symbols** — `fas-caret-right` and `fas-caret-down` —
+rather than rotating one, and that is worth knowing before writing
+`transform: rotate(90deg)` here and wondering why nothing turns. It was tried,
+three ways: as a CSS triangle built from borders, as the same triangle given a
+real width and height, and as an SVG icon. In every case the computed transform
+came back as the identity matrix, while the very same declaration applied to the
+book icon beside it turned as expected. Rather than keep guessing at an engine
+quirk on a cosmetic detail, the caret stopped depending on being turned. Two
+symbols cannot be got wrong, and the swap is one attribute.
+
+**The card no longer lifts.** `.person:hover` used to include
+`transform: translateY(-2px)`. On a card the size of a business card that is a
+pleasant response to the pointer; on one that can open to a publication list, a
+row of faces and a WebGL canvas, it is the whole panel twitching every time the
+cursor crosses it. The light and the border still answer the pointer — the card
+itself holds still, and `transform` is off its transition list so nothing about
+position animates at all.
 
 #### Why one card at a time
 
@@ -3652,7 +3701,7 @@ they are people who have not published in English here.
 
 | | Before | After |
 |---|---|---|
-| aliases | 22 | **35** |
+| aliases | 22 | **35** |<br>(36 since 2026-09-22 — "نابی، ح." is Hossein Nabi)
 | people in the graph | 119 | **106** |
 | co-authorship edges | 345 | **330** |
 | edges without the site owner | 213 | **203** |
@@ -3677,7 +3726,7 @@ The three Persian-only names are the remainder and are correct as they stand.
 
 Point at anybody in the Collaboration or Influence view and their photograph
 appears in a frame at the top right of the canvas, with their name and their
-group under it. Click, and it stays while they are the selected node. **26 of
+group under it. Click, and it stays while they are the selected node. **27 of
 the graph's 106 people have one**; the rest are external collaborators the
 repository holds no photograph of, and they behave exactly as they always did.
 
@@ -3754,9 +3803,9 @@ what the canvases will do:
 
 ```
 106 people in the graph, 55 photographed on the roster
-26 of the graph's people have a face
+27 of the graph's people have a face
 
-Most-published people with no face (12 of 79 shown):
+Most-published people with no face (12 of 78 shown):
   Jafarzadeh, F.                15 papers   key: jafarzadeh|f
   Ng, C.W.W.                    11 papers   key: ng|cww
 ```
