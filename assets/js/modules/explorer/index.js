@@ -1175,13 +1175,48 @@ export async function mountExplorer(
     }
   }
 
-  function applyFilter(person) {
+  /**
+   * Do to a person what clicking their node does.
+   *
+   * The same path, deliberately: the search box asks for this rather than
+   * reimplementing "filter the list, light the edges, show the face", so there
+   * is one behaviour and the canvases need to know nothing about searching.
+   *
+   * The Influence city leaves the site owner out (`withoutSelf`), so a person
+   * can be real and still have no node in the current view. Rather than fail,
+   * fall back to the Collaboration graph, which has everybody.
+   *
+   * @returns {boolean} whether a node was found and selected
+   */
+  function selectPerson(key) {
+    const person = graph.people.find((p) => p.key === key);
+    if (!person) return false;
+
+    if (!aboutPeople(scene)) showView('graph');
+    let index = scene.nodes.findIndex((n) => n.person.key === key);
+    if (index < 0 && view !== 'graph') {
+      showView('graph');
+      index = scene.nodes.findIndex((n) => n.person.key === key);
+    }
+    if (index < 0) return false;
+
+    hovered = null;
+    selected = index;
+    applyFilter(person);
+    return true;
+  }
+
+  function applyFilter(person, silent) {
     if (!person) {
       selected = null;
       clearButton.hidden = true;
       paintStates();
       describe(null);
-      if (onFilter) onFilter(null, '');
+      /* `silent` is for a caller that is about to filter the list itself: a
+         text search drops the selected person from the canvases but must not
+         have its own result wiped a frame later by this one's "show
+         everything". */
+      if (onFilter && !silent) onFilter(null, '');
       return;
     }
     clearButton.hidden = false;
@@ -1440,6 +1475,18 @@ export async function mountExplorer(
     // What the tabs offer, not what has been built — `influence` waits for its
     // first click (see LAZY) and a checker must not read that as missing.
     views: Object.keys(tabs),
+    /* The people, for anything that wants to search them — the box above the
+       list does. Returned as they are: callers read, they do not own this. */
+    people: () => graph.people,
+    faces: () => faces,
+    selectPerson,
+    /**
+     * Let the current person go.
+     *
+     * `{ silent: true }` leaves the list alone, for a caller that is replacing
+     * the filter rather than removing it.
+     */
+    clearSelection: (options) => applyFilter(null, !!(options && options.silent)),
     // The tallest tower in the city, once there is a city. Zero before it has
     // been opened, so check-ui asks after switching to it rather than before.
     cityTop: () => (scenes.influence ? scenes.influence.top : 0),

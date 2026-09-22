@@ -696,6 +696,119 @@ a.pub__cited:hover .pub__cited-n { color: var(--c-accent); }
 }
 .person__status { display: inline-flex; gap: var(--space-1); }
 
+/* ---- what this person has published -------------------------------------- */
+/* Both live across the card's two columns: the photo owns the first one, and a
+   publication list indented under a portrait would read as a caption to it. */
+.person__more,
+.person__work { grid-column: 1 / -1; }
+
+.person__more {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  justify-self: start;
+  margin-top: var(--space-3);
+  padding: 0.3rem 0.7rem;
+  border: 1px solid var(--c-border);
+  border-radius: 999px;
+  background: var(--c-bar-solid);
+  color: var(--c-ink-soft);
+  font: inherit;
+  font-size: var(--t-xs);
+  cursor: pointer;
+}
+.person__more:hover { border-color: var(--c-accent); color: var(--c-ink-strong); }
+.person__more .icon { color: var(--c-accent); }
+.person__more[aria-expanded="true"] {
+  border-color: var(--c-accent);
+  background: var(--c-accent-soft);
+  color: var(--c-ink-strong);
+}
+:root[data-theme="dark"] .person__more[aria-expanded="true"] { background: var(--c-surface-2); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .person__more[aria-expanded="true"] { background: var(--c-surface-2); }
+}
+
+.person__work {
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--c-rule);
+}
+.person__work[hidden] { display: none; }
+
+.person__work-head {
+  margin: var(--space-4) 0 var(--space-2);
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--c-ink-mute);
+}
+
+.person__pubs {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: var(--space-2);
+}
+
+/* Year, title, citations — the count last and hard right, so a column of them
+   is scannable without a table. */
+.person__pub {
+  display: grid;
+  grid-template-columns: 3rem minmax(0, 1fr) auto;
+  gap: var(--space-3);
+  align-items: baseline;
+  font-size: var(--t-sm);
+}
+.person__pub[dir="rtl"] { direction: rtl; }
+.person__pub-year { color: var(--c-ink-mute); font-variant-numeric: tabular-nums; }
+.person__pub-title { color: var(--c-ink); }
+.person__pub-cites {
+  font-variant-numeric: tabular-nums;
+  font-size: var(--t-xs);
+  color: var(--c-ink-strong);
+  padding: 0.05rem 0.4rem;
+  border-radius: 999px;
+  background: var(--c-accent-soft);
+}
+:root[data-theme="dark"] .person__pub-cites { background: var(--c-surface-2); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .person__pub-cites { background: var(--c-surface-2); }
+}
+
+.person__partners { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.person__partner {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0.15rem 0.6rem 0.15rem 0.15rem;
+  border: 1px solid var(--c-border);
+  border-radius: 999px;
+  font-size: var(--t-xs);
+  color: var(--c-ink-soft);
+}
+.person__partner:not(:has(.person__partner-face)) { padding-left: 0.6rem; }
+.person__partner-face {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 999px;
+  object-fit: cover;
+  object-position: center 18%;
+  background: var(--c-surface-2);
+  flex: none;
+}
+.person__partner[lang="fa"] { font-family: var(--f-farsi); }
+
+/* The explorer, scoped to this person. It brings its own panel chrome. */
+.person__explorer { margin-top: var(--space-4); }
+.person__explorer:empty { display: none; }
+
+@media (max-width: 34rem) {
+  .person__pub { grid-template-columns: 2.5rem minmax(0, 1fr); }
+  .person__pub-cites { grid-column: 2; justify-self: start; }
+}
+
 @media (max-width: 34rem) {
   .person { grid-template-columns: minmax(0, 1fr); gap: var(--space-3); }
   .person__photo { grid-row: auto; width: 6rem; }

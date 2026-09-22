@@ -855,6 +855,95 @@ html { scroll-padding-top: calc(var(--bar-h) + var(--secnav-h, 0px) + 1rem); }
    be a stage. */
 .explorer--flat .explorer__written { border-top: 0; }
 
+/* ---- the search box ------------------------------------------------------ */
+/* Above the canvases, because it governs them as well as the list. */
+.pubsearch-host { margin-bottom: var(--space-4); }
+
+.pubsearch__field {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius);
+  background: var(--c-surface-2);
+}
+.pubsearch__field:focus-within { border-color: var(--c-accent); }
+.pubsearch__field .icon { color: var(--c-ink-mute); flex: none; }
+
+.pubsearch__input {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: 0;
+  background: none;
+  color: var(--c-ink);
+  font: inherit;
+  font-size: var(--t-sm);
+  padding: var(--space-2) 0;
+}
+.pubsearch__input:focus { outline: none; }
+.pubsearch__input::placeholder { color: var(--c-ink-mute); }
+
+/* The people the query could mean. One is the answer; the rest are one click
+   away, which is cheaper than making the reader type a longer query. */
+.pubsearch__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+.pubsearch__chips[hidden] { display: none; }
+
+.pubsearch__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0.2rem 0.6rem 0.2rem 0.2rem;
+  border: 1px solid var(--c-border);
+  border-radius: 999px;
+  background: var(--c-bar-solid);
+  color: var(--c-ink-soft);
+  font-size: var(--t-xs);
+  cursor: pointer;
+}
+.pubsearch__chip:hover { border-color: var(--c-accent); color: var(--c-ink-strong); }
+.pubsearch__chip.is-on {
+  border-color: var(--c-accent);
+  background: var(--c-accent-soft);
+  color: var(--c-ink-strong);
+  font-weight: 600;
+}
+:root[data-theme="dark"] .pubsearch__chip.is-on { background: var(--c-surface-2); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .pubsearch__chip.is-on { background: var(--c-surface-2); }
+}
+
+/* A chip without a photograph keeps its shape: the name simply starts where
+   the face would have ended. */
+.pubsearch__chip:not(:has(.pubsearch__chip-face)) { padding-left: 0.6rem; }
+
+.pubsearch__chip-face {
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 999px;
+  object-fit: cover;
+  object-position: center 18%;
+  background: var(--c-surface-2);
+  flex: none;
+}
+.pubsearch__chip-name[lang="fa"], .pubsearch__chip[lang="fa"] { font-family: var(--f-farsi); }
+.pubsearch__chip-count {
+  font-variant-numeric: tabular-nums;
+  color: var(--c-ink-mute);
+}
+
+.pubsearch__summary {
+  margin: var(--space-2) 0 0;
+  font-size: var(--t-xs);
+  color: var(--c-ink-mute);
+}
+.pubsearch__summary:empty { display: none; }
+
 /* ---- the filter banner over the list ------------------------------------- */
 .pub-filter {
   display: flex;

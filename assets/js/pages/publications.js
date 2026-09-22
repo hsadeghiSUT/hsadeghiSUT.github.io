@@ -31,6 +31,7 @@ import { icon } from '../modules/icons.js';
 import { linkPanel, profilePanel } from '../modules/chrome.js';
 import { section, publicationItem, tocLinks } from '../modules/sections.js';
 import { loadScholar, citedByIndex, normaliseTitle } from '../modules/scholar.js';
+import { mountSearch, indexPapers } from '../modules/pubsearch.js';
 
 export async function render(site) {
   /* Both at once. The Scholar snapshot is a second local file fetched in
@@ -90,7 +91,45 @@ export async function render(site) {
     profilePanel(site.identifiers),
   );
 
-  mountExplorer(data, citations);
+  /* The search box waits for the explorer, because a person match is meant to
+     drive the canvases and it can only do that once they exist. It is mounted
+     either way — `api` is null when the explorer failed or was never built, and
+     the box then searches text and filters the list on its own. */
+  mountExplorer(data, citations).then((api) => mountPubSearch(data, api));
+}
+
+/**
+ * The search box, above the canvases and the list they both answer to.
+ *
+ * @param {object} data  the parsed data/publications.json
+ * @param {object|null} api  the explorer, if there is one
+ */
+function mountPubSearch(data, api) {
+  const shell = $('.shell');
+  const anchor = $('#explorer') || $('.layout');
+  if (!shell || !anchor) return;
+
+  const host = el('div', { class: 'pubsearch-host' });
+  shell.insertBefore(host, anchor);
+
+  mountSearch(host, {
+    people: api ? api.people() : [],
+    // A getter, not the map: the roster lands after the graph does.
+    faces: api ? api.faces : () => new Map(),
+    papers: indexPapers(data),
+    onPerson: (key) => !!(api && api.selectPerson(key)),
+    onPapers: (ids, label) => {
+      /* A text search is not about a person, so whoever was selected lets go —
+         silently, because the list is about to be filtered to this result and
+         not to everything. */
+      if (api) api.clearSelection({ silent: true });
+      filterList(ids, label);
+    },
+    onClear: () => {
+      if (api) api.clearSelection();
+      else filterList(null, '');
+    },
+  });
 }
 
 /* -------------------------------------------------------------------------- */
@@ -109,14 +148,14 @@ function mountExplorer(data, citations) {
   const content = $('#content');
   const shell = $('.shell');
   const layout = $('.layout');
-  if (!content || !shell || !layout) return;
+  if (!content || !shell || !layout) return Promise.resolve(null);
 
   // Above `.layout`, not inside the article column: a force-directed graph needs
   // the width, and at 640 px it reads as a smudge.
   const host = el('div', { id: 'explorer', class: 'explorer-host' });
   shell.insertBefore(host, layout);
 
-  Promise.all([
+  return Promise.all([
     import('../modules/explorer/index.js'),
     load('author-aliases').catch(() => ({})),
   ])
@@ -140,6 +179,7 @@ function mountExplorer(data, citations) {
     .catch((err) => {
       console.info('publications: the explorer is unavailable, continuing without it.', err);
       host.remove();
+      return null;
     });
 }
 

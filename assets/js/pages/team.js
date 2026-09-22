@@ -49,6 +49,15 @@ export async function render() {
     ),
   );
 
+  /* What each of them has published.
+     Dynamically imported and not awaited: it joins three data files to put a
+     "More info" button on the cards whose person has publications as well as a
+     thesis, and a roster that cannot reach data/publications.json is still a
+     roster. */
+  import('../modules/teamwork.js')
+    .then(({ mountTeamWork }) => mountTeamWork($('#content'), data))
+    .catch((err) => console.info('team: publication details are unavailable.', err));
+
   /* The 3D roster goes ABOVE `.layout`, not inside the article column — the
      same place and for the same reason as the publications explorer: fifty-five
      cards in a 640-pixel column is a smudge, and this needs the full width of
