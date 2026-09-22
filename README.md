@@ -1295,9 +1295,9 @@ it through Cloudflare's proxy.
 hours. Go back to **Settings → Pages**; when the banner stops saying it is
 checking, tick **Enforce HTTPS**. The site is now live at `https://hsadeghi.org`.
 
-**9. Upload the same files to the university server**, into your `public_html`
-(or equivalent) so they appear at `http://sharif.edu/~hsadeghi/`. Exactly the
-same files — no edits, no different build.
+**9. Upload the same site to the university server**, into your `public_html`
+(or equivalent) so it appears at `http://sharif.edu/~hsadeghi/`. The same
+*build* — `_site/`, not the repository tree — which §11.4B spells out.
 
 **Later changes**, once with Git:
 
@@ -1389,21 +1389,45 @@ current for everyone, including a visitor who was on the page an hour ago.
 #### B. Updating content on the university mirror (`sharif.edu/~hsadeghi/`)
 
 The mirror has no Git, no workflow and nothing automatic. It is files in a
-folder — and **exactly the same files**, because nothing is built differently
-for it (§11.1).
+folder — and the files are **a build, not the repository tree**. Since §11.5
+the two live hosts serve `_site/` rather than the sources, so uploading the
+repository by hand would put a *third*, differently-behaved copy on the web:
+correct content, but none of the `?v=` stamps, and therefore the four-hour
+staleness that §11.5 exists to prevent.
 
-1. Connect to the university server (SFTP, SCP, or whatever file manager the
+**There is a folder that holds exactly what to upload:**
+
+```
+OneDrive/…/WEB/Website_Hamed Sadeghi_-_Cowork-040-GitHub/
+```
+
+It is a **build output folder, not a clone** — no `.git`, no `.github`, no
+`wrangler.jsonc`, no `legacy_index.html`. Refresh it from a clean clone with:
+
+```bash
+node tools/fingerprint.mjs --out "C:/Users/…/WEB/Website_Hamed Sadeghi_-_Cowork-040-GitHub"
+```
+
+`--out` wipes the folder and rebuilds it, so **nothing of your own should ever
+live in there** — it will be deleted without asking. Check `build-version.txt`
+at the top of it afterwards: that commit is what you are about to publish, and
+it should match `curl -s https://hsadeghi.org/build-version.txt`.
+
+1. Refresh the folder with the command above (`git pull` in the clone first).
+2. Connect to the university server (SFTP, SCP, or whatever file manager the
    department provides).
-2. Go to your `public_html` — the folder that answers at
+3. Go to your `public_html` — the folder that answers at
    `http://sharif.edu/~hsadeghi/`.
-3. Upload **the files you changed**, keeping the same folder structure. A
+4. Upload **the files you changed**, keeping the same folder structure. A
    changed publication is `data/publications.json` and nothing else; a changed
-   photo is the one file in `assets/img/people/`.
-4. Open `http://sharif.edu/~hsadeghi/` and look at the page you touched.
+   photo is the one file in `assets/img/people/`. A changed stylesheet or
+   script is that file *and* the seven HTML pages, because the stamp in their
+   `?v=` moved with it.
+5. Open `http://sharif.edu/~hsadeghi/` and look at the page you touched.
 
 **Upload the contents of the folder, never the folder itself.** `index.html`
 has to sit at the top of `public_html`, exactly as it sits at the top of the
-repository.
+build.
 
 If you would rather not work out which files changed, upload all of them — the
 site is a few megabytes and there is no state on the server to preserve. If you
@@ -1493,9 +1517,15 @@ never *"the numbers vanished"*. §18.5 is the full table.
 [ ] node tools/check-trackers.mjs     every page carries every analytics tag
 [ ] node tools/check-scholar.mjs      if you touched data/scholar.json
 [ ] git add . && git commit && git push          -> hsadeghi.org
-[ ] upload the same changed files to public_html -> sharif.edu/~hsadeghi/
-[ ] open both addresses and look at the page you changed
+                                                    + hamedsadeghi.org
+[ ] node tools/fingerprint.mjs --out "…/Website_Hamed Sadeghi_-_Cowork-040-GitHub"
+[ ] upload the changed files from THAT folder    -> sharif.edu/~hsadeghi/
+[ ] open all three addresses and look at the page you changed
 ```
+
+The middle step is the one that is easy to forget, and the mirror will look
+fine without it — it just goes back to serving assets a browser may cache for
+four hours. §11.4B.
 
 The other guards are worth a run after a bigger change, and none of the first
 two needs the network:
@@ -1612,10 +1642,19 @@ files — see §10, *legacy_index.html*.
 Nothing in the repository is rewritten. `tools/serve.py` goes on serving the
 plain sources, which is what you want while editing.
 
-**The mirror gets none of this**, because it is files copied to a server by hand
-(§11.4B). If you want the same protection there, run `node tools/fingerprint.mjs`
-and upload the contents of `_site/` rather than the folder itself — query strings
-on static files work on any ordinary web server.
+**The mirror gets this too, since 2026-09-23** — query strings on static files
+work on any ordinary web server, so there was never a reason for the university
+copy to be the stale one. It is still files copied by hand, but the files now
+come from a build rather than from the repository tree:
+
+```bash
+node tools/fingerprint.mjs --out "…/WEB/Website_Hamed Sadeghi_-_Cowork-040-GitHub"
+```
+
+That folder used to be a stale clone of the repository — 34 commits behind, with
+its own `.git` and no remote — which meant the thing most likely to be uploaded
+to Sharif was the one copy of the site nothing kept current. It is now a build
+output folder and nothing else. §11.4B.
 
 ---
 
