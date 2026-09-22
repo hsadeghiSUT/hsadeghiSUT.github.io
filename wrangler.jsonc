@@ -1,0 +1,26 @@
+// ---------------------------------------------------------------------------
+// Cloudflare, for the second domain — hamedsadeghi.org (README §11.6)
+// ---------------------------------------------------------------------------
+// This file is here for ONE reason: Cloudflare's "connect to Git" flow now
+// builds a Worker rather than a Pages project, and a Worker has to be told what
+// it is serving. With `assets` and no `main`, this deploys as a static site and
+// nothing else — no code runs on a request, the same files GitHub Pages serves
+// are simply served from Cloudflare's edge as well.
+//
+// `directory` is the output of `node tools/fingerprint.mjs`, which is the build
+// command on the Cloudflare side too. So both addresses serve the same stamped
+// URLs (§11.5), built the same way, from the same commit.
+//
+// GitHub Pages ignores this file, and `tools/fingerprint.mjs` keeps it out of
+// the deploy, so it is never served at a URL on either host.
+// ---------------------------------------------------------------------------
+{
+  "name": "hsadeghisut-github-io",
+  "compatibility_date": "2026-09-22",
+  "assets": {
+    "directory": "./_site",
+    // The site links to real files — teaching.html, not /teaching — so a miss is
+    // a genuine miss and should say so rather than quietly serving the home page.
+    "not_found_handling": "none"
+  }
+}

@@ -78,8 +78,12 @@ const SKIP = new Set(['.git', '.github', '_site', 'node_modules', '.gitignore', 
  * analytics tag went missing for four rounds of work the first time.
  *
  * So it stays in the repository and stays out of the deploy.
+ *
+ * `wrangler.jsonc` is the Cloudflare side's build config (§11.6). It belongs in
+ * the repository, because that is where Cloudflare reads it from, and nowhere
+ * near a URL.
  */
-const NOT_DEPLOYED = new Set(['legacy_index.html']);
+const NOT_DEPLOYED = new Set(['legacy_index.html', 'wrangler.jsonc']);
 
 /** The three shapes a relative import takes in this codebase. */
 const JS_PATTERNS = [
