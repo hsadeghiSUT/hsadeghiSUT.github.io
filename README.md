@@ -97,6 +97,9 @@ icons.
 │   │                          transitions and the explorer — the smoke test
 │   ├── check-authors.mjs      reports how the author names parsed, and who
 │   │                          might be the same person twice (§15)
+│   ├── check-author-photos.mjs  who in the citation list has a face, who is
+│   │                          ambiguous, and whether every override in
+│   │                          data/author-photos.json is real (§15.10)
 │   ├── authors-export.mjs     writes that question out as worksheets, one
 │   │                          row per unlinked name, with a suggestion (§15.9)
 │   ├── authors-link.mjs       reads the answers back into
@@ -141,6 +144,8 @@ icons.
 │   ├── honors.json            awards, newest first
 │   ├── publications.json      theses, journals, lectures, patents, proceedings, Persian
 │   ├── author-aliases.json    two spellings of one co-author → one node (§15)
+│   ├── author-photos.json     a face for a cited name the roster cannot
+│   │                          supply one for (§15.10)
 │   ├── scholar.json           ← GENERATED. citation figures + per-paper counts.
 │   │                          Written by tools/fetch-scholar.mjs; delete it and
 │   │                          the figures simply stop appearing (§18)
@@ -388,7 +393,10 @@ The shared modules:
 | `fx/` | — | the 3D layer — field, highlight, transitions; loaded last (§12) |
 | `sectionnav.js` | — | the sticky section bar on the long pages (§13) |
 | `explorer/` | — | the collaboration graph and the timeline — Publications only (§15) |
+| `faces.js` | — | joins a cited name to a roster photograph (§15.10) |
+| `pubsearch.js` | — | the search box over the list and the canvases (§15.11) |
 | `roster/` | — | the 3D team roster — Research Team only (§15b) |
+| `teamwork.js` | — | what each team member has published (§15b, *"More info"*) |
 | `cards3d.js` | — | the light that follows the pointer across the hero (§17) |
 | `backtotop.js` | `icons.js` | the back-to-top control on the long pages (§13b) |
 
@@ -1116,14 +1124,21 @@ one. Opening it will render unstyled. That is expected; its job is to be the
 record of what the original emitted, and it is what `tools/check-trackers.mjs`
 reads.
 
-**The one change: `<meta name="robots" content="noindex, nofollow">`**, added on
-2026-09-20 directly under the `theme-color` tag, with a comment beside it saying
-what it is. Nothing links to this file, but it is published at
-`https://hsadeghi.org/legacy_index.html` along with everything else, and an
-unstyled 2020 page that still says "Hamed Sadeghi" in its `<title>` is exactly
-the kind of thing a crawler finds and a reader then arrives at from a search
-result, wondering why the site looks broken. The tag costs nothing and prevents
-that.
+**Since 2026-09-22 it is not published at all.** `tools/fingerprint.mjs` keeps a
+short `NOT_DEPLOYED` list and this file is on it, so the deploy no longer carries
+it and `https://hsadeghi.org/legacy_index.html` returns 404. The file itself
+stays exactly where it is, because deleting it would disarm `check-trackers.mjs`
+— the one guard that noticed the analytics tag going missing, and the reason
+§10 exists at all. Removed from the web, kept in the repository: those are two
+different decisions and only the first one was wanted.
+
+**The one change inside it: `<meta name="robots" content="noindex, nofollow">`**,
+added on 2026-09-20 directly under the `theme-color` tag, with a comment beside
+it saying what it is. It was published then, and an unstyled 2020 page that still
+says "Hamed Sadeghi" in its `<title>` is exactly the kind of thing a crawler
+finds and a reader then arrives at from a search result, wondering why the site
+looks broken. The tag is now belt and braces — a 404 cannot be indexed — and it
+costs nothing to leave in place.
 
 It is worth being precise about what this does and does not disturb. The file
 was previously byte-identical to the copy supplied, and that claim is now
@@ -1505,12 +1520,76 @@ and the site keeps having no dependencies at all.
 | `git push` rejected, "fetch first" | the robot committed `data/scholar.json` while you were working | `git pull --rebase`, then push |
 | The push landed, the site did not change | the `Deploy the site` run has not finished | check **Actions**; once it is green the page is current, and no reload trick is needed — every stylesheet, script and import carries `?v=<commit>` |
 | An old version of the JavaScript is running | a deploy that predates `tools/fingerprint.mjs`, still in the visitor's cache | it ages out; nothing deployed since carries an unstamped URL. Ctrl-F5 does **not** cure this on its own — the explorer is reached through an `import()` fired after load, which a forced reload does not cover |
-| The push landed, Pages never rebuilt | the known `GITHUB_TOKEN` restriction | §18.2 — swap in a deploy key or a fine-grained PAT |
+| The push landed, Pages never rebuilt | check **Actions** for a red `Deploy the site`; a failed `fingerprint.mjs` stops the deploy rather than shipping a broken build | the log names the file and the specifier; §11.5 |
+| The robot committed a new figure and the site did not change | the `GITHUB_TOKEN` restriction — a push it makes cannot start another workflow | already handled: `refresh-scholar.yml` calls `deploy.yml` itself (§18.2) |
 | The mirror shows old citation figures | nobody carried `data/scholar.json` across | §11.4C, second half |
 | The mirror is broken, `hsadeghi.org` is fine | almost always an absolute path | `node tools/check-offline.mjs` |
 | The workflow was green but nothing changed | Scholar returned a captcha, or no figure moved | nothing — that is the designed behaviour, the next run tries again |
 | The citation tiles vanished from the site | the snapshot is missing, malformed, zero, or over 400 days old | `node tools/check-scholar.mjs` says which; §18.5 |
 | A "Cited by" badge is missing on one paper | Scholar's title and the site's differ too much to join | add the pair to `data/scholar-aliases.json`; §18.3 |
+
+### 11.5 What a deploy actually builds
+
+Until 2026-09-21 GitHub Pages built the branch itself and served the files as
+they are in the repository. It now runs `.github/workflows/deploy.yml`, which
+does one extra thing before handing the site over:
+
+```bash
+node tools/fingerprint.mjs      # → _site/
+```
+
+**Why it exists.** Pages sends `Cache-Control: max-age=14400` for everything
+under `assets/`, and that header cannot be changed at the origin. While the URLs
+stayed the same from one deploy to the next, a returning visitor kept running
+the code they already had for up to four hours. On 2026-09-21 that meant readers
+were being served an `explorer/index.js` from three weeks earlier, which had no
+Impact and no Influence tab in it — and **a hard reload did not fix it**. The
+explorer is reached through an `import()` fired from a promise callback after
+the page has loaded, and a request made that late falls back to the ordinary
+HTTP cache instead of the reload's no-cache mode. That is the one shape of
+staleness Ctrl-F5 does not reach, and this site is full of it.
+
+**What it does.** It copies the tree to `_site/` and stamps every stylesheet,
+script and relative import specifier with the commit:
+
+```html
+<script type="module" src="assets/js/main.js?v=5d189cbbf9"></script>
+```
+```js
+import { loadScholar } from '../modules/scholar.js?v=5d189cbbf9';
+```
+
+A browser has no cache entry for a URL it has never seen, so it fetches. No
+header, no purge, no waiting.
+
+**The whole graph moves, or none of it does.** A fresh `main.js?v=b` that still
+imports an unstamped `./modules/data.js` gets the cached one — a module graph
+with two deploys in it, which fails in ways that look like nothing at all. All
+145 specifiers carry the same version.
+
+**`assets/vendor/three/` is stamped by content, not by commit.** It is 2.1 MB
+and changes only when three.js is deliberately upgraded; versioning it per
+deploy would make every visitor re-download it to fix a staleness that cannot
+happen while the bytes are identical. It gets a hash of its own contents.
+
+**`data/*.json` is deliberately not stamped.** `modules/data.js` and
+`modules/scholar.js` already fetch with `cache: 'no-cache'`, so the data
+revalidates on every load and was never the stale half.
+
+The script refuses to ship a half-stamped build: it checks every URL it writes
+against the file on disk, then re-scans for any specifier the patterns missed,
+and exits non-zero if either finds something. It also skips `NOT_DEPLOYED`
+files — see §10, *legacy_index.html*.
+
+Nothing in the repository is rewritten. `tools/serve.py` goes on serving the
+plain sources, which is what you want while editing.
+
+**The mirror gets none of this**, because it is files copied to a server by hand
+(§11.4B). If you want the same protection there, run `node tools/fingerprint.mjs`
+and upload the contents of `_site/` rather than the folder itself — query strings
+on static files work on any ordinary web server.
+
+---
 
 ### Keeping old links working
 
@@ -2516,6 +2595,12 @@ panel is the two-view panel it always was.
 | **Impact** | what came of it, by year |
 | **Influence** | which of those people the cited work was done with |
 
+Two later additions sit alongside them rather than inside them: the people in
+the two person-shaped views carry **their photograph** (§15.10), and a **search
+box** above the panel answers a name by doing what clicking that person's node
+does (§15.11). Both are enhancements in the strict sense used throughout this
+file — remove either and the four views are what they were.
+
 ```
 assets/js/modules/explorer/
 ├── data.js      author strings → people, co-authorship edges, years,
@@ -3321,6 +3406,65 @@ implementation. `window.__roster` reports what happened.
 
 ---
 
+### What each of them has published — the "More info" panel
+
+A roster card says who somebody is and what their thesis is about. It cannot say
+that they have twenty-five papers and two hundred and thirty-one citations,
+because `research-team.json` does not know: the publications are in a second
+file and the citation counts in a third.
+
+`modules/teamwork.js` joins the three at mount and puts a button on every card
+where the join found something — **31 of the 55**, which is exactly the people
+who have published rather than only written a thesis:
+
+```
+📖  25 publications · 231 citations
+```
+
+Opening one reveals three things, and closes whichever card was open before it.
+
+**Their publications**, newest first, each with its own citation count and
+linked where the entry has a DOI. The counts come from the same join the
+Publications page makes, so a card and the list can never disagree about a
+paper.
+
+**The people they wrote them with**, as faces — the same `faces.js` index §15.10
+describes, so a collaborator photographed on the roster appears with their
+photograph and one who is not appears with their name.
+
+**The same four 3D views**, scoped to their work alone: their own collaboration
+graph, their own timeline, their own skyline, their own city.
+
+#### The views are the explorer, not a copy of it
+
+A scoped view is the same view over fewer papers. `mountExplorer` is handed a
+publications object containing only this person's entries, which gives every
+behaviour — turning, hovering, filtering, the faces, the tabs — already correct,
+with nothing here to keep in step with the original. When there is too little to
+draw the explorer removes itself, so somebody with one co-authored paper simply
+gets the list and the faces.
+
+The subset is renumbered, so its entry ids are not the ids of the full list, and
+its citation counts are therefore re-joined by title rather than carried across.
+That is one line here and the alternative to teaching the graph about two id
+spaces.
+
+#### Why one card at a time
+
+Each open card builds a WebGL canvas. Fifty-five of them is not a page. Opening
+a card stops the last one's renderer and hides its panel, and nothing is built
+at all until somebody asks: the join itself is one pass over the publication
+list at mount, shared by every card.
+
+#### Which person a card is
+
+The same derivation `faces.js` uses, in the other direction: there it is *whose
+face is this key*, here it is *what has this person written*. A card whose name
+matches nothing in the citation list gets no button, which is the correct answer
+for a first-year student and not a failure.
+
+---
+
 ### 15.9 One person, two names — the author-linking worksheet
 
 A co-author who publishes in both languages is written two ways, and nothing
@@ -3494,6 +3638,175 @@ M.` was four spellings — two Persian, two English — and is now one person wi
 17 papers.
 
 The three Persian-only names are the remainder and are correct as they stand.
+
+---
+
+### 15.10 Faces on the nodes
+
+Point at anybody in the Collaboration or Influence view and their photograph
+appears in a frame at the top right of the canvas, with their name and their
+group under it. Click, and it stays while they are the selected node. **26 of
+the graph's 106 people have one**; the rest are external collaborators the
+repository holds no photograph of, and they behave exactly as they always did.
+
+#### The join nothing in the data makes
+
+`data/publications.json` knows people as **"Golaghaei Darzi, A."**, because that
+is how a citation is written. `data/research-team.json` knows them as
+**"Ali Golaghaei Darzi"**, with a photograph, because that is how a roster is
+written. No field in either file links the two, and a third file listing the
+pairs by hand is a file that rots the first time somebody adds a student.
+
+So `modules/faces.js` derives it. From a full name it generates every
+surname/initials pair a journal might print, and keeps the ones the citation
+list has actually seen. **That is what decides where a Persian surname begins**,
+and it cannot be decided from the string alone:
+
+| three tokens | is cited | because |
+|---|---|---|
+| Ali **Golaghaei Darzi** | Golaghaei Darzi, A. | two words of surname |
+| **Ali Akbar** Lavasan | Lavasan, A.A. | two words of given name |
+
+Same shape, opposite answers. The citation list settles it, and the code never
+has to be clever about naming.
+
+#### Three things a citation does to a name
+
+Each of these was found by measuring coverage rather than by guessing, and each
+is worth a few more faces:
+
+| the roster writes | the citation prints | |
+|---|---|---|
+| Milad Jabbarzadeh **Ghandilou** | Jabbarzadeh, M. | a component dropped |
+| Aysa Hedayati **Azar** | Hedayati**-**Azar, A. | joined with a hyphen |
+| **Seyed** Amirreza Mirpanji | Mirpanji, **A.** | a leading given name dropped |
+
+So the surname is any *run* of tokens starting after at least one given name —
+not merely the tail of the string — and each run is tried spaced and hyphenated,
+with the initials taken from every suffix of the given names. Candidates are
+ranked most-likely first: a run reaching the end of the name beats one that
+stops short, longer surnames beat shorter, fuller initials beat an initial.
+
+#### The highest group wins
+
+People move up. Ali Golaghaei Darzi is listed in **three** sections — PhD
+Students, Elite Research Assistants and MPhil Students — with two different
+photographs, and the answer to "whose face is this" is the senior one.
+`research-team.json` lists its sections in order of seniority, so *highest* is
+simply *earliest section*, and within one section the last row wins, which is
+the most recent entry for somebody listed twice in the same group. He gets
+`Golaghaei-Darzi-PhD.jpg`.
+
+#### When derivation cannot reach
+
+`data/author-photos.json` maps an author key straight to a file in
+`assets/img/people/` and beats anything derived. It is for two cases only:
+
+```json
+"sadeghi|m": "Sadeghi-Mohammad.jpg"
+```
+
+- a co-author with a photograph but **no roster row** — the example above, and
+- a name the candidate rules read wrongly, which the check tool reports.
+
+Most people belong in neither category and need no entry.
+
+#### Checking it
+
+```bash
+node tools/check-author-photos.mjs
+```
+
+It runs the browser's own matcher against the real data, so what it prints is
+what the canvases will do:
+
+```
+106 people in the graph, 55 photographed on the roster
+26 of the graph's people have a face
+
+Most-published people with no face (12 of 79 shown):
+  Jafarzadeh, F.                15 papers   key: jafarzadeh|f
+  Ng, C.W.W.                    11 papers   key: ng|cww
+```
+
+A co-author without a photograph is the normal state of a citation list, not an
+error, so nothing here fails a build by default. `--strict` turns the two things
+that *are* errors into a non-zero exit: an override naming a file that does not
+exist, and an override for a key no publication mentions.
+
+**If somebody's face is missing**, the "unmatched" section prints the keys it
+tried for them — copy the right one into `data/author-photos.json`. **If the
+wrong face appears**, they are in the "ambiguous" list, and the same file
+settles it.
+
+#### It is an enhancement, throughout
+
+The roster is loaded after the graph and never awaited. A node is complete
+without its photograph — the label and the readout say who it is — so a missing,
+slow or broken `research-team.json` costs the reader nothing. The frame is
+`pointer-events: none`, so it can never swallow a drag that began under it, and
+on a phone it shrinks to a thumbnail and drops its caption, because the readout
+below already names the person.
+
+---
+
+### 15.11 Searching — one box, two kinds of answer
+
+A search field sits above the canvases on the Publications page. "Alipanahi" and
+"biochar" are different questions, and asking the reader to choose a mode before
+typing is asking them to know which kind of thing they are about to look for. So
+the box decides: **if the query names somebody the citation list knows it is a
+person; if it does not, it is text.**
+
+#### A person match does exactly what a click does
+
+Not a lesser version of it — the same call. `explorer.selectPerson(key)` is what
+the search asks for, so the list filters, the edges light, the readout changes
+and the face appears through one path that already existed. There is one
+behaviour to understand, one to maintain, and the canvases know nothing about
+searching.
+
+Typing `alipanahi` gives *31 publications with Alipanahi, P.* over the list and
+*"Alipanahi, P. · 31 publications · 20 co-authors · 264 citations"* under the
+canvas, with his photograph in the frame.
+
+#### You can search the name you know
+
+A person is matched on the cited form, on the surname alone, and on the full
+roster name, because a reader knows one of those three and should not have to
+know which. **Typing `golaghaei` finds the man the citation list calls
+"Darzi, A.G."**
+
+Case, accents and script are folded away first. `ي` and `ك` are the Arabic forms
+of letters Persian writes as `ی` and `ک` — different code points that look alike
+and are typed interchangeably — so a Persian name searched on an Arabic keyboard
+still matches.
+
+#### When several people match
+
+"Ahmadi" is three of them. The most-published is selected, because with nothing
+else to go on that is who the reader most likely means, and **all three are
+offered as chips with their faces**, so switching is one click rather than a
+re-typed query. Guessing and showing the guess beats a disambiguation step
+nobody asked for.
+
+#### Text search
+
+A query that names nobody is matched against each entry's title, author line,
+journal details and section — so a co-author with too few papers to be a node,
+or one the parser never saw, is still findable by name. The selected person is
+released first, silently: a text result must not sit under a canvas still
+lighting somebody else.
+
+A query that matches nothing says so and **puts the whole list back**. An empty
+list under a filter banner reads as a bug.
+
+#### What it never does
+
+It does not touch the URL, does not post anything anywhere, and does not exist
+if JavaScript does not: the list and its sections are in the page either way.
+With no explorer — it is optional and dynamically imported — the box still
+searches text and still filters the list; only the canvas half goes quiet.
 
 ---
 
@@ -4511,13 +4824,40 @@ month, and this one has to be believable on the day it means something. Two
 attempts twelve hours apart from different pools of runner addresses turn a
 captcha into a delay rather than a missed day.
 
-*If the commit lands but Pages does not rebuild*, that is the known restriction
-on `GITHUB_TOKEN`: a push it makes cannot start another workflow. The built-in
-Pages build is normally exempt and this works as written, but if your repository
-is set up so that it is not, swap the token for a deploy key or a fine-grained
-PAT with **Contents: write** and check it out with
-`actions/checkout@v4` + `with: { ssh-key: … }` or `token: …`. Nothing else in
-the workflow changes.
+**The commit has to ask for its own deploy, and this is why.** A push made with
+the default `GITHUB_TOKEN` cannot start another workflow — GitHub's rule against
+recursion. While Pages built the branch itself that was invisible. From the
+moment the site began deploying through a workflow (§11.5) it stopped being
+invisible: on **2026-09-21 the 20:07 run committed 2068 citations and
+`hsadeghi.org` went on serving 2067 for the next twelve hours**, with a green
+workflow and a correct file in the repository.
+
+The fix is at the end of `refresh-scholar.yml`: when the run has actually pushed
+something it calls the deploy workflow directly.
+
+```yaml
+  deploy:
+    needs: refresh
+    if: needs.refresh.outputs.pushed == 'yes'
+    permissions: { contents: read, pages: write, id-token: write }
+    uses: ./.github/workflows/deploy.yml
+```
+
+One run rather than a second event, so the recursion rule never applies and no
+deploy key or PAT is needed. Two things had to be closed at the same time, and
+both would have deployed **the tree that was already live** rather than the new
+one:
+
+- For a scheduled run that then commits, the event's SHA is the head from
+  *before* that commit. `deploy.yml` checks out `ref: main` explicitly.
+- `fingerprint.mjs` read `GITHUB_SHA` first — the same stale SHA. It now reads
+  the checked-out `HEAD` and falls back to `GITHUB_SHA` only where there is no
+  git directory at all.
+
+If you ever do need the push itself to trigger things — a second workflow
+watching `main`, say — that is when you swap the token for a deploy key or a
+fine-grained PAT with **Contents: write**, checked out with
+`actions/checkout@v4` + `with: { ssh-key: … }` or `token: …`.
 
 #### On this machine, for the mirror
 
