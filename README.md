@@ -1196,7 +1196,7 @@ The site is published twice:
 | | Address | Served by | Who it is for |
 |---|---|---|---|
 | **The domain** | `https://hsadeghi.org/` | GitHub Pages, behind Cloudflare | everyone outside Iran |
-| **The second domain** | `https://hamedsadeghi.org/` | Cloudflare Pages, same repository (§11.6) | the same people, by the longer name |
+| **The second domain** | `https://hamedsadeghi.org/` (and `www.`) | a Cloudflare Worker serving static assets, built from this same repository (§11.6) | the same people, by the longer name |
 | **The mirror** | `http://sharif.edu/~hsadeghi/` | the university's own server | inside Iran, where the .org may be unreachable |
 
 They are **the same files**, uploaded to two places. Nothing is built
@@ -1621,59 +1621,96 @@ on static files work on any ordinary web server.
 
 ### 11.6 The second domain — hamedsadeghi.org
 
-`hamedsadeghi.org` serves **the same site, from the same repository**, and does
-not redirect. It is a second front door, not a second site.
+`hamedsadeghi.org` and `www.hamedsadeghi.org` serve **the same site, from the
+same repository, at the same commit**, and neither redirects to `hsadeghi.org`.
+A second front door, not a second site.
 
 #### Why not a second repository
 
-Because GitHub Pages allows exactly one custom domain per repository — that is
-what `CNAME` is — the obvious route is a second repo holding a copy, with a step
-in `deploy.yml` pushing the built site into it. That works, and it costs a
-deploy key or a PAT held as a secret, a second place for a deploy to fail, and a
-mirror that is only as current as the last time the copy step ran.
+GitHub Pages allows exactly one custom domain per repository — that is what
+`CNAME` is. The obvious route to a second address is therefore a second repo
+holding a copy, with a step in `deploy.yml` pushing the built site into it. It
+works, and it costs a deploy key or a PAT held as a secret, a second place for
+a deploy to fail, and a mirror only as current as the last time the copy step
+ran.
 
-**Cloudflare Pages allows many custom domains on one project**, and the domain
-was bought there anyway. So the second address is a Cloudflare Pages project
-pointed at this same repository:
+Cloudflare can hold many custom domains on one project and the domain was
+bought there anyway, so the second address is built from this same repository.
+One source of truth, no copy step, the same fingerprinted build (§11.5) on both
+addresses.
+
+#### It is a Worker, not a Pages project — and that matters
+
+Cloudflare's **"connect to Git" flow no longer creates a Pages project. It
+creates a Worker.** The give-away is a *Deploy command* of `npx wrangler
+deploy` in the build settings, where a Pages project would have only a build
+command and an output directory.
+
+A Worker has to be told what it is serving, which is what `wrangler.jsonc` in
+the repository root is for:
+
+```jsonc
+{
+  "name": "hsadeghisut-github-io",
+  "compatibility_date": "2026-09-22",
+  "assets": { "directory": "./_site", "not_found_handling": "none" }
+}
+```
+
+`assets` and **no `main`**: it deploys as a static site and no code runs on a
+request. The same files, served from Cloudflare's edge as well as GitHub's.
+`tools/fingerprint.mjs` keeps this file out of the deploy, beside
+`legacy_index.html` — it belongs where Cloudflare reads it and nowhere near a
+URL.
+
+The build settings on the Cloudflare side are:
 
 ```
 Build command:      node tools/fingerprint.mjs
-Build output dir:   _site
-Custom domains:     hamedsadeghi.org, www.hamedsadeghi.org
+Deploy command:     npx wrangler deploy
+Root directory:     /
+Production branch:  main
 ```
 
-One repository, one source of truth, no copy step, and the same fingerprinted
-build (§11.5) on both addresses. `hsadeghi.org` goes on being served by GitHub
-Pages exactly as before; nothing about that path changed.
+**Paste the command alone.** The first build failed with
+`/bin/sh: 1: Production: not found` because the whole three-line block above had
+been pasted into the build command field and the shell tried to run it.
 
-`tools/fingerprint.mjs` reads the commit from `git rev-parse HEAD` and falls
-back to `GITHUB_SHA`, then to **`CF_PAGES_COMMIT_SHA`** — that last one is
-Cloudflare's, for a builder that checks out without a usable git directory.
+`fingerprint.mjs` reads the commit from `git rev-parse HEAD`, then `GITHUB_SHA`,
+then **`CF_PAGES_COMMIT_SHA`** — Cloudflare's, for a builder that checks out
+without a usable git directory.
+
+#### One behavioural difference, deliberately left alone
+
+On this host `/publications.html` **307-redirects to `/publications`**, where
+GitHub Pages serves both directly. That is Cloudflare's default
+`html_handling: "auto-trailing-slash"`.
+
+Setting `html_handling: "none"` makes `.html` paths serve verbatim — and also
+stops `/` mapping to `index.html`, so the home page returns 404. *None* means
+none. The default therefore stands: relative paths resolve identically at both
+depths, every page loads, and the canonical tag names `hsadeghi.org` either
+way, so the redirect is a tidier URL rather than a divergence that matters.
 
 #### hsadeghi.org stays the canonical address
 
 Every page carries `<link rel="canonical" href="https://hsadeghi.org/…">` and a
-matching `og:url`, and **that is left alone on purpose**. Both domains therefore
-tell a search engine that the real address is `hsadeghi.org`, which is what
-stops two identical sites competing with each other and splitting the ranking
-between them. `hamedsadeghi.org` is a way to arrive, not a second identity.
+matching `og:url`, and **that is left alone on purpose**. Both domains tell a
+search engine that the real address is `hsadeghi.org`, which is what stops two
+identical sites competing and splitting the ranking between them.
 
 If that ever changes — if the longer name becomes the one on the business card
 — then `baseUrl` in `data/site.json`, the `canonical` link and the `og:url` in
-all seven pages move together, and `hsadeghi.org` becomes the secondary
-address. It is a single decision with one consequence, and it should be made
-once rather than drifted into.
+all seven pages move together, and `hsadeghi.org` becomes secondary. One
+decision, made once, rather than drifted into.
 
 #### The copy canary had to be told
 
-This is the part that bites, and it is easy to miss until the console says
-something alarming. `modules/canary.js` compares the hostname it was served
-from against `baseUrl` plus `origins` in `data/site.json` (§19). A hostname not
-on that list is, as far as the site is concerned, somebody else's server: it
-fires a GA4 `unlicensed_origin` event and prints *"this page is a copy"* into
-the console.
-
-So the new domain is on the list:
+`modules/canary.js` compares the hostname it was served from against `baseUrl`
+plus `origins` in `data/site.json` (§19). A hostname not on that list is, as far
+as the site is concerned, somebody else's server: a GA4 `unlicensed_origin`
+event and *"this page is a copy"* in the console. The site would have been
+accusing itself.
 
 ```json
 "origins": [
@@ -1684,10 +1721,32 @@ So the new domain is on the list:
 ```
 
 `tools/check-canary.mjs` runs the site under each of those hostnames and asserts
-it stays quiet, and under `copycat.test` and asserts it does not. Both new
-hostnames are in that table now. **Any future address — a staging copy, a
-preview URL, a third domain — needs the same two edits**, and the check is what
-tells you when one was forgotten.
+it stays quiet, and under `copycat.test` and asserts it does not. **Any future
+address — a staging copy, a preview URL, a third domain — needs the same two
+edits**, and that check is what tells you when one was forgotten.
+
+#### The workers.dev URL is switched off
+
+A Worker is also reachable at `<name>.<subdomain>.workers.dev`, which would make
+the whole site available at a third address that is **not** in `origins` — so
+the canary would flag it, correctly. The production workers.dev route is
+disabled on the Domains tab; it returns 404.
+
+The *preview* route (`*-hsadeghisut-github-io.…workers.dev`) is still enabled,
+because it is how a non-production branch gets looked at before it is merged. It
+is the same exposure in miniature: if branch previews are not wanted, turn it
+off beside the other one.
+
+#### Checking it from outside
+
+```bash
+curl -s https://hamedsadeghi.org/build-version.txt        # same commit as
+curl -s https://hsadeghi.org/build-version.txt            # this one
+curl -sI https://hamedsadeghi.org/ | grep -i location     # nothing: it serves
+```
+
+A console with no *"this page is a copy"* warning on the new domain is the
+canary check passing in the real world rather than in Playwright.
 
 ### Keeping old links working
 
