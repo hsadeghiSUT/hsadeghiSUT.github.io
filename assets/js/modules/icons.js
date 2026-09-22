@@ -20,7 +20,7 @@
  *
  * How it works now
  * ----------------
- * `assets/icons/icons.svg` is a sprite containing exactly the 66 icons this site
+ * `assets/icons/icons.svg` is a sprite containing exactly the 71 icons this site
  * uses, extracted from that same Pro file — so the artwork is byte-identical,
  * duotone and all. Each icon is one <symbol>; a page references it with
  *

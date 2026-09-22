@@ -91,6 +91,17 @@ const JS_PATTERNS = [
 /** `href="assets/….css"` and `src="assets/….js"` in the page files. */
 const HTML_PATTERN = /((?:href|src)=")(assets\/[^"?#]+\.(?:css|js))(")/g;
 
+/**
+ * The icon sprite, named once in modules/icons.js.
+ *
+ * It was left unstamped at first on the theory that it never changes. That was
+ * wrong the moment an icon was added to it: on 2026-09-22 two carets went in,
+ * and every visitor with the four-hour-old sprite got a button with an empty
+ * 8×8 box where the caret should be. Stamped by its own content, like the
+ * vendored library — it changes when the icons change, and not on every deploy.
+ */
+const SPRITE_PATTERN = /(')(assets\/icons\/icons\.svg)(')/g;
+
 /** The one place the vendored library is named, and its own one import. */
 const VENDOR_PATTERNS = [
   /(')((?:\.\.\/)+vendor\/three\/three\.module\.js)(')/g,
@@ -197,16 +208,26 @@ const vendorHash = createHash('sha1');
 for (const file of files.filter(isVendorJs).sort()) vendorHash.update(await readFile(file));
 const vendorV = vendorHash.digest('hex').slice(0, 10);
 
+/* The sprite's own version, the same way. */
+const spritePath = path.join(OUT, 'assets', 'icons', 'icons.svg');
+const spriteV = existsSync(spritePath)
+  ? createHash('sha1').update(await readFile(spritePath)).digest('hex').slice(0, 10)
+  : '';
+
 let html = 0;
 let js = 0;
 let vendor = 0;
+let sprite = 0;
 
 for (const file of files) {
   if (file.endsWith('.html')) {
     html += await stamp(file, [HTML_PATTERN], () => OUT, v);
   } else if (isSiteJs(file) || isVendorJs(file)) {
     vendor += await stamp(file, VENDOR_PATTERNS, path.dirname, vendorV);
-    if (isSiteJs(file)) js += await stamp(file, JS_PATTERNS, path.dirname, v);
+    if (isSiteJs(file)) {
+      if (spriteV) sprite += await stamp(file, [SPRITE_PATTERN], () => OUT, spriteV);
+      js += await stamp(file, JS_PATTERNS, path.dirname, v);
+    }
   }
 }
 
@@ -226,6 +247,7 @@ console.log(`fingerprint: v=${v}  vendor=${vendorV}`);
 console.log(`  ${html} stylesheet/script references in HTML`);
 console.log(`  ${js} import specifiers in assets/js`);
 console.log(`  ${vendor} references to the vendored library`);
+console.log(`  ${sprite} reference${sprite === 1 ? '' : 's'} to the icon sprite (v=${spriteV})`);
 console.log(`  → ${path.relative(ROOT, OUT)}`);
 
 if (problems.length) {

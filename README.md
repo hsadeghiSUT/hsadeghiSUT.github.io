@@ -20,7 +20,7 @@ web server and it works.
 |---|---|---|
 | JavaScript (the site's own) | 5.90 MB (`all.min.js` 5.8 MB + jQuery 89 KB + `script.js` 13 KB) | **~410 KB** of source across 49 ES modules — 127 KB gzipped over the wire, and a large share of that 410 is the comments |
 | CSS | 278 KB in one file | **144 KB** across seven files (two colour schemes + the Farsi lock), 26 KB gzipped |
-| Icons | full Font Awesome 5 Pro JS kit, all 7,800 icons | **46 KB** SVG sprite, the 66 icons actually used |
+| Icons | full Font Awesome 5 Pro JS kit, all 7,800 icons | **46 KB** SVG sprite, the 71 icons actually used |
 | Content | hand-written into 7 HTML files (≈ 340 KB of markup) | **8 JSON files** you edit directly |
 | Mobile | none — fixed 1200 px layout | mobile-first, three breakpoints, plus a sticky section bar for the long pages (§13) |
 | Themes | light only | light / dark / follow-the-system, remembered |
@@ -1571,6 +1571,14 @@ with two deploys in it, which fails in ways that look like nothing at all. All
 and changes only when three.js is deliberately upgraded; versioning it per
 deploy would make every visitor re-download it to fix a staleness that cannot
 happen while the bytes are identical. It gets a hash of its own contents.
+
+**The icon sprite is stamped by its own content too**, and that was a
+correction rather than a plan. It was left alone at first on the theory that it
+never changes — which was true until an icon was added to it. Two carets went
+into it on 2026-09-22, and every visitor holding the four-hour-old sprite got a
+button with an empty 8×8 box where the caret should have been. `modules/icons.js`
+names the sprite once, in `SPRITE`, and that one literal is stamped; anything
+else wanting the path imports it rather than writing it out again.
 
 **`data/*.json` is deliberately not stamped.** `modules/data.js` and
 `modules/scholar.js` already fetch with `cache: 'no-cache'`, so the data

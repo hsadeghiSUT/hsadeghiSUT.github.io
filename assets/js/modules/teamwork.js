@@ -51,7 +51,7 @@
  */
 
 import { el, $$ } from './dom.js';
-import { icon } from './icons.js';
+import { icon, SPRITE } from './icons.js';
 import { load } from './data.js';
 import { buildGraph, attachCitations } from './explorer/data.js';
 import { candidateKeys, loadFaces } from './faces.js';
@@ -59,6 +59,27 @@ import { loadScholar, citedByIndex, normaliseTitle } from './scholar.js';
 
 /** Thousands separators, the same way the rest of the site writes a count. */
 const count = (n) => Number(n).toLocaleString('en-US');
+
+/**
+ * Point a caret right (shut) or down (open).
+ *
+ * It swaps symbol rather than rotating one: `transform: rotate(90deg)` resolves
+ * to the identity matrix on this element in at least one engine — measured, not
+ * assumed — while the same declaration on the icon beside it turns as expected.
+ *
+ * `SPRITE` comes from icons.js rather than being written out here, because the
+ * build stamps that one literal with the sprite's content hash. A second copy
+ * of the path would be a second URL, unstamped, and would go on pointing at
+ * whatever version of the sprite the visitor already had.
+ */
+function pointOneCaret(caret, open) {
+  if (!caret) return;
+  const id = open ? 'fas-caret-down' : 'fas-caret-right';
+  for (const use of caret.querySelectorAll('use')) {
+    use.setAttribute('href', `${SPRITE}#${id}`);
+    use.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', `${SPRITE}#${id}`);
+  }
+}
 
 /**
  * Which author key each roster person is, where the citation list knows them.
@@ -166,11 +187,7 @@ export async function mountTeamWork(root, team) {
        from the same declaration. Two symbols cannot be got wrong. */
     const caret = icon('fas-caret-right', { class: 'person__more-caret' });
     const pointCaret = (open) => {
-      const id = open ? 'fas-caret-down' : 'fas-caret-right';
-      for (const use of caret.querySelectorAll('use')) {
-        use.setAttribute('href', 'assets/icons/icons.svg#' + id);
-        use.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', 'assets/icons/icons.svg#' + id);
-      }
+      pointOneCaret(caret, open);
     };
     const button = el(
       'button',
@@ -272,11 +289,7 @@ export async function mountTeamWork(root, team) {
         const other = openPanel.previousElementSibling;
         if (other) {
           other.setAttribute('aria-expanded', 'false');
-          const otherCaret = other.querySelector('.person__more-caret use');
-          if (otherCaret) {
-            otherCaret.setAttribute('href', 'assets/icons/icons.svg#fas-caret-right');
-            otherCaret.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', 'assets/icons/icons.svg#fas-caret-right');
-          }
+          pointOneCaret(other.querySelector('.person__more-caret'), false);
         }
         if (openExplorer && openExplorer.stop) openExplorer.stop();
         openExplorer = null;
