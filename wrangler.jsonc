@@ -17,6 +17,22 @@
 {
   "name": "hsadeghisut-github-io",
   "compatibility_date": "2026-09-22",
+
+  // The Worker answers on its custom domains and nowhere else.
+  //
+  // A Worker is otherwise reachable at <name>.<subdomain>.workers.dev, and its
+  // previews at *-<name>.<subdomain>.workers.dev — which would put the whole
+  // site at addresses that are not in `origins` (data/site.json), so the copy
+  // canary would flag them, correctly, as somebody else's server.
+  //
+  // THESE BELONG HERE AND NOT IN THE DASHBOARD. Switching the route off there
+  // works until the next deploy: `wrangler deploy` re-applies this file, and
+  // both settings default to true when the file does not say otherwise. Turned
+  // off in the dashboard on 2026-09-22, the production URL was serving again
+  // within the hour, after an unrelated push.
+  "workers_dev": false,
+  "preview_urls": false,
+
   "assets": {
     "directory": "./_site",
 

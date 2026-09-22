@@ -1725,17 +1725,31 @@ it stays quiet, and under `copycat.test` and asserts it does not. **Any future
 address — a staging copy, a preview URL, a third domain — needs the same two
 edits**, and that check is what tells you when one was forgotten.
 
-#### The workers.dev URL is switched off
+#### The workers.dev URLs are off, and the switch is in the file
 
-A Worker is also reachable at `<name>.<subdomain>.workers.dev`, which would make
-the whole site available at a third address that is **not** in `origins` — so
-the canary would flag it, correctly. The production workers.dev route is
-disabled on the Domains tab; it returns 404.
+A Worker is also reachable at `<name>.<subdomain>.workers.dev`, and its previews
+at `*-<name>.<subdomain>.workers.dev`. That would put the whole site at
+addresses which are **not** in `origins`, so the canary would flag them —
+correctly — as somebody else's server.
 
-The *preview* route (`*-hsadeghisut-github-io.…workers.dev`) is still enabled,
-because it is how a non-production branch gets looked at before it is merged. It
-is the same exposure in miniature: if branch previews are not wanted, turn it
-off beside the other one.
+Both are disabled in `wrangler.jsonc`:
+
+```jsonc
+"workers_dev": false,
+"preview_urls": false,
+```
+
+**Not in the dashboard.** There is a toggle for each on the Domains tab and it
+appears to work: the URL starts returning 404 immediately. It lasts until the
+next deploy. `npx wrangler deploy` re-applies this file on every build, and both
+settings default to **true** when the file does not say otherwise — so the
+route comes back, quietly, on the next unrelated push. That is exactly what
+happened on 2026-09-22: switched off in the dashboard, serving again within the
+hour.
+
+The rule generalises to anything else about this Worker that the dashboard
+offers to change. The file is what is deployed; the dashboard is a view of the
+last deploy.
 
 #### Checking it from outside
 
