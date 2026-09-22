@@ -6174,3 +6174,156 @@ are a nearly black surface with a bright emissive: this scene has a lot of white
 light in it, so a flame built the obvious way, orange surface and orange glow,
 comes back a flat khaki. Take the diffuse to almost nothing and the emission is
 the whole of the colour.
+
+---
+
+## 21. Being findable — search engines and the other Hamed Sadeghi
+
+There is another Hamed Sadeghi. He owns `hamedsadeghi.com`, and for a long time
+he was the first page of results for the name while this site — 130 peer-reviewed
+papers, a named laboratory, a chair of two technical committees — was on page
+seven or missing entirely.
+
+That is not a ranking accident to be fixed with keywords. It is two separate
+failures, and they need separate fixes.
+
+### 21.1 The first failure: the pages were empty
+
+This is the one that mattered, and it was invisible from a browser.
+
+Every page of this site is a shell. The nav, the footer and about **3.9 KB** of
+boilerplate are in the HTML; the name, the biography, the publication list, the
+students, the courses and the awards are built in the browser by
+`assets/js/pages/*.js` from `data/*.json`. Strip the tags from any of the seven
+pages before 2026-09-23 and you got the same 3.9 KB of chrome on every one of
+them. The home page did not contain the words *"Hamed Sadeghi"* anywhere except
+the `<title>` and a copyright comment.
+
+So to anything that does not run JavaScript, this was seven near-identical
+pages that said **"Loading…"**.
+
+Googlebot does render JavaScript — on a second pass, when it gets round to it,
+and not for every page of every site. Bing is markedly worse at it. Most of the
+rest do not try at all. A competitor with one page of plain HTML wins that
+comparison without doing anything clever.
+
+`tools/prerender.mjs` writes the content into the HTML at build time:
+
+```
+index.html            8.8 KB →  11.1 KB of text
+background.html       8.9 KB →  11.6 KB
+publications.html     8.9 KB →  50.2 KB
+research-team.html    8.9 KB →  15.5 KB
+teaching.html         8.9 KB →  10.1 KB
+services.html         8.9 KB →  12.5 KB
+honors.html           8.9 KB →  12.6 KB
+```
+
+**Why this is free, and why it is not cloaking.** `fill()` in
+`assets/js/modules/dom.js` uses `replaceChildren`, so whatever is in a container
+when the page module runs is discarded and rebuilt. A visitor with JavaScript
+sees exactly the DOM they saw before — verified: one `<h1>`, 33 *More info*
+buttons, 26 canvases, no console errors. A visitor or crawler without it now
+reads the real text instead of a spinner. And the text is generated from the
+same `data/*.json` the page module reads, so the two cannot disagree about what
+the site says.
+
+It runs from `fingerprint.mjs`, after the tree is copied and before anything is
+stamped, so **both hosts get it with no change on the Cloudflare side** (§11.6).
+The repository itself is untouched: `tools/serve.py` still serves plain shells,
+which is what you want while editing.
+
+### 21.2 The second failure: nothing said *which* Hamed Sadeghi
+
+A search engine resolves a name to an *entity*, not to a string. Two people
+called Hamed Sadeghi are two entities, and the one with more corroboration wins
+the name.
+
+Every corroborating link already existed on this site — Scopus, Google Scholar,
+ORCID, ResearchGate, Semantic Scholar, Publons, LinkedIn, Mendeley, SciExplore,
+Academia — rendered as icons in the sidebar, where they read as decoration.
+`tools/build-seo.mjs` also states them as a claim, in `schema.org` terms:
+
+```json
+"@type": "Person",
+"name": "Hamed Sadeghi",
+"alternateName": ["حامد صادقی", "Dr. Hamed Sadeghi", "H. Sadeghi", "صادقی، حامد"],
+"affiliation": { "@type": "CollegeOrUniversity", "name": "Sharif University of Technology" },
+"identifier": [ ORCID, Scopus Author ID, Google Scholar ],
+"sameAs": [ "… 11 profiles …" ]
+```
+
+`sameAs` is the load-bearing field. Each of those eleven URLs is a page an
+engine has already indexed and already associates with a photograph, an
+employer and a publication list. Eleven of them agreeing is a much harder thing
+for a namesake to accidentally out-rank than a title tag.
+
+Sharif is given its Wikipedia, Wikidata and ROR identifiers for the same reason:
+`worksFor` pointing at a known organisation is worth more than a string.
+
+**It is generated, not typed.** Those URLs live in `data/site.json` because the
+page renders them as links. Typing them a second time into a `<script
+type="application/ld+json">` block would create two lists that agree right up
+until one is edited. So the block is generated from the same JSON, and
+`node tools/build-seo.mjs --check` runs in `deploy.yml` — change a profile URL
+without regenerating and the deploy fails instead of the structured data going
+quietly stale.
+
+**The email is deliberately absent.** `data/home.json` splits it into
+`emailParts` so it is assembled in the browser and never appears as a literal
+(§12). `schema.org` has an `email` property; using it would hand the address to
+every crawler in plain text and undo that. It is left out on purpose.
+
+### 21.3 The rest of what changed
+
+| | |
+|---|---|
+| **The home page had no `<h1>`** | the six other pages had one; the most important page did not. It now carries the name and the Persian spelling together |
+| **The home page title was `Hamed Sadeghi`** | two words that match a great many people. Now *"Hamed Sadeghi — Associate Professor of Civil Engineering, Sharif University of Technology"* |
+| **Its description was "Dr. Hamed Sadeghi's Personal Webpage: Home."** | which tells a reader nothing and a ranking algorithm less. Now a real sentence naming the field, the university and the city |
+| **`sitemap.xml`** | seven URLs, canonical host only. No `lastmod`, no `priority`, no `changefreq` — Google ignores the last two, and a `lastmod` regenerated on every build claims every page changed every time, which is untrue and gets discounted |
+| **`robots.txt`** | allows everything, points at the sitemap, and keeps `/tools/`, `/README.md` and `/build-version.txt` out of results — they are served, but there is nothing in them for a search result |
+| **Card metadata** | `twitter:card` as `summary_large_image`, plus `author` and `og:locale`, generated *from* the `og:` tags rather than beside them |
+
+### 21.4 What this cannot do
+
+Everything above is on-page. It makes the site legible and says who it belongs
+to. **It does not create authority, and authority is most of ranking.**
+
+These are the things that move the needle, and none of them can be done from
+the repository:
+
+1. **Google Search Console** — verify `hsadeghi.org` *and* `hamedsadeghi.org`,
+   submit `https://hsadeghi.org/sitemap.xml`, then use *URL Inspection →
+   Request indexing* on the home page. This is the single fastest step: it turns
+   "eventually" into "this week". Bing Webmaster Tools imports from it.
+2. **The university page.** A link from `sharif.edu` — a faculty directory
+   entry, a department staff list — is worth more than any number of edits here,
+   because it is an authoritative domain confirming the affiliation the
+   structured data claims.
+3. **Google Scholar and ORCID** should list `hsadeghi.org` as the homepage.
+   Those profiles are already in `sameAs`; a link *back* closes the loop and is
+   what turns a claim into a confirmed one.
+4. **LinkedIn, ResearchGate, Academia** — same. The website field, filled in.
+5. **A Wikidata item.** For an academic with an ORCID, a Scopus ID and 130
+   papers this is reasonable, and it is how a knowledge panel gets built.
+
+### 21.5 Two decisions left open
+
+**`hamedsadeghi.org` currently cannot rank.** Every page on it carries
+`<link rel="canonical" href="https://hsadeghi.org/…">`, which tells search
+engines to index the other address and ignore this one (§11.6). That is correct
+for avoiding duplicate content — but it also means the domain whose spelling
+*exactly matches the name people search for* is deliberately invisible, while
+the namesake's `hamedsadeghi.com` is not. Switching which domain is canonical
+is a single decision affecting `baseUrl`, seven `canonical` links and seven
+`og:url` tags; it should be made deliberately, and only once.
+
+**The hidden alias list.** `index.html` carries a `#seo-aliases` div,
+`visually-hidden` and `aria-hidden`, which JavaScript fills with 37 spellings of
+the name. Text hidden from users but served to crawlers is what Google's spam
+policies call *hidden text*. It is probably doing nothing — it is built by
+JavaScript, so most crawlers never see it — but its intent is the kind that gets
+a site discounted if it is noticed. The same name variants are now in
+`alternateName` in the structured data, which is the sanctioned way to say it.
+Removing the div is the safer position.
