@@ -712,7 +712,7 @@ a.pub__cited:hover .pub__cited-n { color: var(--c-accent); }
   gap: var(--space-2);
   justify-self: start;
   margin-top: var(--space-3);
-  padding: 0.3rem 0.7rem;
+  padding: 0.4rem 0.9rem;
   border: 1px solid var(--c-border);
   border-radius: 999px;
   background: var(--c-bar-solid);
@@ -734,9 +734,11 @@ a.pub__cited:hover .pub__cited-n { color: var(--c-accent); }
    matrix on each, measured rather than assumed — so the caret stopped depending
    on being turned. All this rule does now is colour it. */
 .person__more-caret {
-  width: 0.7em;
-  height: 0.7em;
-  color: var(--c-ink-mute);
+  /* Deliberately larger than the text beside it. At 0.7em it was technically
+     present and nobody saw it, which is the same as not being there. */
+  width: 1.1em;
+  height: 1.1em;
+  color: var(--c-accent);
   transition: color var(--dur) var(--ease);
 }
 .person__more:hover .person__more-caret { color: var(--c-accent); }
@@ -822,6 +824,14 @@ a.pub__cited:hover .pub__cited-n { color: var(--c-accent); }
   flex: none;
 }
 .person__partner[lang="fa"] { font-family: var(--f-farsi); }
+
+/* Said when the graph could not be drawn, so the panel ends on a sentence
+   rather than on nothing. */
+.person__work-note {
+  margin: var(--space-4) 0 0;
+  font-size: var(--t-xs);
+  color: var(--c-ink-mute);
+}
 
 /* The explorer, scoped to this person. It brings its own panel chrome. */
 .person__explorer { margin-top: var(--space-4); }

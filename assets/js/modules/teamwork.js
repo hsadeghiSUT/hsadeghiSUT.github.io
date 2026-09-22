@@ -277,12 +277,34 @@ export async function mountTeamWork(root, team) {
           onFilter: () => {},
           onReveal: () => {},
         }))
-        .then((api) => { openExplorer = api; })
+        .then((api) => {
+          openExplorer = api;
+          /* `mountExplorer` removes its own host when there is too little to
+             draw — fewer than three people in the graph, which is the case for
+             somebody whose one paper was written with the site owner alone.
+             That is the right call for the canvas and the wrong ending for the
+             panel: the reader sees a card that stops mid-thought and looks
+             broken next to its neighbours. Say what happened instead. */
+          if (api) return;
+          panel.append(el('p', {
+            class: 'person__work-note',
+            text: partners.length === 1
+              ? 'Only one co-author here, so there is no graph to draw.'
+              : 'Too few co-authors here to draw a graph.',
+          }));
+        })
         .catch(() => stage.remove());
     }
 
     button.addEventListener('click', () => {
       const opening = panel.hidden;
+      /* Where the button is on screen right now.
+         Closing the card that was open may remove eight hundred pixels from
+         ABOVE this one, which slides the thing the reader just clicked up and
+         out of view — they clicked a card and the page appeared to jump several
+         cards down. The scroll is corrected by exactly the distance the button
+         moved, so from the reader's point of view it does not move at all. */
+      const before = button.getBoundingClientRect().top;
 
       if (openPanel && openPanel !== panel) {
         openPanel.hidden = true;
@@ -304,6 +326,9 @@ export async function mountTeamWork(root, team) {
         openExplorer.stop();
         openExplorer = null;
       }
+
+      const shift = button.getBoundingClientRect().top - before;
+      if (Math.abs(shift) > 1) window.scrollBy({ top: shift, behavior: 'instant' });
     });
 
     card.append(button, panel);

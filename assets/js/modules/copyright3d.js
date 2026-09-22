@@ -132,6 +132,44 @@ function token(name, fallback) {
 
 const rgba = (c, a) => `rgba(${c.r},${c.g},${c.b},${a})`;
 
+/** The same crimson, scaled toward black — the pool's own depth. */
+const shade = (c, k, a) =>
+  `rgba(${Math.round(c.r * k)},${Math.round(c.g * k * 0.72)},${Math.round(c.b * k * 0.83)},${a})`;
+
+/**
+ * Which way round the page is.
+ *
+ * Mirrors the inline script in every page head: an explicit choice wins, and
+ * with no choice the system's preference decides.
+ */
+function pageIsDark() {
+  const set = document.documentElement.getAttribute('data-theme');
+  if (set === 'dark') return true;
+  if (set === 'light') return false;
+  return window.matchMedia('(prefers-color-scheme: dark)').matches;
+}
+
+/**
+ * How to paint the pool, which is not the same job in the two themes.
+ *
+ * ON WHITE the body is read by its own darkness: the gradient falls away to
+ * near-black crimson at the bottom, the page behind it is bright, and the eye
+ * gets depth for free — a shallow dish of something heavy.
+ *
+ * ON BLACK that same gradient disappears. The bottom of the pool becomes the
+ * page, the only thing left with contrast is the bright line along the
+ * meniscus, and seven pixels of liquid read as a red line ruled across the
+ * footer. So on dark the pool is lit from inside instead: it stays saturated
+ * all the way down, never darker than the crimson it is made of, and the glow
+ * around it is widened — on a dark page a glow is the cheapest depth there is,
+ * where on a light one it would only look like fog.
+ */
+function poolPaint(dark) {
+  return dark
+    ? { top: rgba(DEW_LIT, 0.98), mid: rgba(DEW, 0.99), deep: shade(DEW, 0.82, 0.99), glowBlur: 20, glowAlpha: 0.9, rimSoft: 0.45 }
+    : { top: rgba(DEW_LIT, 0.92), mid: rgba(DEW, 0.96), deep: shade(DEW, 0.42, 0.98), glowBlur: 10, glowAlpha: 0.8, rimSoft: 0.3 };
+}
+
 /* -------------------------------------------------------------------------- */
 /* The overlay                                                                 */
 /* -------------------------------------------------------------------------- */
@@ -741,16 +779,21 @@ export async function mountCopyright(host, canvas) {
     ctx.lineTo(poolX - poolHalf(), layer.height + 2);
     ctx.closePath();
 
+    const paint = poolPaint(pageIsDark());
+
     const body = ctx.createLinearGradient(0, top, 0, layer.height);
-    body.addColorStop(0, rgba(DEW_LIT, 0.92));
-    body.addColorStop(0.3, rgba(DEW, 0.96));
-    body.addColorStop(1, `rgba(${Math.round(DEW.r * 0.42)},${Math.round(DEW.g * 0.3)},${Math.round(DEW.b * 0.35)},0.98)`);
+    body.addColorStop(0, paint.top);
+    body.addColorStop(0.3, paint.mid);
+    body.addColorStop(1, paint.deep);
 
     ctx.save();
-    ctx.shadowColor = rgba(DEW, 0.8);
-    ctx.shadowBlur = 10;
+    ctx.shadowColor = rgba(DEW, paint.glowAlpha);
+    ctx.shadowBlur = paint.glowBlur;
     ctx.fillStyle = body;
     ctx.fill();
+    /* Twice on dark: one pass of shadow at this size is a halo the page
+       swallows, two is a pool that appears to be lit from within. */
+    if (paint.glowBlur > 12) ctx.fill();
     ctx.restore();
 
     /* The rim. A liquid is read from the line of light along its meniscus far
@@ -760,7 +803,7 @@ export async function mountCopyright(host, canvas) {
     traceSurface(ctx, t);
     ctx.lineJoin = 'round';
     ctx.lineCap = 'round';
-    ctx.strokeStyle = rgba(DEW_LIT, 0.3);
+    ctx.strokeStyle = rgba(DEW_LIT, paint.rimSoft);
     ctx.lineWidth = 3;
     ctx.stroke();
     ctx.strokeStyle = 'rgba(255,226,230,0.85)';

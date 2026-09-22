@@ -127,6 +127,21 @@ li[data-fx].is-lit {
 .card[data-fx].is-lit,
 .person[data-fx].is-lit { border-color: var(--fx-glow); }
 
+/* A ROSTER CARD DOES NOT TILT.
+   It did, and it was right to, while a person card was a photograph and three
+   lines: a small object leaning toward the pointer reads as a card responding.
+   Since it gained a "More info" panel it can be eight hundred pixels tall with
+   a publication list, a row of faces and a WebGL canvas inside it, and tilting
+   THAT toward the pointer reads as the whole page coming loose — the canvas
+   least of all, since it is already drawing its own 3D and now does so on a
+   plane that is itself turning.
+
+   The glow, the border and the lifted surface stay: they are what says "this is
+   the thing under your cursor", and none of them moves anything. Only the
+   rotation and the lift go, and only here — a publication entry or an honour
+   card is still a small object and still tilts. */
+.person[data-fx].is-lit { transform: none; }
+
 /* Someone who asked for less motion still gets the colour — they just do not
    get the tilt.  The information is in the colour; the movement is decoration. */
 @media (prefers-reduced-motion: reduce) {
@@ -754,13 +769,24 @@ html { scroll-padding-top: calc(var(--bar-h) + var(--secnav-h, 0px) + 1rem); }
   left: var(--space-4);
   right: var(--space-4);
   bottom: var(--space-3);
-  margin: 0;
+  /* A pill, not bare text.
+     It sits over the stage, and on the Impact view the year markers are drawn
+     along the bottom of that stage — so bare text landed on top of "2024 · 407"
+     and the two became unreadable together. Bounded by left/right so a long
+     title still wraps, but only as wide as it needs. */
+  width: fit-content;
+  max-width: calc(100% - var(--space-4) * 2);
+  margin: 0 auto;
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-sm);
+  background: var(--c-bar-solid);
   font-size: var(--t-xs);
-  color: var(--c-ink-mute);
+  color: var(--c-ink-soft);
   text-align: center;
   pointer-events: none;
   text-wrap: balance;
 }
+.explorer__readout:empty { display: none; }
 
 /* ---- year chips ---------------------------------------------------------- */
 .explorer__years {
