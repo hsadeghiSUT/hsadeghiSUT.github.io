@@ -5031,6 +5031,53 @@ watching `main`, say — that is when you swap the token for a deploy key or a
 fine-grained PAT with **Contents: write**, checked out with
 `actions/checkout@v4` + `with: { ssh-key: … }` or `token: …`.
 
+#### Confirmed end to end, 2026-09-22
+
+The fix above was written the morning after the failure it describes, which
+means it was reasoning rather than evidence. It was then run twice on purpose,
+and both outcomes are worth recording because they are the two the pipeline has.
+
+**The first run hit a captcha.** It finished green, committed nothing, and the
+deploy job was **skipped** — which is the gate doing its job. A run that found
+no change has nothing to publish, and publishing anyway would be the pipeline
+lying about having done something.
+
+**The second run answered.** The figures had not moved, but `fetched` had, so
+`data/scholar.json` genuinely differed and the run committed it:
+
+```
+6f2b7ef  HKULegend  Scholar: 2068 citations, h 26, i10 51 (88 cited papers)
+data/scholar.json  +1 -1
+
+-  "fetched": "2026-09-21",
++  "fetched": "2026-09-22",
+```
+
+Everything after that is the part that had never actually been exercised:
+
+| | |
+|---|---|
+| Committed as the owner, not the bot | author `HKULegend` |
+| The commit reached `main` | repo HEAD `6f2b7efe90` |
+| The deploy ran **inside the refresh run** | `deploy / build` and `deploy / deploy`, jobs of run `35705104130` — no separate `Deploy the site` event exists for it |
+| It published the **new** tree | `fingerprint: v=6f2b7efe90` |
+| The site served it | live `build-version.txt` = `6f2b7efe90` |
+
+**The fourth row is the one that matters.** That run was *triggered* at head
+`691b4d9` — the commit before the Scholar one. A bare checkout would have built
+that tree, the version would have been stamped `691b4d9`, and the deploy would
+have published a site without the new data while reporting success. `ref: main`
+and versioning from the checked-out `HEAD` are what put `6f2b7ef` on the site
+instead, and this run is the evidence that both are load-bearing rather than
+defensive.
+
+**One thing the same morning demonstrated about the schedule.** The 03:17 UTC
+run did not happen at all — the previous run was 20:06 the evening before.
+GitHub's cron is best-effort and drops runs under load, which is the other half
+of why this workflow runs twice a day rather than once. If the figures ever lag
+by a day, a skipped schedule is the likelier explanation than a broken pipeline;
+the Actions tab says which.
+
 #### On this machine, for the mirror
 
 ```powershell
