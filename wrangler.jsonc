@@ -19,8 +19,17 @@
   "compatibility_date": "2026-09-22",
   "assets": {
     "directory": "./_site",
-    // The site links to real files — teaching.html, not /teaching — so a miss is
-    // a genuine miss and should say so rather than quietly serving the home page.
+
+    // Serve the paths exactly as they are written, which is what GitHub Pages
+    // does. Left at its default, Cloudflare 307-redirects /publications.html to
+    // /publications — a tidier URL, and the wrong one here: every canonical
+    // link, every og:url and every internal href in this site names the .html
+    // file, so the two hosts would disagree about what a page is called and a
+    // crawler would be told one thing and sent to another.
+    "html_handling": "none",
+
+    // The site links to real files, so a miss is a genuine miss and should say
+    // so rather than quietly serving the home page.
     "not_found_handling": "none"
   }
 }
