@@ -60,6 +60,8 @@ import { existsSync } from 'node:fs';
 import { copyFile, mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
+import { prerender } from './prerender.mjs';
+
 const ROOT = path.resolve(import.meta.dirname, '..');
 const argOut = process.argv.indexOf('--out');
 const OUT = path.resolve(ROOT, argOut > -1 ? process.argv[argOut + 1] : '_site');
@@ -222,6 +224,11 @@ async function copyTree(from, to, depth = 0) {
 }
 await copyTree(ROOT, OUT);
 
+/* Put the page content into the HTML before anything is stamped.  This only
+   ever touches the copy in OUT — the sources stay a shell, which is what
+   tools/serve.py serves while editing.  See tools/prerender.mjs. */
+const pre = await prerender(OUT);
+
 const files = await walk(OUT);
 
 /* The library's own version: a hash of the bytes that would be served. */
@@ -269,6 +276,7 @@ console.log(`  ${html} stylesheet/script references in HTML`);
 console.log(`  ${js} import specifiers in assets/js`);
 console.log(`  ${vendor} references to the vendored library`);
 console.log(`  ${sprite} reference${sprite === 1 ? '' : 's'} to the icon sprite (v=${spriteV})`);
+console.log(`  ${pre.pages} pages pre-rendered (${(pre.bytes / 1024).toFixed(0)} KB of text for crawlers)`);
 console.log(`  → ${path.relative(ROOT, OUT)}`);
 
 if (problems.length) {
