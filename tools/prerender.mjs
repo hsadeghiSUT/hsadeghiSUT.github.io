@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------------
 // Put the page content into the HTML, for readers that do not run JavaScript.
-// README §20.2.  Called by tools/fingerprint.mjs; never rewrites the sources.
+// README §21.2.  Called by tools/fingerprint.mjs; never rewrites the sources.
 // ---------------------------------------------------------------------------
 //
 // THE PROBLEM THIS SOLVES

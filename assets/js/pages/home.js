@@ -27,7 +27,7 @@
 import { $, el, fill } from '../modules/dom.js';
 import { load } from '../modules/data.js';
 import { icon } from '../modules/icons.js';
-import { linkPanel, renderAliases } from '../modules/chrome.js';
+import { linkPanel } from '../modules/chrome.js';
 import { renderEmail } from '../modules/email.js';
 import { loadScholar, metricTiles, formatCount, formatFetched } from '../modules/scholar.js';
 
@@ -341,8 +341,6 @@ export async function render(site) {
       ),
     ),
   );
-
-  renderAliases(home.seoAliases);
 
   /* ---------------------------------------------------------------- sidebar */
   fill(

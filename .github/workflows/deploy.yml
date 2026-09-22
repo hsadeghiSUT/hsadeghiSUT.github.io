@@ -59,7 +59,7 @@ jobs:
           node-version: '22'
 
       # The structured data is generated from data/site.json and data/home.json
-      # (§20). Editing either without regenerating would leave the <script
+      # (§21). Editing either without regenerating would leave the <script
       # type="application/ld+json"> blocks describing a profile that has moved,
       # which nothing on the rendered page would reveal. Fail the deploy instead.
       - name: Check the structured data is current
@@ -67,7 +67,7 @@ jobs:
 
       # The version comes from the checked-out commit, so every commit —
       # including the twice-daily Scholar refresh — gets its own set of URLs.
-      # This also pre-renders the page content into the HTML (§20.2).
+      # This also pre-renders the page content into the HTML (§21.2).
       - name: Stamp the asset URLs and pre-render
         run: node tools/fingerprint.mjs
 

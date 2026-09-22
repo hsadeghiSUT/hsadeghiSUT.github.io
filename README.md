@@ -6350,11 +6350,37 @@ and it should be made once, deliberately, not drifted into. Not before
 `hsadeghi.org` is ranking for the name, though: switching while the first
 address is still fighting for it would be starting the same fight twice.
 
-**The hidden alias list.** `index.html` carries a `#seo-aliases` div,
-`visually-hidden` and `aria-hidden`, which JavaScript fills with 37 spellings of
-the name. Text hidden from users but served to crawlers is what Google's spam
-policies call *hidden text*. It is probably doing nothing — it is built by
-JavaScript, so most crawlers never see it — but its intent is the kind that gets
-a site discounted if it is noticed. The same name variants are now in
-`alternateName` in the structured data, which is the sanctioned way to say it.
-Removing the div is the safer position.
+#### The hidden alias list — removed 2026-09-23
+
+All seven pages carried a `#seo-aliases` div, `visually-hidden` and
+`aria-hidden`, which `renderAliases()` in `modules/chrome.js` filled with 36
+spellings of the name from `seoAliases` in `data/home.json`. It came over from
+the original WordPress site, where the same list was a stack of near-invisible
+`<h2>`s.
+
+Text hidden from users but served to crawlers is what Google's spam policies
+call **hidden text**. Two things made it worse than the usual borderline case:
+
+- **Most of the 36 were not names.** They were whole search queries — *"حامد
+  صادقی مهندسی ژئوتکنیک دانشگاه صنعتی شریف"*, *"Hamed Sadeghi Geotechnique"*.
+  A person does not have 36 names; a keyword list has 36 entries.
+- **It was almost certainly inert anyway.** The div was filled by JavaScript,
+  so the crawlers most likely to penalise it were the least likely to see it.
+  All risk, no benefit.
+
+Gone: the div from seven pages, `renderAliases()` and its import, and
+`seoAliases` from `data/home.json`. The genuine name forms live in
+`alternateName` (§21.2) — `حامد صادقی`, `دکتر حامد صادقی`, `Dr. Hamed Sadeghi`,
+`H. Sadeghi`, `صادقی، حامد` — which is the sanctioned way to state them, is
+visible to anyone who views source, and is the field engines actually read for
+this.
+
+**The list was not moved wholesale into `alternateName`**, and that restraint is
+the point. Thirty-six search queries in a structured-data field is the same
+keyword stuffing in a format that happens to validate. The five above are names;
+the rest were never anything a person is called. The full list is in the commit
+that removed it if it is ever wanted back.
+
+Note that `.visually-hidden` itself stays in `base.css` — it is a legitimate
+accessibility utility, still used for screen-reader labels on JS-built nodes.
+What was wrong here was hiding *keywords*, not hiding text.

@@ -480,14 +480,17 @@ export function renderBrand(site) {
   );
 }
 
-/**
- * The hidden block of name variants the original kept for search engines.
- * It is preserved verbatim, but as a visually-hidden list rather than a stack
- * of near-invisible <h2>s, which is friendlier to both crawlers and screen
- * readers.
+/*
+ * `renderAliases()` used to live here.
+ *
+ * It filled a `visually-hidden`, `aria-hidden` div with 37 spellings of the
+ * name — carried over from the original WordPress site, which had them as a
+ * stack of near-invisible <h2>s. Text hidden from users but served to crawlers
+ * is what Google's spam policies call hidden text, and most of those 37 were
+ * not name variants at all but whole search queries ("حامد صادقی مهندسی
+ * ژئوتکنیک دانشگاه صنعتی شریف").
+ *
+ * The genuine name forms are now in `alternateName` in the structured data
+ * (§21.2), which is the sanctioned way to say the same thing. Removed
+ * 2026-09-23; §21.5 has the reasoning.
  */
-export function renderAliases(aliases) {
-  const host = $('#seo-aliases');
-  if (!host || !aliases) return;
-  fill(host, el('ul', {}, aliases.map((a) => el('li', { text: a }))));
-}

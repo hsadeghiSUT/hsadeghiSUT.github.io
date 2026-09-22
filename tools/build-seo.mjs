@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// Generate the structured data, the sitemap and robots.txt.  README §20.
+// Generate the structured data, the sitemap and robots.txt.  README §21.
 // ---------------------------------------------------------------------------
 //
 //   node tools/build-seo.mjs            # write the files
@@ -96,8 +96,20 @@ const person = {
   givenName: 'Hamed',
   familyName: 'Sadeghi',
   /* The Persian spellings are how he is searched for inside Iran, and the
-     accented/initial forms are how the publications spell him. */
-  alternateName: [site.nameFa, 'Dr. Hamed Sadeghi', 'H. Sadeghi', 'صادقی، حامد'],
+     initial/surname-first forms are how the publications spell him.
+
+     These are *names*, and the list stops there on purpose. data/home.json
+     used to carry 37 "SEO aliases" which a hidden div served to crawlers
+     (§21.5); most were whole search queries rather than names — "حامد صادقی
+     مهندسی ژئوتکنیک دانشگاه صنعتی شریف". Moving those in here would be the
+     same keyword stuffing in a format that happens to validate. */
+  alternateName: [
+    site.nameFa,
+    'دکتر حامد صادقی',
+    'Dr. Hamed Sadeghi',
+    'H. Sadeghi',
+    'صادقی، حامد',
+  ],
   honorificPrefix: 'Dr.',
   jobTitle: home.position,
   description: summary,
