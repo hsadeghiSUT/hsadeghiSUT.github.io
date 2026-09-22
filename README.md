@@ -1762,6 +1762,55 @@ curl -sI https://hamedsadeghi.org/ | grep -i location     # nothing: it serves
 A console with no *"this page is a copy"* warning on the new domain is the
 canary check passing in the real world rather than in Playwright.
 
+#### Verified, 2026-09-22
+
+Both domains were checked end to end once the second one was live. Recorded
+because "it loaded" is not the same statement as any of these.
+
+**One commit, three addresses.**
+
+```
+repo HEAD                3428126d6b
+hsadeghi.org             3428126d6b
+hamedsadeghi.org         3428126d6b
+www.hamedsadeghi.org     3428126d6b
+```
+
+**Everything that should be served, is — and everything that should not, is
+not.** All seven pages 200 on all three hosts. `data/*.json`, the icon sprite
+and `main.js` 200 on both. `legacy_index.html` and `wrangler.jsonc` **404 on
+both**, which is the deploy exclusion list (§11.5) doing its job on a host that
+has never heard of it. `data/scholar.json` reads 2068 citations on both.
+
+**It serves rather than redirects.** `https://hamedsadeghi.org/` answers
+`200 OK` with `Server: cloudflare` and no `Location` header, which is the whole
+point of the exercise.
+
+**The workers.dev route stays off across a deploy.** 404 before and after a
+rebuild — see the section above for why checking it once would have proved
+nothing.
+
+**The canary is silent on the new domain.** Zero `"this page is a copy"`
+warnings in the console at `hamedsadeghi.org`. `check-canary.mjs` asserts this
+under a resolver rule; this is the same assertion against the real DNS, the real
+certificate and the real `site.json`.
+
+**The canonical still points home.** Served from `hamedsadeghi.org`, every page
+still declares `https://hsadeghi.org/…` — so the two addresses consolidate
+rather than compete (see above).
+
+**Both pages were driven, not just fetched.**
+
+| | |
+|---|---|
+| `hamedsadeghi.org` → Research Team | 33 "More info" buttons; card `transform: none` when lit; caret turns down on open; **0 px** scroll drift; an opened panel with 4 publications, 3 collaborators, a live canvas and all four tabs |
+| `hsadeghi.org` → Publications | all four views switch and draw; searching `golaghaei` gives *"25 publications with Darzi, A.G."*, his portrait, and the readout *"Darzi, A.G. · 25 publications · 23 co-authors · 231 citations"* |
+
+The second row is the one worth repeating after any deploy that touches
+`assets/js/`: it exercises the search, the person match, the portrait, the
+filter and the canvas in a single query, and all five have to be right for that
+sentence to appear.
+
 ### Keeping old links working
 
 The old page addresses were `files/pages/publications.html` and similar. If you
