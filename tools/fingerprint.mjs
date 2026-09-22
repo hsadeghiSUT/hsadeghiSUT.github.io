@@ -193,7 +193,19 @@ const isVendorJs = (file) =>
 
 const v = version();
 
-await rm(OUT, { recursive: true, force: true });
+/* Empty the output directory, but never remove the directory itself.
+   `--out` points at a OneDrive-synced folder for the Sharif mirror (§11.4B),
+   and Windows refuses to rmdir a folder something else has open — OneDrive's
+   sync engine, a shell sitting in it, an editor. Deleting the children always
+   works; deleting the root is what fails, with EBUSY, for no gain. */
+const stale = await readdir(OUT).catch(() => null);
+if (stale) {
+  for (const name of stale) {
+    await rm(path.join(OUT, name), { recursive: true, force: true });
+  }
+} else {
+  await mkdir(OUT, { recursive: true });
+}
 
 /* Hand-rolled rather than `fs.cp`, which refuses a destination inside its
    source — and `_site/` inside the repository is exactly that. */
