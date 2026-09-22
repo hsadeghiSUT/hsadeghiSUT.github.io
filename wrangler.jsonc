@@ -20,13 +20,20 @@
   "assets": {
     "directory": "./_site",
 
-    // Serve the paths exactly as they are written, which is what GitHub Pages
-    // does. Left at its default, Cloudflare 307-redirects /publications.html to
-    // /publications — a tidier URL, and the wrong one here: every canonical
-    // link, every og:url and every internal href in this site names the .html
-    // file, so the two hosts would disagree about what a page is called and a
-    // crawler would be told one thing and sent to another.
-    "html_handling": "none",
+    // `html_handling` is left at its default — "auto-trailing-slash" — and that
+    // is a decision made twice.
+    //
+    // The first attempt set it to "none", to serve every path exactly as
+    // written the way GitHub Pages does, because every canonical link and
+    // og:url in this site names a .html file. It does that, and it also stops
+    // "/" mapping to index.html: the home page returned 404. "none" means
+    // none.
+    //
+    // So the default stands, and the cost is that /publications.html
+    // 307-redirects to /publications on this host while GitHub Pages serves
+    // both directly. Nothing breaks — relative paths resolve identically at
+    // both depths, and the canonical tag still names hsadeghi.org, so search
+    // engines consolidate there either way.
 
     // The site links to real files, so a miss is a genuine miss and should say
     // so rather than quietly serving the home page.
