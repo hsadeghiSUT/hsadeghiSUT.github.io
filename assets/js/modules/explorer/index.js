@@ -69,6 +69,7 @@
 import { $, el } from '../dom.js';
 import { icon } from '../icons.js';
 import { buildGraph, attachCitations, withoutSelf } from './data.js';
+import { loadFaces } from '../faces.js';
 import { solveLayout } from './layout.js';
 import {
   buildGraphScene, buildTimelineScene, buildImpactScene, buildInfluenceScene, YEAR_GAP,
@@ -164,6 +165,21 @@ export async function mountExplorer(
   /** Whether there is anything to draw an Impact view or a size toggle from. */
   const cited = !!(graph.citations && graph.citations.known);
 
+  /* The faces, if there are any.
+     Started after the graph and never awaited. A node is complete without its
+     photograph — the label and the readout say who it is — so a roster that is
+     slow, missing or broken costs the reader nothing. When it does land,
+     whatever is already under the cursor is described again, so the face
+     appears without the reader having to move and come back. */
+  let faces = new Map();
+  loadFaces(new Set(graph.people.map((p) => p.key)))
+    .then((found) => {
+      if (!found.size) return;
+      faces = found;
+      describe(hovered !== null ? hovered : selected);
+    })
+    .catch(() => {});
+
   /* Which question the graph's node sizes answer. It survives a theme change
      and a view change, because a reader who asked for citations did not ask for
      them until they next touched something. */
@@ -226,7 +242,23 @@ export async function mountExplorer(
   const canvas = el('canvas', { class: 'explorer__canvas' });
   const labels = el('div', { class: 'explorer__labels', 'aria-hidden': 'true' });
   const readout = el('p', { class: 'explorer__readout', role: 'status', 'aria-live': 'polite' });
-  const stage = el('div', { class: 'explorer__stage' }, canvas, labels, readout);
+
+  /* The face of whoever is under the cursor.
+     It is `aria-hidden` and it carries no text the readout does not already
+     say, because the readout is the accessible answer to "what am I pointing
+     at" and saying it twice is worse than saying it once. This is the same
+     sentence for the eye. */
+  const portraitImg = el('img', { class: 'explorer__portrait-img', alt: '', decoding: 'async' });
+  const portraitName = el('b', { class: 'explorer__portrait-name' });
+  const portraitGroup = el('span', { class: 'explorer__portrait-group' });
+  const portrait = el(
+    'figure',
+    { class: 'explorer__portrait', hidden: true, 'aria-hidden': 'true' },
+    portraitImg,
+    el('figcaption', { class: 'explorer__portrait-cap' }, portraitName, portraitGroup),
+  );
+
+  const stage = el('div', { class: 'explorer__stage' }, canvas, labels, readout, portrait);
 
   const tabs = {};
   const tabRow = el('div', { class: 'explorer__tabs', role: 'tablist', 'aria-label': 'Explorer view' });
@@ -915,10 +947,33 @@ export async function mountExplorer(
     return best;
   }
 
+  /**
+   * The portrait, for a person who has one.
+   *
+   * `src` is left in place when the frame hides: the same face is usually the
+   * next one asked for — hover out, hover back — and clearing it would throw
+   * away a decoded image to gain nothing.
+   */
+  function showFace(person) {
+    const face = person && faces.get(person.key);
+    if (!face) {
+      portrait.hidden = true;
+      return;
+    }
+    if (portraitImg.getAttribute('src') !== face.url) {
+      portraitImg.src = face.url;
+      portraitImg.alt = '';
+    }
+    portraitName.textContent = face.name || person.label;
+    portraitGroup.textContent = face.group || '';
+    portrait.hidden = false;
+  }
+
   function describe(index) {
     if (index === null) {
       caption.textContent = hintFor(view);
       readout.textContent = '';
+      showFace(null);
       return;
     }
     if (aboutPeople(scene)) {
@@ -931,7 +986,9 @@ export async function mountExplorer(
         // citations" under a first-year student's name is a true sentence that
         // reads as a verdict.
         (cited && person.citations ? ' · ' + count(person.citations) + ' citations' : '');
+      showFace(person);
     } else {
+      showFace(null);
       const paper = scene.cards[index].paper;
       /* The citation count goes FIRST on the skyline and last on the timeline.
          On the skyline it is what the reader is pointing at — the height of the

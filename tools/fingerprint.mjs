@@ -67,6 +67,20 @@ const OUT = path.resolve(ROOT, argOut > -1 ? process.argv[argOut + 1] : '_site')
 /** Never shipped: version control, CI definitions, and the output itself. */
 const SKIP = new Set(['.git', '.github', '_site', 'node_modules', '.gitignore', '.gitattributes']);
 
+/**
+ * In the repository, but not on the web.
+ *
+ * `legacy_index.html` is the original site's home page. It is not a page of
+ * this site and should not answer at a URL — but it is the reference
+ * `tools/check-trackers.mjs` reads to work out which analytics properties and
+ * meta tags every page must still carry. Deleting it would silently disarm the
+ * one guard against the rebuild dropping a tracker again, which is how the
+ * analytics tag went missing for four rounds of work the first time.
+ *
+ * So it stays in the repository and stays out of the deploy.
+ */
+const NOT_DEPLOYED = new Set(['legacy_index.html']);
+
 /** The three shapes a relative import takes in this codebase. */
 const JS_PATTERNS = [
   /(\bfrom\s*')(\.{1,2}\/[^']+\.js)(')/g,
@@ -163,13 +177,14 @@ await rm(OUT, { recursive: true, force: true });
 
 /* Hand-rolled rather than `fs.cp`, which refuses a destination inside its
    source — and `_site/` inside the repository is exactly that. */
-async function copyTree(from, to) {
+async function copyTree(from, to, depth = 0) {
   await mkdir(to, { recursive: true });
   for (const entry of await readdir(from, { withFileTypes: true })) {
     if (SKIP.has(entry.name)) continue;
+    if (depth === 0 && NOT_DEPLOYED.has(entry.name)) continue;
     const src = path.join(from, entry.name);
     const dest = path.join(to, entry.name);
-    if (entry.isDirectory()) await copyTree(src, dest);
+    if (entry.isDirectory()) await copyTree(src, dest, depth + 1);
     else await copyFile(src, dest);
   }
 }

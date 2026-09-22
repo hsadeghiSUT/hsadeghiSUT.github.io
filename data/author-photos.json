@@ -1,0 +1,30 @@
+{
+  "_readme": [
+    "Author photographs: a face for a name in the publication list, where the",
+    "roster cannot supply one (README §15).",
+    "",
+    "Keys are the graph's internal author keys — surname + '|' + initials,",
+    "lower-cased with spaces and full stops removed, the same keys",
+    "data/author-aliases.json uses. Values are file names inside",
+    "assets/img/people/.",
+    "",
+    "MOST PEOPLE DO NOT BELONG HERE. assets/js/modules/faces.js derives the link",
+    "from data/research-team.json on its own: it turns 'Ali Golaghaei Darzi' into",
+    "every surname/initials pair a journal might print and keeps the one the",
+    "citation list has actually seen. Someone with a roster row and a photograph",
+    "is already covered.",
+    "",
+    "This file is for the two cases that derivation cannot reach:",
+    "  - a co-author with a photograph but no roster row, and",
+    "  - a name the candidate rules get wrong, which check-author-photos.mjs",
+    "    reports as ambiguous.",
+    "",
+    "An entry here beats anything derived.",
+    "",
+    "Run `node tools/check-author-photos.mjs` to see who has a face, who is",
+    "ambiguous, and whether every file named here exists."
+  ],
+
+  "_not_on_the_roster": "co-authors with a photograph but no roster row",
+  "sadeghi|m": "Sadeghi-Mohammad.jpg"
+}

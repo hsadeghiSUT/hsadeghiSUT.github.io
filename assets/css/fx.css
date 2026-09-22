@@ -686,6 +686,69 @@ html { scroll-padding-top: calc(var(--bar-h) + var(--secnav-h, 0px) + 1rem); }
   letter-spacing: 0.02em;
 }
 
+/* ---- the portrait -------------------------------------------------------- */
+/* Whoever is under the cursor, if the roster has a photograph of them.
+   Top-right, because the graph settles around the middle and the readout owns
+   the bottom; `pointer-events: none` because the frame sits over the canvas and
+   must never eat a drag that started under it. */
+.explorer__portrait {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  z-index: 3;
+  margin: 0;
+  width: 7.5rem;
+  padding: var(--space-2);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  background: var(--c-bar-solid);
+  box-shadow: 0 6px 18px rgb(0 0 0 / 22%);
+  pointer-events: none;
+  /* Appearing instantly on every hover reads as a flicker when the cursor
+     crosses a crowded part of the graph. */
+  animation: explorer-portrait-in 140ms ease-out both;
+}
+.explorer__portrait[hidden] { display: none; }
+
+@keyframes explorer-portrait-in {
+  from { opacity: 0; transform: translateY(-0.25rem); }
+  to   { opacity: 1; transform: none; }
+}
+
+.explorer__portrait-img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  /* The same bias the roster uses: a head sits above the middle of a portrait,
+     and a centred crop cuts it. */
+  object-position: center 18%;
+  border-radius: var(--radius-sm);
+  background: var(--c-surface-2);
+}
+
+.explorer__portrait-cap {
+  margin-top: var(--space-2);
+  font-size: var(--t-xs);
+  line-height: 1.3;
+  text-align: center;
+}
+.explorer__portrait-name { display: block; color: var(--c-ink-strong); }
+.explorer__portrait-group { display: block; color: var(--c-ink-mute); }
+.explorer__portrait-group:empty { display: none; }
+
+/* On a phone the stage is barely taller than the frame would be, so it shrinks
+   to a thumbnail and drops the caption — the readout underneath already names
+   the person. */
+@media (max-width: 30rem) {
+  .explorer__portrait { width: 4.5rem; padding: 0.25rem; }
+  .explorer__portrait-cap { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .explorer__portrait { animation: none; }
+}
+
 .explorer__readout {
   position: absolute;
   left: var(--space-4);

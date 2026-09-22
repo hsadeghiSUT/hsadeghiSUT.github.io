@@ -76,8 +76,15 @@ function readAuthorField(html) {
   return { text, bolded };
 }
 
-/** A stable key for a person: case-folded, punctuation-free, script-aware. */
-function keyOf(surname, initials) {
+/**
+ * A stable key for a person: case-folded, punctuation-free, script-aware.
+ *
+ * Exported because `modules/faces.js` has to produce the same key from the
+ * other end — a roster's "Ali Golaghaei Darzi" rather than a citation's
+ * "Golaghaei Darzi, A." — and two spellings of the key format would be two
+ * sets of people who never meet.
+ */
+export function authorKey(surname, initials) {
   return (surname + '|' + initials)
     .toLowerCase()
     .replace(/[.\s‌]/g, '')
@@ -105,7 +112,7 @@ function matchAll(re, text, out, script) {
       initials,
       script,
       label: script === 'fa' ? surname + '، ' + initials : surname + ', ' + initials,
-      key: keyOf(surname, initials),
+      key: authorKey(surname, initials),
     });
   }
 }
