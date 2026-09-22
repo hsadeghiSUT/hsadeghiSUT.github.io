@@ -5072,11 +5072,16 @@ instead, and this run is the evidence that both are load-bearing rather than
 defensive.
 
 **One thing the same morning demonstrated about the schedule.** The 03:17 UTC
-run did not happen at all — the previous run was 20:06 the evening before.
-GitHub's cron is best-effort and drops runs under load, which is the other half
-of why this workflow runs twice a day rather than once. If the figures ever lag
-by a day, a skipped schedule is the likelier explanation than a broken pipeline;
-the Actions tab says which.
+run did not arrive until **08:35** — five hours and eighteen minutes late. It was
+not dropped, and it was not lost: GitHub's cron is best-effort, queues under
+load, and delivers when it can. By the time it ran, the manual dispatch had
+already committed the day's change, so it correctly found nothing to do and
+skipped its deploy.
+
+That is the other half of why this workflow runs twice a day rather than once,
+and it is worth knowing before reading a late figure as a broken pipeline. If
+the numbers ever look stale, the Actions tab says whether a run happened, when,
+and what it found — in that order.
 
 #### On this machine, for the mirror
 
