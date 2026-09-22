@@ -85,10 +85,22 @@ const VENDOR_PATTERNS = [
 
 const problems = [];
 
+/**
+ * The commit actually being built.
+ *
+ * Read from the checked-out tree, NOT from GITHUB_SHA. For a scheduled run that
+ * commits and then deploys — which is what the Scholar refresh does — the
+ * event's SHA is the head from before that commit, and trusting it would stamp
+ * a build with the version of the tree it replaces.
+ */
 function version() {
-  if (process.env.GITHUB_SHA) return process.env.GITHUB_SHA.slice(0, 10);
-  return execFileSync('git', ['rev-parse', '--short=10', 'HEAD'], { cwd: ROOT })
-    .toString().trim();
+  try {
+    return execFileSync('git', ['rev-parse', '--short=10', 'HEAD'], { cwd: ROOT })
+      .toString().trim();
+  } catch {
+    if (process.env.GITHUB_SHA) return process.env.GITHUB_SHA.slice(0, 10);
+    throw new Error('no git checkout and no GITHUB_SHA: cannot version this build');
+  }
 }
 
 /**

@@ -62,6 +62,10 @@ concurrency:
 jobs:
   refresh:
     runs-on: ubuntu-latest
+    # Whether this run actually pushed a commit. The deploy job below reads it:
+    # a run that found no change has nothing to publish.
+    outputs:
+      pushed: ${{ steps.commit.outputs.pushed }}
     steps:
       - name: Check out the site
         uses: actions/checkout@v4
@@ -98,6 +102,7 @@ jobs:
         run: node tools/check-scholar.mjs
 
       - name: Commit, if the numbers moved
+        id: commit
         if: steps.fetch.outputs.answered == 'yes'
         run: |
           if git diff --quiet -- data/scholar.json; then
@@ -128,4 +133,29 @@ jobs:
           git pull --rebase --autostash origin "${GITHUB_REF_NAME}"
           git push origin "HEAD:${GITHUB_REF_NAME}"
 
+          # Tells the deploy job below that there is something new to publish.
+          echo "pushed=yes" >> "$GITHUB_OUTPUT"
+
           echo "::notice title=Updated::${SUMMARY}"
+
+# ---------------------------------------------------------------------------
+# Publish what was just committed.
+# ---------------------------------------------------------------------------
+# A push made with the default GITHUB_TOKEN does not start another workflow —
+# GitHub's rule against recursion. While Pages built the branch itself that did
+# not matter; since the site is deployed by a workflow it matters a great deal,
+# because the commit above would sit in the repository and never reach anyone.
+# That is exactly what happened on 2026-09-21: the 20:07 run committed 2068
+# citations and hsadeghi.org went on saying 2067 for the next twelve hours.
+#
+# Calling the deploy workflow from inside this run sidesteps the rule: it is one
+# run, not a second event, so nothing has to be triggered by the push.
+# ---------------------------------------------------------------------------
+  deploy:
+    needs: refresh
+    if: needs.refresh.outputs.pushed == 'yes'
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    uses: ./.github/workflows/deploy.yml

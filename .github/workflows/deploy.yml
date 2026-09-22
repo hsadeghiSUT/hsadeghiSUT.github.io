@@ -27,6 +27,10 @@ on:
     branches: [main]
   # So you can redeploy without a commit: Actions → this workflow → Run workflow.
   workflow_dispatch:
+  # Called by refresh-scholar.yml after it commits a new snapshot. A push made
+  # with GITHUB_TOKEN cannot start a workflow of its own, so the refresh has to
+  # ask for the deploy directly — see the note at the end of that file.
+  workflow_call:
 
 permissions:
   contents: read
@@ -43,14 +47,19 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      # `ref` is explicit on purpose. For a scheduled run that then commits, the
+      # event's SHA is the head from *before* the commit, and a bare checkout
+      # would faithfully build the tree that is already deployed.
       - uses: actions/checkout@v4
+        with:
+          ref: main
 
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
 
-      # The version comes from GITHUB_SHA, so every commit — including the
-      # twice-daily Scholar refresh — produces its own set of URLs.
+      # The version comes from the checked-out commit, so every commit —
+      # including the twice-daily Scholar refresh — gets its own set of URLs.
       - name: Stamp the asset URLs
         run: node tools/fingerprint.mjs
 
