@@ -158,13 +158,32 @@ export async function mountTeamWork(root, team) {
       .sort((a, b) => b.papers.length - a.papers.length);
 
     const panel = el('div', { class: 'person__work', hidden: true });
+
+    /* The caret points right when the panel is shut and down when it is open.
+       It SWAPS SYMBOL rather than rotating one, because rotating it does not
+       work: `transform` on this element resolves to the identity matrix in at
+       least one engine — measured, not assumed — while the icon beside it turns
+       from the same declaration. Two symbols cannot be got wrong. */
+    const caret = icon('fas-caret-right', { class: 'person__more-caret' });
+    const pointCaret = (open) => {
+      const id = open ? 'fas-caret-down' : 'fas-caret-right';
+      for (const use of caret.querySelectorAll('use')) {
+        use.setAttribute('href', 'assets/icons/icons.svg#' + id);
+        use.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', 'assets/icons/icons.svg#' + id);
+      }
+    };
     const button = el(
       'button',
       {
         type: 'button',
         class: 'person__more',
         'aria-expanded': 'false',
+        /* `aria-expanded` tells a screen reader this opens; the triangle tells
+           everybody else. Without one the counts read as a label rather than a
+           control, and nobody clicks it. */
+        title: 'Show this person’s publications',
       },
+      caret,
       icon('fad-book-reader'),
       el('span', {
         text: person.papers.length + (person.papers.length === 1 ? ' publication' : ' publications')
@@ -251,7 +270,14 @@ export async function mountTeamWork(root, team) {
       if (openPanel && openPanel !== panel) {
         openPanel.hidden = true;
         const other = openPanel.previousElementSibling;
-        if (other) other.setAttribute('aria-expanded', 'false');
+        if (other) {
+          other.setAttribute('aria-expanded', 'false');
+          const otherCaret = other.querySelector('.person__more-caret use');
+          if (otherCaret) {
+            otherCaret.setAttribute('href', 'assets/icons/icons.svg#fas-caret-right');
+            otherCaret.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', 'assets/icons/icons.svg#fas-caret-right');
+          }
+        }
         if (openExplorer && openExplorer.stop) openExplorer.stop();
         openExplorer = null;
       }
@@ -259,6 +285,7 @@ export async function mountTeamWork(root, team) {
       if (opening && !built) { built = true; build(); }
       panel.hidden = !opening;
       button.setAttribute('aria-expanded', String(opening));
+      pointCaret(opening);
       openPanel = opening ? panel : null;
       if (!opening && openExplorer && openExplorer.stop) {
         openExplorer.stop();

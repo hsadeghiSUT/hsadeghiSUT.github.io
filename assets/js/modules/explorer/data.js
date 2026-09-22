@@ -267,6 +267,32 @@ export function buildGraph(publications, aliases = {}) {
       }
     }
     canonical.papers = [...new Set(canonical.papers)];
+
+    /* Re-pointing can turn two edges into the same pair, and did: anyone who
+       wrote with the owner on an English paper AND on a Persian one had an
+       edge to each spelling of him, and both now name the same two people. Left
+       alone that is 330 edges for 308 collaborations — a line drawn twice, a
+       weight that undercounts, and a co-author listed twice by anything reading
+       this list (the "More info" panel on the roster did exactly that).
+
+       The index is rebuilt rather than patched because the pair key itself is
+       what changed. */
+    const collapsed = new Map();
+    for (const e of edgeIndex.values()) {
+      const pair = [e.a, e.b].sort();
+      const pairKey = pair[0] + ' ' + pair[1];
+      const existing = collapsed.get(pairKey);
+      if (existing) {
+        existing.papers.push(...e.papers);
+        // One paper can reach this twice — both spellings on the same entry.
+        existing.papers = [...new Set(existing.papers)];
+        existing.weight = existing.papers.length;
+      } else {
+        collapsed.set(pairKey, { a: pair[0], b: pair[1], weight: e.weight, papers: [...e.papers] });
+      }
+    }
+    edgeIndex.clear();
+    for (const [pairKey, e] of collapsed) edgeIndex.set(pairKey, e);
   }
 
   const list = [...people.values()].map((p) => ({

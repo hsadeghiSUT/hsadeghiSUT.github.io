@@ -639,14 +639,18 @@ a.pub__cited:hover .pub__cited-n { color: var(--c-accent); }
   border-radius: var(--radius-lg);
   background: var(--c-surface);
   box-shadow: var(--sh-card);
+  /* No `transform` here on purpose — see the note on :hover below. */
   transition: box-shadow var(--dur) var(--ease),
-              transform var(--dur) var(--ease),
               border-color var(--dur) var(--ease);
 }
+/* The card used to lift 2px under the pointer. That reads well on a card the
+   size of a business card; it does not on one that can open to a publication
+   list, a row of faces and a WebGL canvas, where the lift becomes the whole
+   panel twitching as the pointer crosses it. The light and the border still
+   answer the pointer — the card itself holds still. */
 .person:hover {
   box-shadow: var(--sh-card-hover);
   border-color: var(--c-accent);
-  transform: translateY(-2px);
 }
 
 .person__photo {
@@ -719,6 +723,25 @@ a.pub__cited:hover .pub__cited-n { color: var(--c-accent); }
 }
 .person__more:hover { border-color: var(--c-accent); color: var(--c-ink-strong); }
 .person__more .icon { color: var(--c-accent); }
+
+/* The affordance. A button reading "25 publications · 231 citations" is a label
+   unless something on it says it opens, so the caret is that something: it
+   points right when the panel is closed and down when it is open.
+
+   The turn is a SWAP BETWEEN TWO SYMBOLS, done in teamwork.js, not a rotation
+   here. Both the CSS triangle this started as and the icon that replaced it
+   refused to rotate — `transform: rotate(90deg)` resolved to the identity
+   matrix on each, measured rather than assumed — so the caret stopped depending
+   on being turned. All this rule does now is colour it. */
+.person__more-caret {
+  width: 0.7em;
+  height: 0.7em;
+  color: var(--c-ink-mute);
+  transition: color var(--dur) var(--ease);
+}
+.person__more:hover .person__more-caret { color: var(--c-accent); }
+.person__more[aria-expanded="true"] .person__more-caret { color: var(--c-accent); }
+
 .person__more[aria-expanded="true"] {
   border-color: var(--c-accent);
   background: var(--c-accent-soft);

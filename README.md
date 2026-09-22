@@ -1878,7 +1878,7 @@ factors is `premultipliedAlpha` on the MATERIAL, not on the renderer** — the
 renderer's flag only describes the canvas. Setting the renderer's and leaving the
 material's at its default `false` changes nothing at all, which is a quiet way to
 spend an afternoon. The same defect was in the publications explorer and is fixed
-the same way there; its 330 edges were about eight times fainter than the numbers
+the same way there; its edges were about eight times fainter than the numbers
 in its shader said, which is why they had to be re-balanced downward afterwards.
 
 `check-ui.mjs` §5a-2 now guards both halves: it reads `BLEND_SRC_RGB` off the
@@ -2696,6 +2696,26 @@ Keys are the graph's internal author keys — surname, a pipe, initials, lower-c
 with spaces and full stops removed. The file currently merges 22 spellings, which
 takes 103 nodes down to 81.
 
+#### The owner's two spellings left two edges
+
+The site owner writes his own name in both scripts, and `buildGraph` merges the
+two into one node without needing to be told which name is his — the bold in the
+source marks both. What it did not do until 2026-09-22 was merge the *edges*.
+
+Re-pointing an edge from the Persian spelling to the Latin one can turn it into
+an edge that already exists: anyone who wrote with him on an English paper and
+on a Persian one had one of each, and after re-pointing both name the same two
+people. The graph carried **330 edges for 308 collaborations**, and the
+consequences were quiet but real — a line drawn twice, a weight that undercounted
+how often two people actually worked together, and a co-author listed twice by
+anything reading the list. The "More info" panel on the roster did exactly that,
+which is how it was found: Alipanahi's card showed "Sadeghi, H." twice.
+
+The edge index is now rebuilt after the merge rather than patched, because the
+pair key itself is what changes. The owner-to-Alipanahi edge went from two edges
+of weight 26 and 5 — the English papers and the Persian ones — to one of weight
+**31**, which is how many papers they have actually written together.
+
 **Nothing here is required**: with the file missing the graph still builds, it
 just shows some people twice. And nothing is merged automatically, because two
 people who merely share a surname are usually two people and quietly merging them
@@ -3042,8 +3062,8 @@ Without him the heights spread properly — 641, 575, 438, 307, 306, 277, 264 �
 and the picture becomes the one worth drawing: **which of his collaborators the
 cited work was done with.**
 
-The edges go the same way, and that is the better half of the bargain. 132 of
-the 330 co-authorships are simply "with him": true, and uninformative. Removing
+The edges go the same way, and that is the better half of the bargain. 105 of
+the 308 co-authorships are simply "with him": true, and uninformative. Removing
 them leaves the **203 collaborations between his co-authors**, which is the
 structure of the groups he works through rather than the star that structure
 hangs from. Two people lose their only edge and stand alone, which is also true
@@ -3630,6 +3650,10 @@ they are people who have not published in English here.
 | edges without the site owner | 213 | **203** |
 | towers in the Influence city | 118 | **105** |
 | likely duplicates reported | 4 pairs + 12 names | **none** |
+
+The edge count fell once more afterwards, from 330 to **308**, and that was a
+bug rather than a merge — see *"The owner's two spellings left two edges"* in
+§15.3.
 
 Thirteen people stopped being two people each. The visible effect is in the
 Influence city, where height is citations: a person split across two spellings
