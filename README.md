@@ -1751,6 +1751,12 @@ If that ever changes — if the longer name becomes the one on the business card
 all seven pages move together, and `hsadeghi.org` becomes secondary. One
 decision, made once, rather than drifted into.
 
+**Reviewed and kept, 2026-09-23.** The SEO work (§21) raised the obvious
+counter-argument — `hamedsadeghi.org` is the exact-match domain and is being
+held invisible while a namesake's `hamedsadeghi.com` is not — and it was
+weighed and rejected. §21.5 has the reasoning and the condition under which it
+should be reopened.
+
 #### The copy canary had to be told
 
 `modules/canary.js` compares the hostname it was served from against `baseUrl`
@@ -6308,16 +6314,41 @@ the repository:
 5. **A Wikidata item.** For an academic with an ORCID, a Scopus ID and 130
    papers this is reasonable, and it is how a knowledge panel gets built.
 
-### 21.5 Two decisions left open
+### 21.5 One decision made, one still open
 
-**`hamedsadeghi.org` currently cannot rank.** Every page on it carries
+#### `hsadeghi.org` stays canonical — decided 2026-09-23
+
+Every page on `hamedsadeghi.org` carries
 `<link rel="canonical" href="https://hsadeghi.org/…">`, which tells search
-engines to index the other address and ignore this one (§11.6). That is correct
-for avoiding duplicate content — but it also means the domain whose spelling
-*exactly matches the name people search for* is deliberately invisible, while
-the namesake's `hamedsadeghi.com` is not. Switching which domain is canonical
-is a single decision affecting `baseUrl`, seven `canonical` links and seven
-`og:url` tags; it should be made deliberately, and only once.
+engines to index the other address and ignore this one (§11.6). **That was
+reviewed when the SEO work went in, and deliberately kept.**
+
+It was worth reviewing, because the argument against it is real: the domain
+whose spelling *exactly matches the name people search for* is the one being
+held invisible, while the namesake's `hamedsadeghi.com` is not. Exact-match
+domains are not the ranking force they were a decade ago, but they are not
+nothing either.
+
+It was kept anyway, and the reason is that the alternative throws away the
+thing the site actually has. `hsadeghi.org` is the address in the ORCID record,
+in the Scholar profile, on the university page and in every `sameAs` link the
+structured data now asserts (§21.2). Whatever history and corroboration exist,
+they point there. Making `hamedsadeghi.org` canonical would restart that
+accumulation from zero on a domain registered in 2026, and split the evidence
+across two addresses during the months it took to settle — in exchange for a
+keyword match in a hostname.
+
+**So the two addresses consolidate rather than compete, and `hamedsadeghi.org`
+earns its keep as a second front door**: a name that can be said aloud, spelled
+once and typed correctly, which then serves the same build and points every
+engine back at the same entity.
+
+**This is the decision to revisit if the name ever becomes the brand** — if the
+longer spelling is what goes on the business card. It is a single change to
+`baseUrl` in `data/site.json`, seven `canonical` links and seven `og:url` tags,
+and it should be made once, deliberately, not drifted into. Not before
+`hsadeghi.org` is ranking for the name, though: switching while the first
+address is still fighting for it would be starting the same fight twice.
 
 **The hidden alias list.** `index.html` carries a `#seo-aliases` div,
 `visually-hidden` and `aria-hidden`, which JavaScript fills with 37 spellings of
