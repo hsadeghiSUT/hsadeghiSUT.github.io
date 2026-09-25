@@ -184,6 +184,8 @@ export async function mountExplorer(
      and a view change, because a reader who asked for citations did not ask for
      them until they next touched something. */
   let sizeBy = 'papers';
+  /** What the Influence towers are coloured by: 'section' or 'period'. */
+  let cityColour = 'section';
 
   const layout = solveLayout(graph.people, graph.edges);
   const palette = readPalette();
@@ -228,7 +230,7 @@ export async function mountExplorer(
         city = withoutSelf(graph);
         ground = solveLayout(city.people, city.edges, { flat: true });
       }
-      return buildInfluenceScene(city, ground, readPalette(), look.edge);
+      return buildInfluenceScene(city, ground, readPalette(), look.edge, cityColour);
     },
   };
 
@@ -328,9 +330,40 @@ export async function mountExplorer(
       el('span', { class: 'explorer__size-label', text: 'Size: papers' }),
     )
     : null;
-  if (sizeButton) sizeButton.addEventListener('click', () => toggleSize());
+  /* The colour toggle, for the Influence city only.
 
-  const controls = el('div', { class: 'explorer__controls' }, hint, sizeButton, resetButton);
+     The city already says who and how much — tower height is citations,
+     footprint is papers. What it could not say was *when*, and on a record
+     spanning 2008–2026 that is the difference between a collaborator whose
+     work is still being read and one whose was read a decade ago. Both are
+     worth knowing and neither is visible from height.
+
+     Same shape as the size toggle for the same reasons: two states, says which
+     one it is in, hidden on the views it does not apply to. */
+  const colourButton = cited
+    ? el(
+      'button',
+      {
+        type: 'button',
+        class: 'explorer__size explorer__citycolour',
+        title: 'Colour the towers by the list they publish in, or by when their cited work happened',
+        'aria-live': 'polite',
+      },
+      icon('fad-globe-americas'),
+      el('span', { class: 'explorer__citycolour-label', text: 'Colour: field' }),
+    )
+    : null;
+
+  if (sizeButton) sizeButton.addEventListener('click', () => toggleSize());
+  if (colourButton) colourButton.addEventListener('click', () => toggleCityColour());
+
+  /* The view starts on Collaboration, and the view-switch handler is what
+     normally decides which toggles apply — but it does not run for the view
+     the explorer opens on. The size toggle is correct by luck (it belongs to
+     the opening view); this one has to say so itself. */
+  if (colourButton) colourButton.hidden = true;
+
+  const controls = el('div', { class: 'explorer__controls' }, hint, sizeButton, colourButton, resetButton);
 
   const yearRow = el('div', { class: 'explorer__years', hidden: true });
   const allYears = el('button', {
@@ -1246,12 +1279,28 @@ export async function mountExplorer(
       + 'Click a tower to filter the list.'
     : '';
 
+  /* The city's caption depends on what its colour currently means, and the
+     year span is only known once the scene is built — so it is computed on
+     read rather than fixed at start-up. */
+  const influenceHint = () => {
+    if (!cited) return '';
+    const city3d = scenes.influence;
+    if (!city3d || city3d.colourBy !== 'period') return INFLUENCE_HINT;
+    const { min, max } = city3d.years;
+    return 'Every co-author as a tower: its height is the citations their papers have '
+      + 'earned, its footprint the papers they have written. Colour is when that '
+      + 'influence happened — the citation-weighted mean year of their work, '
+      + 'indigo for ' + min + ' through amber for ' + max + '. Two towers the same '
+      + 'height and different colours are the same amount of influence, a decade '
+      + 'apart. Click a tower to filter the list.';
+  };
+
   /** What the caption says over each view. */
   const HINTS = {
     graph: GRAPH_HINT,
     timeline: TIMELINE_HINT,
     impact: IMPACT_HINT,
-    influence: INFLUENCE_HINT,
+    get influence() { return influenceHint(); },
   };
   const hintFor = (which) => HINTS[which] || '';
 
@@ -1264,6 +1313,35 @@ export async function mountExplorer(
    * comparison the toggle exists to make — and it keeps `radiusFor` and
    * `radiusForCitations` as the only two places a node's size is decided.
    */
+  /**
+   * Swap what the city's colour means, and say so in the caption.
+   *
+   * The scene is rebuilt rather than the colour array patched in place: the
+   * plan is reused (`ground` is not re-solved), so this is an array fill and an
+   * upload, and it keeps one function — `buildInfluenceScene` — as the only
+   * place a tower's colour is decided.
+   */
+  function toggleCityColour() {
+    if (!cited || !scenes.influence) return;
+    cityColour = cityColour === 'period' ? 'section' : 'period';
+    scenes.influence = buildInfluenceScene(city, ground, readPalette(), look.edge, cityColour);
+    const actual = scenes.influence.colourBy;
+    if (colourButton) {
+      $('.explorer__citycolour-label', colourButton).textContent =
+        actual === 'period' ? 'Colour: period' : 'Colour: field';
+      colourButton.classList.toggle('is-on', actual === 'period');
+    }
+    /* `caption` is the sentence above the stage that says what the view means;
+       `hint` is the drag/zoom help under it and is the same on every view. */
+    if (caption && view === 'influence') caption.textContent = hintFor('influence');
+    if (view === 'influence') {
+      scene = scenes.influence;
+      renderer.setScene(scene);
+      paintStates();
+      if (!raf) drawOnce();
+    }
+  }
+
   function toggleSize() {
     if (!cited) return;
     sizeBy = sizeBy === 'citations' ? 'papers' : 'citations';
@@ -1299,6 +1377,7 @@ export async function mountExplorer(
     if (touched[next] !== undefined) fitOne(next);
     // The toggle belongs to the graph; the other two views size themselves.
     if (sizeButton) sizeButton.hidden = next !== 'graph';
+    if (colourButton) colourButton.hidden = next !== 'influence';
     for (const [id, button] of Object.entries(tabs)) {
       button.setAttribute('aria-selected', String(id === next));
     }
@@ -1455,7 +1534,7 @@ export async function mountExplorer(
     if (scenes.impact) scenes.impact = buildImpactScene(graph, next);
     // The solved plan is reused, not re-solved: a change of colour scheme is
     // not a reason to move a hundred and nineteen people.
-    if (scenes.influence) scenes.influence = buildInfluenceScene(city, ground, next, look.edge);
+    if (scenes.influence) scenes.influence = buildInfluenceScene(city, ground, next, look.edge, cityColour);
     scene = scenes[view];
     renderer.setScene(scene);
     paintStates();
