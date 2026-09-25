@@ -9,4 +9,8 @@ Disallow: /tools/
 Disallow: /build-version.txt
 Disallow: /README.md
 
+# Cloudflare consumes this one; GitHub Pages, which has no idea what it is,
+# serves it as a text file. Harmless, but not a search result.
+Disallow: /_headers
+
 Sitemap: https://hsadeghi.org/sitemap.xml
