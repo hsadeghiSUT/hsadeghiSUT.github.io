@@ -1175,10 +1175,6 @@ export async function mountRoster(host, data, listRoot) {
       return lanes;
     },
     view: () => ({ yaw: view.yaw, pitch: view.pitch, distance: view.distance, target: view.target.toArray() }),
-    __probe: () => ({ morph, morphWant, queued, rootsVisible: rootParts.group.visible,
-      sample: cards[0] ? { home: cards[0].home.toArray().map(n=>+n.toFixed(2)),
-        root: cards[0].rootHome.toArray().map(n=>+n.toFixed(2)),
-        at: cards[0].mesh.position.toArray().map(n=>+n.toFixed(2)) } : null }),
     dispose() {
       renderer.dispose();
       cards.forEach((c) => { c.mesh.geometry.dispose(); c.material.dispose(); });
