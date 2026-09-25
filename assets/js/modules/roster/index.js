@@ -57,6 +57,7 @@ import { icon } from '../icons.js';
 import { loadThree } from '../fx/three.js';
 import { buildAtlas } from './atlas.js';
 import { CATEGORIES, buildRoster } from './data.js';
+import { buildRootGeometry, layoutRoots, rootCardScale } from './roots.js';
 
 /* ---- the shape of a card ------------------------------------------------- */
 const CARD_W = 1.12;
@@ -243,7 +244,25 @@ export async function mountRoster(host, data, listRoot) {
     icon('fad-history'),
     el('span', { text: 'Reset view' }),
   );
-  const controls = el('div', { class: 'explorer__controls' }, hint, resetButton);
+  /* The layout toggle.
+
+     Two arrangements of the same fifty-five cards, not two panels: the page
+     already holds about thirty WebGL canvases and a phone will keep a dozen
+     (README §23), so a second renderer to show the same people would be the
+     most expensive way imaginable to say the same thing. */
+  const rootsButton = el(
+    'button',
+    {
+      type: 'button',
+      class: 'explorer__size explorer__roots',
+      title: 'Arrange the group as a grid of cards, or as a root system by year',
+      'aria-live': 'polite',
+    },
+    icon('fad-search'),
+    el('span', { class: 'explorer__roots-label', text: 'View: cards' }),
+  );
+
+  const controls = el('div', { class: 'explorer__controls' }, hint, rootsButton, resetButton);
 
   const catRow = el('div', { class: 'explorer__years', role: 'group', 'aria-label': 'Filter by group' });
   const yearRow = el('div', { class: 'explorer__years', role: 'group', 'aria-label': 'Filter by year' });
@@ -389,6 +408,43 @@ export async function mountRoster(host, data, listRoot) {
     });
   });
 
+  /* ---- the root system ----------------------------------------------------
+     A second home for every card, and the trunk and roots they hang from. Both
+     are built once; switching views is a lerp between two positions, so the
+     hit-test, the filter and the hover all keep working without knowing which
+     arrangement is on screen. See roots.js. */
+  /** How large a card is drawn in the root view, for the current selection. */
+  let rootScale = rootCardScale(roster.people.length);
+  let rootPlan = layoutRoots(roster.people, CARD_W * rootScale);
+  const woodToken = token('--c-bar-solid', '#6b4f3a');
+  let rootParts = buildRootGeometry(THREE, roster.people, palette, woodToken, rootPlan.reaches);
+  scene.add(rootParts.group);
+
+  /** Throw the roots away and grow them again at the lengths the layout wants. */
+  function rebuildRoots(people) {
+    const wasVisible = rootParts.group.visible;
+    const opacity = rootParts.materials[0] ? rootParts.materials[0].opacity : 0;
+    scene.remove(rootParts.group);
+    for (const g of rootParts.geometries) g.dispose();
+    for (const m of rootParts.materials) m.dispose();
+    rootParts = buildRootGeometry(THREE, people, palette, woodToken, rootPlan.reaches);
+    rootParts.group.visible = wasVisible;
+    for (const m of rootParts.materials) m.opacity = opacity;
+    scene.add(rootParts.group);
+  }
+
+  for (const card of cards) {
+    const at = rootPlan.home.get(card.person.index);
+    card.rootHome = at
+      ? new THREE.Vector3(at[0], at[1], at[2])
+      : card.home.clone();
+  }
+
+  /** 0 = the card grid, 1 = the root system. */
+  let morph = 0;
+  let morphWant = 0;
+  const rootPose = new THREE.Vector3();
+
   /* ---- light --------------------------------------------------------------
      A key from the upper left so the slabs' top and left edges catch it and the
      thickness is visible; a cool fill from the other side so the far faces keep
@@ -450,9 +506,22 @@ export async function mountRoster(host, data, listRoot) {
        a card needs is its own half-width, not the roster's largest — padding
        everything by the biggest wastes space around the small ones, and padding
        by the average clips the big ones off the edge. */
+    /* Framed on where the cards are GOING, not where they are. The fit runs as
+       the switch between the two arrangements begins, and framing the positions
+       being left behind puts the camera on the old layout — which, since the
+       two occupy very different volumes, means the new one arrives half out of
+       shot. */
+    const asRoots = morphWant > 0.5;
+    const goingTo = asRoots ? 'rootHome' : 'home';
     const points = cards
       .filter((c) => c.shown > 0.5)
-      .map((c) => ({ at: c.home, halfW: (CARD_W * c.scale) / 2, halfH: (CARD_H * c.scale) / 2 }));
+      .map((c) => {
+        /* The size it will BE there: the root view draws every card the same,
+           so fitting on the grid's per-category scales would leave the junior
+           groups cropped. */
+        const drawn = asRoots ? rootScale : c.scale;
+        return { at: c[goingTo], halfW: (CARD_W * drawn) / 2, halfH: (CARD_H * drawn) / 2 };
+      });
     if (!points.length) return;
 
     const centre = new THREE.Vector3();
@@ -547,6 +616,28 @@ export async function mountRoster(host, data, listRoot) {
       card.shown = okCat && okYear ? 1 : 0;
       if (card.shown) visible += 1;
     }
+
+    /* THE ROOT LAYOUT IS RECOMPUTED FOR WHAT IS ON SCREEN.
+    
+       The root view has a fixed length of root per group whatever is on it, so
+       the only way to make nine PhD students readable is to give them the whole
+       root and draw them larger — which is precisely what filtering to them is
+       asking for. Laying out the whole roster once and then hiding most of it
+       left the nine where they were: piled at one end, at the size that
+       fifty-five need to be.
+    
+       The card view is untouched by this. Its grid is a fixed arrangement and
+       moving it under a filter would be disorienting rather than helpful. */
+    const on = cards.filter((c) => c.shown > 0.5).map((c) => c.person);
+    rootScale = rootCardScale(visible);
+    rootPlan = layoutRoots(on, CARD_W * rootScale);
+    for (const card of cards) {
+      const at = rootPlan.home.get(card.person.index);
+      if (at) card.rootHome.set(at[0], at[1], at[2]);
+    }
+    /* The roots themselves change length with what is on them, so the tubes are
+       grown again rather than left at whatever the last selection needed. */
+    rebuildRoots(on);
 
     for (const chip of catRow.children) {
       chip.classList.toggle('is-current', (chip.dataset.cat || '') === (activeCategory || ''));
@@ -684,7 +775,13 @@ export async function mountRoster(host, data, listRoot) {
     const what = activeCategory
       ? CATEGORIES.find((c) => c.id === activeCategory).label
       : 'the whole group';
-    readout.textContent = `${visible} of ${cards.length} — ${what}${activeYear ? `, ${activeYear}` : ''}`;
+    const head = `${visible} of ${cards.length} — ${what}${activeYear ? `, ${activeYear}` : ''}`;
+    /* In the root view the counts alone do not say what the shape means, and
+       the arrangement is the whole content of that view. */
+    readout.textContent = morphWant > 0.5
+      ? `${head} · one root per group, ${rootPlan.span.min} at the base to `
+        + `${rootPlan.span.max} at the tip`
+      : head;
   }
 
   /* Right-drag has to be able to start, so the stage's context menu goes. There
@@ -832,6 +929,30 @@ export async function mountRoster(host, data, listRoot) {
   resetButton.addEventListener('click', resetView);
 
   /**
+   * Swap between the card grid and the root system.
+   *
+   * The camera is re-framed afterwards rather than left where it was: the two
+   * arrangements occupy very different volumes — a wide shallow block against a
+   * deep ball — and a camera framed for one shows the other half out of shot.
+   * `frameVisible` already knows how to fit whatever is on screen, and it reads
+   * live positions, so it is called once the cards have somewhere to go.
+   */
+  function toggleRoots() {
+    morphWant = morphWant > 0.5 ? 0 : 1;
+    const asRoots = morphWant > 0.5;
+    rootsButton.querySelector('.explorer__roots-label').textContent =
+      asRoots ? 'View: roots' : 'View: cards';
+    rootsButton.classList.toggle('is-on', asRoots);
+    /* Framed immediately. `frameVisible` reads the arrangement being moved TO,
+       not the one on screen, so there is nothing to wait for — and waiting was
+       80ms of the switch feeling slow before it had even started. */
+    frameVisible(true);
+    applyReadoutSummary();
+    invalidate();
+  }
+  rootsButton.addEventListener('click', toggleRoots);
+
+  /**
    * Take the reader to this person's entry in the list below.
    *
    * Found by SECTION and then position within it, not by position in the whole
@@ -919,6 +1040,21 @@ export async function mountRoster(host, data, listRoot) {
       moving = true;
     }
 
+    if (Math.abs(morph - morphWant) > 0.002) {
+      morph = reduced.matches ? morphWant : lerp(morph, morphWant, Math.min(1, dt / 0.22));
+      moving = true;
+    } else morph = morphWant;
+
+    /* The roots fade in behind the cards rather than appearing with them. They
+       are the structure the people hang on, so they should already be there
+       when the cards arrive — `morph * morph` puts most of their fade in the
+       first half of the move. */
+    rootParts.group.visible = morph > 0.01;
+    if (rootParts.group.visible) {
+      const fade = Math.min(1, morph * morph * 1.6);
+      for (const material of rootParts.materials) material.opacity = fade;
+    }
+
     for (const card of cards) {
       const target = card.shown;
       if (Math.abs(card.eased - target) > 0.002) {
@@ -932,7 +1068,12 @@ export async function mountRoster(host, data, listRoot) {
         moving = true;
       } else card.lit = litTarget;
 
-      const scale = card.eased * (1 + card.lit * 0.12);
+      /* In the root view every card is drawn the same size, so a final-year
+         undergraduate strung out along a root is as legible as a fellow at the
+         trunk. The geometry was already built at the card view's own scale, so
+         this is the ratio between the two, eased in with the morph. */
+      const sizing = 1 + morph * (rootScale / card.scale - 1);
+      const scale = card.eased * (1 + card.lit * 0.12) * sizing;
       card.mesh.visible = card.eased > 0.01;
       card.mesh.scale.setScalar(Math.max(0.001, scale));
       card.material.opacity = card.eased;
@@ -951,7 +1092,33 @@ export async function mountRoster(host, data, listRoot) {
          
          Scaling about the centre can only ever add coverage, never take it
          away, so the card under the pointer stays the card under the pointer. */
-      card.mesh.position.copy(card.home);
+      /* Between the two arrangements. `copy` when there is nothing to morph so
+         the common case does no arithmetic at all. */
+      if (morph < 0.001) {
+        card.mesh.position.copy(card.home);
+        card.mesh.rotation.y = 0;
+      } else {
+        card.mesh.position.copy(card.home).lerp(card.rootHome, morph);
+
+        /* TURN THE CARD TO FACE THE CAMERA.
+           
+           The photograph is on ONE face of the box — the +Z one. The grid gets
+           away with never rotating anything because every card in it faces the
+           same way and the camera is in front of all of them. The roots do not:
+           they are spread all the way around a trunk, so half the group ends up
+           with its back to the viewer showing the blank cell that colours the
+           edges. Filtering to the PhDs, whose root points away and to the left,
+           showed nine invisible cards.
+           
+           Yaw only. Tilting them to face a camera that looks down as well would
+           lean the whole roster backwards, and the one thing a wall of
+           photographs has to stay is upright. */
+        const yaw = Math.atan2(
+          camera.position.x - card.mesh.position.x,
+          camera.position.z - card.mesh.position.z,
+        );
+        card.mesh.rotation.y = yaw * morph;
+      }
     }
 
     placeCamera();
