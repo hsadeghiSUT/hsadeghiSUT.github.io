@@ -342,6 +342,24 @@ export async function render(site) {
     ),
   );
 
+  /* ---- the retention surface ----------------------------------------------
+     Below the article rather than inside it, and after the interests it
+     illustrates. Built last and not awaited: it is the one panel on this page
+     that is about the research rather than the person, and nothing above it
+     should wait on a 2 880-vertex surface or on Three.js loading.
+
+     `data/retention.json` carries a note about what its numbers are. Read it
+     before quoting anything from the figure. */
+  const shell = $('.shell');
+  const layout = $('.layout');
+  if (shell && layout) {
+    const retentionHost = el('div', { class: 'roster-host' });
+    shell.insertBefore(retentionHost, layout.nextSibling);
+    Promise.all([load('retention'), import('../modules/retention/index.js')])
+      .then(([params, mod]) => mod.mountRetention(retentionHost, params))
+      .catch((err) => { retentionHost.remove(); console.info('retention: not built.', err); });
+  }
+
   /* ---------------------------------------------------------------- sidebar */
   fill(
     $('#aside'),
