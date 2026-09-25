@@ -205,6 +205,14 @@ const CLOSE = '\t<!-- /structured data -->';
 
 const stale = [];
 
+/* Compare without line endings.
+ *
+ * `.gitattributes` checks these files out with CRLF on Windows, and everything
+ * generated here is written with LF — so a byte comparison called every file
+ * stale on a Windows working copy while passing in CI on Linux. A check that
+ * fails only on the machine you edit on is a check you learn to ignore. */
+const sameText = (a, b) => a.replace(/\r\n/g, '\n') === b.replace(/\r\n/g, '\n');
+
 /* `body` receives the current text — '' when the file does not exist yet, so a
    missing sitemap.xml is "out of date" rather than a crash. */
 async function put(file, body) {
@@ -214,7 +222,7 @@ async function put(file, body) {
     throw err;
   });
   const after = body(before);
-  if (before === after) return;
+  if (sameText(before, after)) return;
   if (CHECK) stale.push(before === '' ? `${file} (missing)` : file);
   else await writeFile(full, after);
 }

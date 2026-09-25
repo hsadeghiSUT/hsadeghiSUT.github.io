@@ -98,6 +98,72 @@ function dominantSection(person, papers, byId) {
 }
 
 /**
+ * When a person's influence happened: the citation-weighted mean year of their
+ * papers.
+ *
+ * WHY WEIGHTED, AND WEIGHTED BY CITATIONS
+ *
+ * The plain mean year of someone's papers answers "when were they active",
+ * which the Timeline already shows. This view is about influence, so the
+ * question worth answering is "when did the work that is *read* happen" — and
+ * those are different people. A co-author with one paper from 2016 carrying
+ * 277 citations and four recent ones with none is, for this view's purposes, a
+ * 2016 collaborator, and a plain mean would put them in 2022.
+ *
+ * Falls back to the plain mean year when none of their papers has a citation,
+ * because the alternative is dropping the towers that need the most help being
+ * read. Returns null only when no paper of theirs has a year at all.
+ */
+function influenceYear(person, byId) {
+  let weighted = 0;
+  let weight = 0;
+  let plain = 0;
+  let dated = 0;
+
+  for (const id of person.papers) {
+    const paper = byId.get(id);
+    if (!paper || !paper.year) continue;
+    dated += 1;
+    plain += paper.year;
+    const cites = paper.citedBy || 0;
+    if (cites > 0) { weighted += paper.year * cites; weight += cites; }
+  }
+
+  if (!dated) return null;
+  return weight > 0 ? weighted / weight : plain / dated;
+}
+
+/**
+ * The year ramp: cool for old work, warm for recent.
+ *
+ * Three stops rather than two. A straight blue→amber interpolation passes
+ * through a dead grey-brown in the middle, which is exactly where most of the
+ * record sits, so the years that most need telling apart would be the ones
+ * least distinguishable. Going through teal keeps every step of the ramp a
+ * colour rather than a muddle.
+ *
+ * Fixed rather than read from the theme: these have to stay in the same order
+ * and the same distance apart in both colour schemes, or the ramp stops
+ * meaning one thing. They are chosen to sit on either background.
+ *
+ * @param {number} t  0 = oldest year in the record, 1 = newest
+ */
+const YEAR_STOPS = [
+  [0.29, 0.40, 0.72],  // indigo — the early record
+  [0.16, 0.71, 0.68],  // teal   — the middle
+  [0.98, 0.69, 0.25],  // amber  — the recent work
+];
+
+function rampColour(t) {
+  const x = Math.max(0, Math.min(1, t)) * (YEAR_STOPS.length - 1);
+  const i = Math.min(YEAR_STOPS.length - 2, Math.floor(x));
+  const f = x - i;
+  const a = YEAR_STOPS[i];
+  const b = YEAR_STOPS[i + 1];
+  return [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f, a[2] + (b[2] - a[2]) * f];
+}
+
+/**
  * The collaboration graph.
  *
  * @param {object} graph      from buildGraph()
@@ -739,9 +805,19 @@ const widthFor = (papers) => Math.min(0.3, 0.09 + 0.045 * Math.sqrt(Math.max(1, 
  * @param {string[]} palette  six [r,g,b] triples, one per section hue
  * @param {number[]} edgeColour
  */
-export function buildInfluenceScene(graph, ground, palette, edgeColour) {
+export function buildInfluenceScene(graph, ground, palette, edgeColour, colourBy = 'section') {
   const { people, edges, papers } = graph;
   const byId = new Map(papers.map((p) => [p.id, p]));
+
+  /* ---- when each tower's influence happened -------------------------------
+     Computed for both modes, not just the one being drawn: the caption reports
+     the span whichever colouring is on, and it costs one pass over the papers.
+     ---------------------------------------------------------------------- */
+  const years = people.map((person) => influenceYear(person, byId));
+  const dated = years.filter((y) => y !== null);
+  const minYear = dated.length ? Math.min(...dated) : 0;
+  const maxYear = dated.length ? Math.max(...dated) : 0;
+  const yearSpan = maxYear - minYear;
   const pos = ground.positions;
   const n = people.length;
 
@@ -792,7 +868,15 @@ export function buildInfluenceScene(graph, ground, palette, edgeColour) {
 
   for (let i = 0; i < n; i++) {
     const person = people[i];
-    const hue = palette[dominantSection(person, papers, byId) % palette.length];
+    /* Colour says one of two things, and the toggle says which. By section it
+       matches the list's own highlighting; by period it is the year ramp.
+
+       An undated person keeps their section colour rather than being given a
+       point on a ramp they are not on — inventing a year for them would be the
+       one lie in a view built entirely from the record. */
+    const hue = (colourBy === 'period' && years[i] !== null && yearSpan > 0)
+      ? rampColour((years[i] - minYear) / yearSpan)
+      : palette[dominantSection(person, papers, byId) % palette.length];
     const [x, z] = place(i);
     const w = widthFor(person.count);
     const h = Math.max(TOWER_FLOOR, (person.citations || 0) * unit);
@@ -855,6 +939,9 @@ export function buildInfluenceScene(graph, ground, palette, edgeColour) {
 
   return {
     kind: 'influence',
+    /** What the towers are coloured by, and the span the ramp covers. */
+    colourBy,
+    years: { min: Math.round(minYear), max: Math.round(maxYear), dated: dated.length },
     /* The tower impostor, which is this view's own: a lit round column with a
        roof on it (`uRound > 1.5` in shaders.js).
 
