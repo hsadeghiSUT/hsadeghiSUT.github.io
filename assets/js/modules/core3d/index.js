@@ -51,9 +51,17 @@ import { bedPlacement, buildStrata } from './strata.js';
 const CORE_HEIGHT = 6.0;
 const CORE_RADIUS = 0.92;
 
-/** How far the camera stands back, and how far it looks down. */
-const DISTANCE = 11.2;
+/** How far the camera looks down. */
 const PITCH = -0.13;
+
+/** Field of view, and how much room to leave around the core. */
+const FOV = 32;
+const MARGIN = 1.26;
+
+/* The readout sits along the bottom of the stage, and a column drawn dead
+   centre runs straight through it. Lifting the core a little clears the pill
+   without moving the camera off the middle of the object. */
+const CORE_LIFT = 0.34;
 
 /** Radians per second while nobody is touching it. */
 const IDLE_SPIN = 0.16;
@@ -138,8 +146,9 @@ export async function mountCore(host, data, listRoot) {
   renderer.setClearColor(0x000000, 0);
 
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 60);
+  const camera = new THREE.PerspectiveCamera(FOV, 1, 0.1, 80);
   const core = new THREE.Group();
+  core.position.y = CORE_LIFT;
   scene.add(core);
 
   /* ---- the beds ----------------------------------------------------------
@@ -170,6 +179,34 @@ export async function mountCore(host, data, listRoot) {
     beds.push({ bed, mesh, material, lit: 0 });
   });
 
+  /* THE TWO ENDS OF THE COLUMN.
+  
+     The beds are open-ended tubes, which is right for the eleven joints nobody
+     sees and wrong for the two that everybody does: without these the core just
+     stops at the top, and what a reader sees is a column clipped by the edge of
+     the stage rather than the whole of a career. The top cap is the surface,
+     the bottom is the end of the hole. */
+  const capFor = (bed, atTop) => {
+    const { y, thickness } = bedPlacement(bed, strata.span, CORE_HEIGHT);
+    const radius = CORE_RADIUS * (1 + bed.grain * 0.03);
+    const disc = new THREE.Mesh(
+      new THREE.CircleGeometry(radius, 40),
+      new THREE.MeshStandardMaterial({
+        color: new THREE.Color(bed.colour[0], bed.colour[1], bed.colour[2])
+          .multiplyScalar(atTop ? 1.16 : 0.72),
+        roughness: 0.96,
+        metalness: 0.0,
+        side: THREE.DoubleSide,
+      }),
+    );
+    /* A circle is born facing +Z; the ends of a core face up and down. */
+    disc.rotation.x = atTop ? -Math.PI / 2 : Math.PI / 2;
+    disc.position.y = y + (atTop ? thickness / 2 : -thickness / 2);
+    return disc;
+  };
+  core.add(capFor(strata.beds[strata.beds.length - 1], true));
+  core.add(capFor(strata.beds[0], false));
+
   /* The partings. A dark line on every bed boundary, which is what actually
      makes a stack of cylinders read as a log rather than as a gradient. */
   const partingMat = new THREE.MeshBasicMaterial({ color: 0x1a1512, transparent: true, opacity: 0.55 });
@@ -195,8 +232,30 @@ export async function mountCore(host, data, listRoot) {
   const view = { yaw: 0.6, spin: true };
   const HOME = { ...view };
 
+  /**
+   * How far back the camera has to stand for the whole core to be in shot.
+   *
+   * Computed, not chosen. A fixed distance is right for exactly one stage
+   * shape, and this stage is a letterbox whose height depends on the viewport —
+   * so the first version stood at 11.2 and clipped the top and bottom beds off
+   * on a wide screen, which on a column whose whole point is its full extent is
+   * the one failure that matters.
+   *
+   * The vertical fit is what binds: the core is six units tall and under two
+   * wide, and the stage is wider than it is tall. Both are checked anyway, so a
+   * narrow window frames on the width instead of pushing the core off the sides.
+   */
+  function distanceFor() {
+    const half = (CORE_HEIGHT / 2 + CORE_LIFT) * MARGIN;
+    const vertical = half / Math.tan((FOV * Math.PI) / 360);
+    const halfWide = CORE_RADIUS * 1.12 * MARGIN;
+    const horizontal = halfWide / (Math.tan((FOV * Math.PI) / 360) * Math.max(0.2, camera.aspect));
+    return Math.max(vertical, horizontal);
+  }
+
   function place() {
-    camera.position.set(0, -Math.sin(PITCH) * DISTANCE, Math.cos(PITCH) * DISTANCE);
+    const d = distanceFor();
+    camera.position.set(0, -Math.sin(PITCH) * d, Math.cos(PITCH) * d);
     camera.lookAt(0, 0, 0);
     core.rotation.y = view.yaw;
   }
@@ -378,6 +437,12 @@ export async function mountCore(host, data, listRoot) {
   });
 
   window.addEventListener('resize', () => { size(); invalidate(); }, { passive: true });
+
+  /* The stage's height is set by CSS that may not have settled when this first
+     runs, and a camera framed against the wrong height is a clipped core. */
+  if ('ResizeObserver' in window) {
+    new ResizeObserver(() => { size(); invalidate(); }).observe(stage);
+  }
 
   guardContext(canvas, {
     onLost() { running = false; host.replaceChildren(); },
