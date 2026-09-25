@@ -53,6 +53,17 @@
 const CROWN_Y = 0.55;
 const TRUNK_Y = -2.45;
 
+/* Spacing is expressed in CARD WIDTHS, not scene units.
+ *
+ * The cards change size with how many are on screen (see `rootCardScale`), so
+ * any spacing fixed in scene units is correct at exactly one count and wrong
+ * either side of it — which is how nine PhD students ended up 0.73 apart with a
+ * card 1.27 wide. These are multiples of the drawn card instead, so the gaps
+ * grow and shrink with the thing they are separating. */
+const FAN_ACROSS = 1.06;
+const FAN_UP = 1.42;
+const STOP_GAP = 1.12;
+
 /**
  * How far out a root reaches at full length.
  *
@@ -60,10 +71,10 @@ const TRUNK_Y = -2.45;
  * that the block of fifty-five cards becomes a ring with a hole in it — the
  * camera frames the whole thing, so a wider ring means a smaller everything.
  */
-const ROOT_REACH = 4.3;
+const ROOT_REACH = 3.75;
 
 /** How far below the crown each root leaves the trunk, per lane. */
-const LANE_DEPTH = [-0.15, -0.42, -0.72, -1.05, -1.42, -1.82];
+const LANE_DEPTH = [-0.10, -0.34, -0.58, -0.84, -1.12, -1.42];
 
 /**
  * Where each root points, as an angle around the trunk.
@@ -105,7 +116,7 @@ function rootPoint(lane, t, reach) {
   const r = reach * t;
   return [
     Math.cos(angle) * r,
-    LANE_DEPTH[lane] - t * t * 1.35,
+    LANE_DEPTH[lane] - t * t * 0.95,
     Math.sin(angle) * r,
   ];
 }
@@ -125,18 +136,15 @@ function rootPoint(lane, t, reach) {
  * @returns {{home: Map<number, number[]>, span: {min: number, max: number},
  *           undated: number, tips: Array}}
  */
-export function layoutRoots(people) {
+export function layoutRoots(people, cardWidth = 1.12) {
   const dated = people.map((p) => p.year).filter(Boolean);
   const min = dated.length ? Math.min(...dated) : 0;
   const max = dated.length ? Math.max(...dated) : 0;
-  const span = Math.max(1, max - min);
 
   const home = new Map();
+  const reaches = new Map();
   let undated = 0;
 
-  /* Everyone on a lane, so the crowding at one year can be spread. Two people
-     who started the same year would otherwise be given the same point on the
-     root and drawn inside one another. */
   const byLane = new Map();
   for (const person of people) {
     if (!byLane.has(person.lane)) byLane.set(person.lane, []);
@@ -144,46 +152,89 @@ export function layoutRoots(people) {
   }
 
   for (const [lane, group] of byLane) {
-    /* Sorted by year so that "further along the root" and "later" are the same
-       statement even when the list is not in that order. */
+    /* Ordered by year, so "further along the root" and "later" are the same
+       statement however the list happens to be ordered. */
     const sorted = [...group].sort((a, b) => (a.year || max) - (b.year || max));
+    for (const p of sorted) if (!p.year) undated += 1;
 
-    /* How many share each year, and which of them this is — the two numbers a
-       fan needs. */
-    const seen = new Map();
-    const total = new Map();
+    /* Runs of people who share a year. They cannot be strung along the root —
+       they are the same point in time — so each run becomes one stop, and the
+       people in it are fanned across the root at that stop. */
+    const stops = [];
     for (const p of sorted) {
-      const key = p.year || 'none';
-      total.set(key, (total.get(key) || 0) + 1);
+      const last = stops[stops.length - 1];
+      if (last && last.year === (p.year || null)) last.people.push(p);
+      else stops.push({ year: p.year || null, people: [p] });
     }
 
-    for (const p of sorted) {
-      const key = p.year || 'none';
-      const nth = seen.get(key) || 0;
-      seen.set(key, nth + 1);
-      if (!p.year) undated += 1;
+    /* EVENLY SPACED STOPS, NOT PROPORTIONAL TO THE YEAR.
+       
+       Proportional was the first version and it cannot work at this size. The
+       record spans about ten years on a root under four units long, so one year
+       is roughly a third of a unit — and a card is over a unit wide. Every
+       group came out as a pile: nine PhD students occupied 1.5 units of root
+       between them and were drawn one on top of another.
+       
+       So the stops are spread evenly and the ORDER carries the time. "Further
+       out is later" stays exactly true; "twice as far out is twice as long ago"
+       was never true anyway, because a root is not an axis with a scale on it.
+       The readout gives the span in years, and every card gives its own. */
+    /* THE ROOT GROWS TO HOLD WHAT IS ON IT.
+    
+       A fixed length divided by however many stops there are gives a spacing
+       that shrinks as a group gets bigger, which is the opposite of what is
+       needed. So the root is as long as its contents require — the base length
+       when that is enough, longer when it is not — and the caller builds the
+       tube to the length it is told. */
+    const n = stops.length;
+    const needed = (n - 1) * cardWidth * STOP_GAP;
+    const reach = Math.max(ROOT_REACH, needed / 0.86);
+    reaches.set(lane, reach);
 
-      /* 0.12 rather than 0 at the base: a card sitting exactly on the trunk is
-         a card inside the trunk. */
-      const t = p.year ? lerp(0.12, 1, (p.year - min) / span) : 1;
-      const [x, y, z] = rootPoint(lane, t, ROOT_REACH);
+    stops.forEach((stop, i) => {
+      const t = n === 1 ? 0.62 : lerp(0.14, 1, i / (n - 1));
+      const [x, y, z] = rootPoint(lane, t, reach);
 
-      /* People sharing a year fan out around the root rather than stacking on
-         it. Sideways and up, never down — down is where the next root is. */
-      const count = total.get(key);
-      const spread = count > 1 ? (nth - (count - 1) / 2) : 0;
       const a = LANE_AZIMUTH[lane];
       const across = [-Math.sin(a), 0, Math.cos(a)];
+      const k = stop.people.length;
 
-      home.set(p.index, [
-        x + across[0] * spread * 0.52,
-        y + Math.abs(spread) * 0.20 + 0.16,
-        z + across[2] * spread * 0.52,
-      ]);
-    }
+      /* A fan across the root and up from it, laid out as a block rather than a
+         line: ten people who finished in the same year would otherwise reach
+         five card-widths out to one side and leave the root. */
+      const cols = Math.max(1, Math.ceil(Math.sqrt(k)));
+      stop.people.forEach((p, j) => {
+        const col = j % cols;
+        const row = Math.floor(j / cols);
+        const offset = col - (Math.min(cols, k - row * cols) - 1) / 2;
+        home.set(p.index, [
+          x + across[0] * offset * FAN_ACROSS * cardWidth,
+          y + 0.34 + row * FAN_UP * cardWidth,
+          z + across[2] * offset * FAN_ACROSS * cardWidth,
+        ]);
+      });
+    });
   }
 
-  return { home, span: { min, max }, undated, lanes: [...byLane.keys()] };
+  return { home, reaches, span: { min, max }, undated, lanes: [...byLane.keys()] };
+}
+
+/**
+ * How large to draw the cards, for a given number of them on screen.
+ *
+ * The root view has one length of root per group however many people are on it,
+ * so the only thing that can give way is the card. Fifty-five at a readable
+ * size do not fit on six roots and never will; nine do, comfortably — which is
+ * exactly what filtering to a single group asks for.
+ *
+ * So the size follows the count, and the filter becomes the way to read the
+ * view rather than a thing that happens to it. `sqrt` because the crowding is
+ * two-dimensional, and the clamp keeps the whole group from becoming confetti
+ * at one end and two postdocs from filling the frame at the other.
+ */
+export function rootCardScale(visible) {
+  const n = Math.max(1, visible);
+  return Math.max(0.46, Math.min(1.15, 3.4 / Math.sqrt(n)));
 }
 
 /* ---- the geometry --------------------------------------------------------- */
@@ -268,7 +319,7 @@ function taperedTube(THREE, pointAt, segments, radial, r0, r1) {
  * @param {string[]} palette  one colour per lane, the same six the cards use
  * @param {string} woodColour the trunk's colour
  */
-export function buildRootGeometry(THREE, people, palette, woodColour) {
+export function buildRootGeometry(THREE, people, palette, woodColour, reaches = new Map()) {
   const group = new THREE.Group();
   const materials = [];
   const geometries = [];
@@ -296,7 +347,7 @@ export function buildRootGeometry(THREE, people, palette, woodColour) {
   for (const lane of lanes) {
     const geometry = taperedTube(
       THREE,
-      (t) => rootPoint(lane, t, ROOT_REACH),
+      (t) => rootPoint(lane, t, reaches.get(lane) || ROOT_REACH),
       26, 8,
       LANE_RADIUS[lane] || 0.05,
       (LANE_RADIUS[lane] || 0.05) * TIP_TAPER,
