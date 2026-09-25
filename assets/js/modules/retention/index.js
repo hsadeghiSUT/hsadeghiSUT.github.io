@@ -30,6 +30,7 @@ import { el } from '../dom.js';
 import { icon } from '../icons.js';
 import { guardContext, loadThree } from '../fx/three.js';
 import { airEntry, alphaFor, placeSample, sampleSurface, saturation } from './model.js';
+import { buildCrackFloor } from './cracks.js';
 
 /** The box the surface is drawn in. */
 const BOX = { width: 7.2, height: 3.4, depth: 4.4 };
@@ -249,6 +250,14 @@ export async function mountRetention(host, p) {
     markCurves.push({ mark, row, geo, line });
   }
 
+  /* ---- the crack floor ---------------------------------------------------
+     Under the surface, cracking where the soil above it is dry. Same model,
+     same uniforms — see cracks.js for why it lives here and not behind the
+     page. Added before the lights because it is unlit: a shader material with
+     its own colour, which is what a crack pattern wants. */
+  const floor = buildCrackFloor(THREE, p, BOX, [0.62, 0.52, 0.38]);
+  world.add(floor.mesh);
+
   scene.add(new THREE.HemisphereLight(0xffffff, 0x35414d, 1.15));
   const key = new THREE.DirectionalLight(0xffffff, 1.6);
   key.position.set(-3.5, 5.0, 4.0);
@@ -386,6 +395,8 @@ export async function mountRetention(host, p) {
       surfaceMat.dispose();
       wireGeo.dispose();
       markCurves.forEach((m) => m.geo.dispose());
+      floor.geometry.dispose();
+      floor.material.dispose();
     },
   };
 }
