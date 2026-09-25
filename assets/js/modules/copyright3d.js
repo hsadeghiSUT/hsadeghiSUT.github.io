@@ -99,7 +99,7 @@
  * neither ever runs.
  */
 
-import { loadThree } from './fx/three.js';
+import { guardContext, loadThree } from './fx/three.js';
 
 /** Seconds for one full turn of the mark. */
 const TURN_SECONDS = 10;
@@ -1105,6 +1105,23 @@ export async function mountCopyright(host, canvas) {
   size();
   renderer.render(scene, camera);
   host.dataset.mark = 'three';
+
+  /* A phone may take the context away — it drops the oldest when a page asks
+     for more than the device allows, and this site asks for about thirty. Put
+     the flat mark back rather than leaving an empty box. See fx/three.js. */
+  guardContext(canvas, {
+    onLost() {
+      stop();
+      host.dataset.mark = 'css';
+    },
+    onRestored() {
+      // Attribute first: the canvas is display:none until it is set, and a
+      // hidden canvas measures zero.
+      host.dataset.mark = 'three';
+      size();
+      renderer.render(scene, camera);
+    },
+  });
 
   if ('IntersectionObserver' in window && !reduced.matches) {
     /* No `rootMargin`. It used to be 80px — a courtesy margin so the mark was

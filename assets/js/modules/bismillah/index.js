@@ -65,7 +65,7 @@
  * context — so there is never a moment with a hole in the header.
  */
 
-import { loadThree } from '../fx/three.js';
+import { guardContext, loadThree } from '../fx/three.js';
 import { MARKS } from './marks.js';
 
 /** Seconds the arrival takes, when the page before this one had the other mark. */
@@ -513,6 +513,23 @@ export async function mountBismillah(host, canvas, lights, hoverOn, mark = MARKS
   if (arrived === 0) host.classList.add('is-arriving');
   draw(0);
   host.dataset.bismillah = 'three';
+
+  /* A phone may take the context away — it drops the oldest when a page asks
+     for more than the device allows, and this site asks for about thirty. Put
+     the flat mark back rather than leaving an empty box. See fx/three.js. */
+  guardContext(canvas, {
+    onLost() {
+      stop();
+      host.dataset.bismillah = 'css';
+    },
+    onRestored() {
+      // Attribute first: the canvas is display:none until it is set, and a
+      // hidden canvas measures zero.
+      host.dataset.bismillah = 'three';
+      size();
+      draw(0);
+    },
+  });
 
   if (hoverOn) {
     const on = () => { hovered = true; };

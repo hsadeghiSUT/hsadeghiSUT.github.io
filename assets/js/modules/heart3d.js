@@ -59,7 +59,7 @@
  * most of the point.
  */
 
-import { loadThree } from './fx/three.js';
+import { guardContext, loadThree } from './fx/three.js';
 
 /** Seconds for one full beat-and-rest. */
 const BEAT_SECONDS = 1.5;
@@ -327,6 +327,23 @@ export async function mountHeart(host, canvas) {
   size();
   renderer.render(scene, camera);
   host.dataset.heart = 'three';
+
+  /* A phone may take the context away — it drops the oldest when a page asks
+     for more than the device allows, and this site asks for about thirty. Put
+     the flat mark back rather than leaving an empty box. See fx/three.js. */
+  guardContext(canvas, {
+    onLost() {
+      stop();
+      host.dataset.heart = 'css';
+    },
+    onRestored() {
+      // Attribute first: the canvas is display:none until it is set, and a
+      // hidden canvas measures zero.
+      host.dataset.heart = 'three';
+      size();
+      renderer.render(scene, camera);
+    },
+  });
 
   /* Only while it is on screen. The footer is below everything, so on most
      visits this never runs at all — and a beating heart nobody is looking at is

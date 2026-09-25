@@ -52,7 +52,7 @@
  * removes `is-shown` — so on a page you have not scrolled, nothing draws.
  */
 
-import { loadThree } from './fx/three.js';
+import { guardContext, loadThree } from './fx/three.js';
 
 /** Seconds for one full turn. Slower than the header mark: this is smaller, and
  *  the same angular speed on a smaller object reads as faster. */
@@ -245,6 +245,23 @@ export async function mountBayonet(host, canvas) {
   size();
   draw();
   host.dataset.bayonet = 'three';
+
+  /* A phone may take the context away — it drops the oldest when a page asks
+     for more than the device allows, and this site asks for about thirty. Put
+     the flat mark back rather than leaving an empty box. See fx/three.js. */
+  guardContext(canvas, {
+    onLost() {
+      pause();
+      host.dataset.bayonet = 'css';
+    },
+    onRestored() {
+      // Attribute first: the canvas is display:none until it is set, and a
+      // hidden canvas measures zero.
+      host.dataset.bayonet = 'three';
+      size();
+      draw();
+    },
+  });
 
   window.addEventListener('resize', () => { size(); if (!running) draw(); }, { passive: true });
   document.addEventListener('visibilitychange', () => (document.hidden ? pause() : resume()));

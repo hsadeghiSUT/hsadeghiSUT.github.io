@@ -59,7 +59,7 @@
  * same name said again in light.
  */
 
-import { loadThree } from '../fx/three.js';
+import { guardContext, loadThree } from '../fx/three.js';
 
 /** Where the traced glyphs live. */
 const LETTERS = 'assets/data/name-letters.json';
@@ -572,6 +572,23 @@ export async function mountNameColumn(host, canvas, anchor) {
   size();
   draw(0);
   host.dataset.namecolumn = 'three';
+
+  /* A phone may take the context away — it drops the oldest when a page asks
+     for more than the device allows, and this site asks for about thirty. Put
+     the flat mark back rather than leaving an empty box. See fx/three.js. */
+  guardContext(canvas, {
+    onLost() {
+      stop();
+      host.dataset.namecolumn = 'css';
+    },
+    onRestored() {
+      // Attribute first: the canvas is display:none until it is set, and a
+      // hidden canvas measures zero.
+      host.dataset.namecolumn = 'three';
+      size();
+      draw(0);
+    },
+  });
 
   document.addEventListener('visibilitychange', () => (document.hidden ? stop() : start()));
   window.addEventListener('resize', () => { size(); if (!running) draw(0); }, { passive: true });

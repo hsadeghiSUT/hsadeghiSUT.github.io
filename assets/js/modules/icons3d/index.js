@@ -83,7 +83,7 @@
  * with. There is no state in which an icon is missing.
  */
 
-import { loadThree } from '../fx/three.js';
+import { guardContext, loadThree } from '../fx/three.js';
 import { kit } from './lib.js';
 import { FAMILIES, REGISTRY, entry, defaultMotion } from './registry.js';
 
@@ -977,6 +977,16 @@ export async function initIcons3d() {
       renderer.dispose();
     },
   };
+
+  /* One renderer serves every 3D icon on the page (§20.2), so one lost context
+     is all of them at once — and a frozen icon is worse than a flat one. The
+     layer's own `dispose()` is already a complete undo: it puts every icon back
+     to the plain SVG it was built from (§20.1). Reuse it.
+
+     There is no `onRestored`. Once the icons are back to flat SVG the layer is
+     gone, and rebuilding it would mean re-mounting from scratch — the flat
+     icons are the documented fallback, and they are a good one. */
+  guardContext(renderer.domElement, { onLost: () => handle.dispose() });
 
   return handle;
 }
