@@ -1,0 +1,27 @@
+{
+  "_readme": "Parameters for the soil-water retention surface on the Summary page. READ 'source' BEFORE CITING ANYTHING FROM THIS FILE. See assets/js/modules/retention/model.js and README.",
+
+  "_provenance": "THESE ARE ILLUSTRATIVE DEFAULTS, NOT MEASUREMENTS. They were chosen to show the shape of the van Genuchten relationship and the direction in which packing shifts it. They are not taken from a publication and are not attributed to one. To turn this diagram into a figure, replace alphaRef / n / residual / beta with published values for a real soil and put the citation in 'source' — the page prints whatever is there, and nothing else has to change.",
+
+  "title": "How a soil holds water",
+  "source": "",
+
+  "model": "van Genuchten (1980), with the air-entry value scaled by void ratio",
+  "equation": "Se = [1 + (a·psi)^n]^(-m),  m = 1 - 1/n,  a(e) = a_ref · (e/e_ref)^beta",
+
+  "alphaRef": 0.011,
+  "eRef": 0.72,
+  "beta": 1.45,
+  "n": 1.62,
+  "residual": 0.14,
+
+  "suctionMin": 0.1,
+  "suctionMax": 100000,
+  "voidMin": 0.52,
+  "voidMax": 1.16,
+
+  "marks": [
+    { "e": 0.58, "label": "Denser packing" },
+    { "e": 1.08, "label": "Looser packing" }
+  ]
+}
