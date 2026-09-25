@@ -4033,6 +4033,36 @@ M.` was four spellings — two Persian, two English — and is now one person wi
 
 The three Persian-only names are the remainder and are correct as they stand.
 
+#### An alias does not fix a misspelling on the roster
+
+`author-aliases.json` repairs the **graph**. It does not repair a name typed
+two ways in `data/research-team.json`, and that distinction cost a card its
+publications.
+
+Paniz Surmanshahi appears twice, legitimately: a BSc final-year project in
+2024, an MPhil from 2026. She was entered as *"Paniz Surmanshahi"* on one and
+*"Paniz Sourmanshahi"* on the other. Her paper spells her `Surmanshahi, P.`, so
+the MPhil card found it and **the BSc card found nothing** — no publications, no
+collaborators, no graph, and no "More info" button to say anything was missing.
+
+Adding an alias would not have helped, and the reason is worth knowing.
+`resolveKeys()` in `modules/teamwork.js` matches a roster person like this:
+
+```js
+const hit = candidateKeys(person.name).find((c) => known.has(c.key));
+```
+
+`known` holds the graph's keys, which are already alias-merged — so an alias
+`sourmanshahi|p → surmanshahi|p` changes what is *in* `known`, while
+`candidateKeys('Paniz Sourmanshahi')` still produces `sourmanshahi|p`, which by
+then is not a key any more. The alias is applied on one side of the comparison
+and not the other.
+
+**So: aliases are for spellings this site does not control** — the ones printed
+on a published paper. A name in `research-team.json` is a name this site does
+control, and it gets one spelling, matching the publication record. The two
+cards keep their own photographs; only the name was wrong.
+
 ---
 
 ### 15.10 Faces on the nodes
@@ -6384,3 +6414,206 @@ that removed it if it is ever wanted back.
 Note that `.visually-hidden` itself stays in `base.css` — it is a legitimate
 accessibility utility, still used for screen-reader labels on JS-built nodes.
 What was wrong here was hiding *keywords*, not hiding text.
+
+---
+
+## 22. "Unsafe", and the headers that answer it
+
+A search result for the site appeared with a crossed-out shield beside the
+title. This is what that was, and what was and was not wrong.
+
+### 22.1 Google was not flagging anything
+
+Checked first, because it is the only claim that would have been serious and it
+is answerable in one request:
+
+```
+https://transparencyreport.google.com/safe-browsing/search?url=hsadeghi.org
+  → "No unsafe content found."
+```
+
+No malware, no phishing, no "this site may be hacked". **Whatever drew that
+badge, it was not Google Safe Browsing.** Two things did fit.
+
+**The result was for `http://www.hsadeghi.org`** — plain HTTP, and the `www`
+host. Safe-browsing browser extensions (Norton, Avast, WOT, McAfee) annotate
+search results, and an `http://` result is the ordinary reason they draw a
+warning mark next to a title. The redirect itself is correct and always was:
+
+```
+http://hsadeghi.org       301 → https://hsadeghi.org/
+http://www.hsadeghi.org   301 → https://hsadeghi.org/
+https://www.hsadeghi.org  301 → https://hsadeghi.org/
+```
+
+So the site is not reachable over plain HTTP; a search engine is simply still
+showing a URL it indexed before that was true. Re-crawling fixes it, which is
+§21.4's first item.
+
+**The second domain really was served over plain HTTP**, and that one was a
+defect rather than a stale index:
+
+```
+http://hamedsadeghi.org   200 OK        ← no redirect at all
+http://hsadeghi.org       301 → https
+```
+
+A page answering on `http://` is marked "Not secure" by every current browser,
+and it is the one address a visitor is likeliest to type by hand.
+
+### 22.2 What a file can fix, and what it cannot
+
+**GitHub Pages cannot set response headers.** There is no configuration for it
+and no file it reads. Cloudflare serves the same build for `hamedsadeghi.org`
+(§11.6) and *does* read `_headers`, so that is where the headers live:
+
+```
+X-Content-Type-Options: nosniff
+Referrer-Policy: strict-origin-when-cross-origin
+X-Frame-Options: SAMEORIGIN
+Content-Security-Policy: frame-ancestors 'self'
+Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
+Strict-Transport-Security: max-age=63072000; includeSubDomains
+```
+
+Confirmed live on `hamedsadeghi.org`. **The two addresses therefore do not
+carry identical headers**, and that asymmetry is a property of the hosting, not
+an oversight: `hsadeghi.org` gets HSTS from its Cloudflare zone and nothing
+else, because GitHub Pages is the origin.
+
+Cloudflare *consumes* `_headers` — it 404s there. GitHub Pages, which has never
+heard of it, serves it as a text file, so `robots.txt` disallows it (§21.3). It
+holds nothing but headers and comments.
+
+**No Content-Security-Policy beyond `frame-ancestors`, on purpose.** Every page
+runs an inline `<script>` in its `<head>` to apply the saved colour scheme
+before the first paint (§4), and the site loads Google Analytics and gtag. A
+real CSP would need `'unsafe-inline'` or a per-page nonce, and a static build
+cannot generate a nonce. A CSP containing `'unsafe-inline'` is a header that
+looks like security rather than one that is. It is left out until the inline
+script is given a hash instead.
+
+**A header cannot force HTTPS.** `Strict-Transport-Security` is only obeyed by
+a browser that has already been served the site over HTTPS once; the first
+plain-HTTP request has to be answered with a redirect, and that happens before
+anything in this repository is consulted.
+
+### 22.3 The two settings that are not in this repository
+
+For the **hamedsadeghi.org** zone, in the Cloudflare dashboard:
+
+| | |
+|---|---|
+| **SSL/TLS → Edge Certificates → Always Use HTTPS** | on. Answers `http://` with a redirect instead of the page |
+| **Same page → HSTS** | enable, 6–12 months, include subdomains. `hsadeghi.org` already has this — `max-age=31556952` — which is why only one of the two domains had the problem |
+
+These are **zone** settings, not Worker settings, so unlike `workers_dev`
+(§11.6) `wrangler deploy` does not overwrite them and the dashboard is the
+right place for them.
+
+Check afterwards with:
+
+```bash
+curl -sI http://hamedsadeghi.org/ | head -1     # want 301, not 200
+```
+
+---
+
+## 23. Losing the GPU — when a mark goes blank on a phone
+
+Five marks vanished on an Android phone partway down the Research Team page —
+the header bismillah, the round brandmark, the footer heart, the copyright mark
+and the floating back-to-top button — leaving empty boxes where they had been.
+Everything was fine on load, and a reload fixed it. Every one of those is a
+WebGL canvas.
+
+### 23.1 This site asks for a lot of contexts
+
+Ten modules each build their own `WebGLRenderer`: `logo3d`, `bismillah`,
+`heart3d`, `copyright3d`, `bayonet3d`, `namecolumn`, `roster`, `icons3d`, the
+explorer and the field. The Research Team page ends up with **about 30
+canvases**.
+
+Mobile Chrome allows on the order of **8–16 live WebGL contexts** and, past
+that, takes the oldest ones away to stay under the cap — which is exactly the
+order the symptom appeared in: the marks built first were the ones that went.
+A reload rebuilds every context from scratch, which is why it always "fixed"
+it.
+
+### 23.2 Why a lost context looked like a broken image
+
+Each mark draws a flat poster or SVG first and reveals its canvas only once
+WebGL is actually running:
+
+```css
+.brandmark[data-brandmark="three"] .brandmark__poster { opacity: 0; }
+.heart3d[data-heart="three"]       .heart3d__flat     { display: none; }
+```
+
+When the context went away the canvas stopped painting — **but the element
+stayed in its `three` state, so the flat version stayed hidden too.** Not a
+fallback: a hole. The page had a perfectly good flat mark for every one of
+those five and was actively hiding it.
+
+There were **no `webglcontextlost` handlers anywhere in the codebase.**
+
+### 23.3 The fix
+
+`guardContext()` in `modules/fx/three.js`, wired into every module that builds
+a renderer:
+
+```js
+guardContext(canvas, {
+  onLost()     { stop(); host.dataset.heart = 'css'; },
+  onRestored() { host.dataset.heart = 'three'; size(); render(); },
+});
+```
+
+Three things matter in it.
+
+**`event.preventDefault()` on `webglcontextlost`.** The default action is "this
+context is gone for good"; preventing it is the only thing that lets the
+browser hand it back and fire `webglcontextrestored`. Without that line the
+restore half can never run.
+
+**The attribute goes back before anything is measured.** The canvas is
+`display: none` until `data-*="three"` is set, and a hidden canvas measures
+zero — so setting the attribute first and calling `size()` second is the order,
+not the other way round.
+
+**`icons3d` is disposed rather than degraded.** One renderer serves every 3D
+icon on the page (§20.2), so one lost context is all of them at once, and a
+frozen icon is worse than a flat one. Its existing `dispose()` already puts
+every icon back to the plain SVG it was built from (§20.1), so the handler just
+calls that. There is no restore path for it: rebuilding would mean re-mounting
+the whole layer, and the flat icons are the documented fallback.
+
+### 23.4 Verified by breaking it on purpose
+
+`WEBGL_lose_context` makes this testable rather than a thing to hope about:
+
+```js
+const ext = gl.getExtension('WEBGL_lose_context');  // hold this BEFORE losing
+ext.loseContext();     // → data-brandmark="css", the poster is visible again
+ext.restoreContext();  // → data-brandmark="three", canvas repainted
+```
+
+All five marks: `three` → loss → `css` with the flat form visible → restore →
+`three`, repainted, no console errors.
+
+**Get the extension handle before losing the context.** Calling
+`getExtension()` on an already-lost context returns `null`, which looks exactly
+like a restore that did not work and cost a round of confusion here.
+
+### 23.5 What this does not do
+
+It stops a lost context from leaving a hole. **It does not stop the context
+being lost** — thirty canvases on one page is still more than a phone wants to
+hold, and the honest description of the current behaviour is that some marks
+may quietly go flat on a long page on a small device.
+
+The deeper fix is to stop holding contexts that are not on screen: several
+modules already pause their animation loop with an `IntersectionObserver`, but
+pausing a loop does not free a context — only `renderer.dispose()` does, and
+coming back then means rebuilding the scene. That is a larger change than this
+one and has not been made.
