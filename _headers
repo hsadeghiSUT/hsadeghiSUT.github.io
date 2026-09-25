@@ -44,8 +44,16 @@
   # after someone else edits it will fail loudly instead of quietly.
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
 
-  # Two years, subdomains included.  The apex already carries this on
-  # hsadeghi.org from the zone's own HSTS setting; this is what puts it on the
-  # second domain as well.  `preload` is deliberately absent: it is a one-way
-  # door that needs a submission to a browser list and is painful to undo.
-  Strict-Transport-Security: max-age=63072000; includeSubDomains
+  # Twelve months, subdomains included.
+  #
+  # This is the whole of HSTS for hamedsadeghi.org — there is no zone-level
+  # HSTS switched on for it, and there does not need to be, because every
+  # response for that hostname is served by the Worker and every one of them
+  # carries this.  (hsadeghi.org gets `max-age=31556952` from its own zone
+  # setting instead, and without `includeSubDomains`.)
+  #
+  # A year rather than the two it started at: long enough to be worth having,
+  # short enough that a mistake ages out rather than having to be waited out.
+  # `preload` is deliberately absent — it is a one-way door that needs a
+  # submission to a browser list and is painful to undo.
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
