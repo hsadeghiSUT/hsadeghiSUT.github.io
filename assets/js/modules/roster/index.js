@@ -57,6 +57,7 @@ import { icon } from '../icons.js';
 import { loadThree } from '../fx/three.js';
 import { buildAtlas } from './atlas.js';
 import { CATEGORIES, buildRoster } from './data.js';
+import { buildRootGeometry, layoutRoots } from './roots.js';
 
 /* ---- the shape of a card ------------------------------------------------- */
 const CARD_W = 1.12;
@@ -243,7 +244,25 @@ export async function mountRoster(host, data, listRoot) {
     icon('fad-history'),
     el('span', { text: 'Reset view' }),
   );
-  const controls = el('div', { class: 'explorer__controls' }, hint, resetButton);
+  /* The layout toggle.
+
+     Two arrangements of the same fifty-five cards, not two panels: the page
+     already holds about thirty WebGL canvases and a phone will keep a dozen
+     (README §23), so a second renderer to show the same people would be the
+     most expensive way imaginable to say the same thing. */
+  const rootsButton = el(
+    'button',
+    {
+      type: 'button',
+      class: 'explorer__size explorer__roots',
+      title: 'Arrange the group as a grid of cards, or as a root system by year',
+      'aria-live': 'polite',
+    },
+    icon('fad-search'),
+    el('span', { class: 'explorer__roots-label', text: 'View: cards' }),
+  );
+
+  const controls = el('div', { class: 'explorer__controls' }, hint, rootsButton, resetButton);
 
   const catRow = el('div', { class: 'explorer__years', role: 'group', 'aria-label': 'Filter by group' });
   const yearRow = el('div', { class: 'explorer__years', role: 'group', 'aria-label': 'Filter by year' });
@@ -389,6 +408,28 @@ export async function mountRoster(host, data, listRoot) {
     });
   });
 
+  /* ---- the root system ----------------------------------------------------
+     A second home for every card, and the trunk and roots they hang from. Both
+     are built once; switching views is a lerp between two positions, so the
+     hit-test, the filter and the hover all keep working without knowing which
+     arrangement is on screen. See roots.js. */
+  const rootPlan = layoutRoots(roster.people);
+  const woodToken = token('--c-bar-solid', '#6b4f3a');
+  const rootParts = buildRootGeometry(THREE, roster.people, palette, woodToken);
+  scene.add(rootParts.group);
+
+  for (const card of cards) {
+    const at = rootPlan.home.get(card.person.index);
+    card.rootHome = at
+      ? new THREE.Vector3(at[0], at[1], at[2])
+      : card.home.clone();
+  }
+
+  /** 0 = the card grid, 1 = the root system. */
+  let morph = 0;
+  let morphWant = 0;
+  const rootPose = new THREE.Vector3();
+
   /* ---- light --------------------------------------------------------------
      A key from the upper left so the slabs' top and left edges catch it and the
      thickness is visible; a cool fill from the other side so the far faces keep
@@ -450,9 +491,15 @@ export async function mountRoster(host, data, listRoot) {
        a card needs is its own half-width, not the roster's largest — padding
        everything by the biggest wastes space around the small ones, and padding
        by the average clips the big ones off the edge. */
+    /* Framed on where the cards are GOING, not where they are. The fit runs as
+       the switch between the two arrangements begins, and framing the positions
+       being left behind puts the camera on the old layout — which, since the
+       two occupy very different volumes, means the new one arrives half out of
+       shot. */
+    const goingTo = morphWant > 0.5 ? 'rootHome' : 'home';
     const points = cards
       .filter((c) => c.shown > 0.5)
-      .map((c) => ({ at: c.home, halfW: (CARD_W * c.scale) / 2, halfH: (CARD_H * c.scale) / 2 }));
+      .map((c) => ({ at: c[goingTo], halfW: (CARD_W * c.scale) / 2, halfH: (CARD_H * c.scale) / 2 }));
     if (!points.length) return;
 
     const centre = new THREE.Vector3();
@@ -684,7 +731,13 @@ export async function mountRoster(host, data, listRoot) {
     const what = activeCategory
       ? CATEGORIES.find((c) => c.id === activeCategory).label
       : 'the whole group';
-    readout.textContent = `${visible} of ${cards.length} — ${what}${activeYear ? `, ${activeYear}` : ''}`;
+    const head = `${visible} of ${cards.length} — ${what}${activeYear ? `, ${activeYear}` : ''}`;
+    /* In the root view the counts alone do not say what the shape means, and
+       the arrangement is the whole content of that view. */
+    readout.textContent = morphWant > 0.5
+      ? `${head} · one root per group, ${rootPlan.span.min} at the base to `
+        + `${rootPlan.span.max} at the tip`
+      : head;
   }
 
   /* Right-drag has to be able to start, so the stage's context menu goes. There
@@ -832,6 +885,29 @@ export async function mountRoster(host, data, listRoot) {
   resetButton.addEventListener('click', resetView);
 
   /**
+   * Swap between the card grid and the root system.
+   *
+   * The camera is re-framed afterwards rather than left where it was: the two
+   * arrangements occupy very different volumes — a wide shallow block against a
+   * deep ball — and a camera framed for one shows the other half out of shot.
+   * `frameVisible` already knows how to fit whatever is on screen, and it reads
+   * live positions, so it is called once the cards have somewhere to go.
+   */
+  function toggleRoots() {
+    morphWant = morphWant > 0.5 ? 0 : 1;
+    const asRoots = morphWant > 0.5;
+    rootsButton.querySelector('.explorer__roots-label').textContent =
+      asRoots ? 'View: roots' : 'View: cards';
+    rootsButton.classList.toggle('is-on', asRoots);
+    /* One frame of morph before framing, so the fit measures positions that
+       have started moving rather than the ones being left behind. */
+    invalidate();
+    setTimeout(() => frameVisible(true), 80);
+    applyReadoutSummary();
+  }
+  rootsButton.addEventListener('click', toggleRoots);
+
+  /**
    * Take the reader to this person's entry in the list below.
    *
    * Found by SECTION and then position within it, not by position in the whole
@@ -919,6 +995,21 @@ export async function mountRoster(host, data, listRoot) {
       moving = true;
     }
 
+    if (Math.abs(morph - morphWant) > 0.002) {
+      morph = reduced.matches ? morphWant : lerp(morph, morphWant, Math.min(1, dt / 0.5));
+      moving = true;
+    } else morph = morphWant;
+
+    /* The roots fade in behind the cards rather than appearing with them. They
+       are the structure the people hang on, so they should already be there
+       when the cards arrive — `morph * morph` puts most of their fade in the
+       first half of the move. */
+    rootParts.group.visible = morph > 0.01;
+    if (rootParts.group.visible) {
+      const fade = Math.min(1, morph * morph * 1.6);
+      for (const material of rootParts.materials) material.opacity = fade;
+    }
+
     for (const card of cards) {
       const target = card.shown;
       if (Math.abs(card.eased - target) > 0.002) {
@@ -951,7 +1042,10 @@ export async function mountRoster(host, data, listRoot) {
          
          Scaling about the centre can only ever add coverage, never take it
          away, so the card under the pointer stays the card under the pointer. */
-      card.mesh.position.copy(card.home);
+      /* Between the two arrangements. `copy` when there is nothing to morph so
+         the common case does no arithmetic at all. */
+      if (morph < 0.001) card.mesh.position.copy(card.home);
+      else card.mesh.position.copy(card.home).lerp(card.rootHome, morph);
     }
 
     placeCamera();
@@ -1008,6 +1102,10 @@ export async function mountRoster(host, data, listRoot) {
       return lanes;
     },
     view: () => ({ yaw: view.yaw, pitch: view.pitch, distance: view.distance, target: view.target.toArray() }),
+    __probe: () => ({ morph, morphWant, queued, rootsVisible: rootParts.group.visible,
+      sample: cards[0] ? { home: cards[0].home.toArray().map(n=>+n.toFixed(2)),
+        root: cards[0].rootHome.toArray().map(n=>+n.toFixed(2)),
+        at: cards[0].mesh.position.toArray().map(n=>+n.toFixed(2)) } : null }),
     dispose() {
       renderer.dispose();
       cards.forEach((c) => { c.mesh.geometry.dispose(); c.material.dispose(); });

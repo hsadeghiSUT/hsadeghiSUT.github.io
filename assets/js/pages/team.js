@@ -74,7 +74,7 @@ export async function render() {
     const rosterHost = el('div', { class: 'roster-host' });
     shell.insertBefore(rosterHost, layout);
     import('../modules/roster/index.js')
-      .then(({ mountRoster }) => mountRoster(rosterHost, data, $('#content')))
+      .then(({ mountRoster }) => mountRoster(rosterHost, data, $('#content')).then((h) => { window.__roster = h; return h; }))
       .catch((err) => console.info('roster: not built.', err));
   }
 
