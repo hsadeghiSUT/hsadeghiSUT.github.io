@@ -480,9 +480,14 @@ html { scroll-padding-top: calc(var(--bar-h) + var(--secnav-h, 0px) + 1rem); }
 
 .roster-host:not(:empty) { margin-bottom: var(--space-6); }
 
-/* The row the roster just took you to. Its own class rather than `.is-lit`,
-   which belongs to highlight.js — see the note in roster/index.js. */
-.person.is-jumped {
+/* The row a 3D panel just took you to. Its own class rather than `.is-lit`,
+   which belongs to highlight.js — see the note in roster/index.js.
+
+   Two selectors, because two panels do this: the roster lands on a `.person`
+   card on Research Team, and the career core lands on a `.tl__item` row on
+   Background. Same gesture, same answer, so the same mark. */
+.person.is-jumped,
+.tl__item.is-jumped {
   box-shadow:
     0 0 0 2px var(--roster-jump, var(--c-accent)),
     0 14px 34px -14px var(--roster-jump, var(--c-accent));
@@ -497,7 +502,8 @@ html { scroll-padding-top: calc(var(--bar-h) + var(--secnav-h, 0px) + 1rem); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .person.is-jumped { animation: none; }
+  .person.is-jumped,
+  .tl__item.is-jumped { animation: none; }
 }
 
 /* The dot on a category chip, in that category's own colour. */

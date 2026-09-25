@@ -48,5 +48,24 @@ export async function render() {
     ),
   );
 
+  /* The core goes ABOVE `.layout`, not inside the article column — the same
+     place and the same reasoning as the publications explorer and the 3D
+     roster: a six-unit column of eleven beds in a 640-pixel measure is a
+     splinter, and this wants the width of the shell.
+
+     Built after the lists and deliberately not awaited. It needs the rendered
+     rows to scroll to when a bed is clicked, and it must not delay them. If the
+     browser cannot draw it the host stays empty and the lists below are exactly
+     what they were. */
+  const shell = $('.shell');
+  const layout = $('.layout');
+  if (shell && layout) {
+    const coreHost = el('div', { class: 'roster-host' });
+    shell.insertBefore(coreHost, layout);
+    import('../modules/core3d/index.js')
+      .then(({ mountCore }) => mountCore(coreHost, data, $('#content')))
+      .catch((err) => console.info('core: not built.', err));
+  }
+
   fill($('#aside'), linkPanel('Background', tocLinks(data.sections)));
 }
