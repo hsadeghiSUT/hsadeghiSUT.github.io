@@ -74,6 +74,108 @@ function token(name, fallback) {
   return value || fallback;
 }
 
+
+/**
+ * A soil face for one bed, drawn to a canvas.
+ *
+ * WHY THIS IS NOT OPTIONAL DECORATION
+ * ----------------------------------
+ * A smooth cylinder is rotationally symmetric: turning it about its own axis
+ * produces a pixel-for-pixel identical image. The first version had no surface
+ * detail at all, so dragging it — and the idle spin, and the arrow keys — all
+ * worked perfectly and looked like nothing whatsoever was happening. Verified
+ * by sampling the canvas before and after a 140-pixel drag: not one pixel
+ * changed.
+ *
+ * So the grain is what makes the object turn. It also stops eleven flat bands
+ * reading as painted plastic, which is the other half of the same complaint.
+ *
+ * WHAT IS DRAWN
+ * -------------
+ * Laminations across the bed, because sediment is laid down in layers and that
+ * is the direction they run; clasts scattered through it, bigger and sparser
+ * toward the sandy end of the ramp and finer toward the clays; and a wash of
+ * mottling over everything so no two parts of the circumference look alike.
+ *
+ * Deterministic. A seeded generator rather than `Math.random`, so a bed looks
+ * the same on every load and on every machine — a core sample that reshuffles
+ * its own grain when you reload it is not a sample of anything.
+ */
+function bedTexture(THREE, bed, seed) {
+  const W = 256;
+  const H = 128;
+  const canvas = document.createElement('canvas');
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  /* xorshift, so the pattern is fixed per bed. */
+  let state = (seed * 2654435761) >>> 0 || 1;
+  const rnd = () => {
+    state ^= state << 13; state >>>= 0;
+    state ^= state >> 17;
+    state ^= state << 5; state >>>= 0;
+    return state / 4294967296;
+  };
+
+  const [r, g, b] = bed.colour;
+  const rgb = (m) => `rgb(${Math.round(Math.min(1, r * m) * 255)},`
+    + `${Math.round(Math.min(1, g * m) * 255)},${Math.round(Math.min(1, b * m) * 255)})`;
+
+  ctx.fillStyle = rgb(1);
+  ctx.fillRect(0, 0, W, H);
+
+  /* Laminations. Horizontal in texture space, which wraps around the core as
+     bands at a constant depth — which is what a lamination is. */
+  const bands = 5 + Math.floor(rnd() * 5);
+  for (let i = 0; i < bands; i++) {
+    const y = rnd() * H;
+    const h = 1 + rnd() * 3;
+    ctx.fillStyle = rgb(rnd() > 0.5 ? 1.13 : 0.84);
+    ctx.globalAlpha = 0.30 + rnd() * 0.30;
+    ctx.fillRect(0, y, W, h);
+  }
+  ctx.globalAlpha = 1;
+
+  /* Clasts. The sandy units get coarse, frequent grains; the clays get few and
+     fine — `grain` runs 0.15 at the dark clay to 0.92 at the topsoil. */
+  const count = Math.round(140 + bed.grain * 620);
+  const maxR = 0.5 + bed.grain * 2.4;
+  for (let i = 0; i < count; i++) {
+    const x = rnd() * W;
+    const y = rnd() * H;
+    const rad = 0.3 + rnd() * maxR;
+    ctx.fillStyle = rgb(rnd() > 0.45 ? 1.0 + rnd() * 0.30 : 0.70 + rnd() * 0.18);
+    ctx.globalAlpha = 0.35 + rnd() * 0.45;
+    ctx.beginPath();
+    ctx.arc(x, y, rad, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+
+  /* Mottling, so the two sides of the core are never the same. */
+  for (let i = 0; i < 16; i++) {
+    const x = rnd() * W;
+    const y = rnd() * H;
+    const rad = 10 + rnd() * 46;
+    const wash = ctx.createRadialGradient(x, y, 0, x, y, rad);
+    wash.addColorStop(0, rgb(rnd() > 0.5 ? 1.10 : 0.86));
+    wash.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.globalAlpha = 0.22;
+    ctx.fillStyle = wash;
+    ctx.beginPath();
+    ctx.arc(x, y, rad, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.ClampToEdgeWrapping;
+  texture.anisotropy = 4;
+  return texture;
+}
+
 /**
  * Mount the core.
  *
@@ -160,18 +262,24 @@ export async function mountCore(host, data, listRoot) {
      weathered core stands out where the harder units are. It is 4% and it is
      the difference between a column with beds in it and a painted cylinder. */
   const beds = [];
+  const textures = [];
   strata.beds.forEach((bed, i) => {
     const { y, thickness } = bedPlacement(bed, strata.span, CORE_HEIGHT);
     const radius = CORE_RADIUS * (1 + (i % 2 ? 0.04 : 0) + bed.grain * 0.03);
     const geometry = new THREE.CylinderGeometry(radius, radius, thickness, 40, 1, true);
+    const texture = bedTexture(THREE, bed, i + 7);
     const material = new THREE.MeshStandardMaterial({
-      color: new THREE.Color(bed.colour[0], bed.colour[1], bed.colour[2]),
+      /* White, because the colour is in the texture. Tinting a coloured map
+         multiplies the colour in twice and the whole column goes muddy. */
+      color: 0xffffff,
+      map: texture,
       roughness: 0.94 - bed.grain * 0.25,
       metalness: 0.0,
       emissive: new THREE.Color(token('--c-accent', '#00ccff')),
       emissiveIntensity: 0,
       side: THREE.DoubleSide,
     });
+    textures.push(texture);
     const mesh = new THREE.Mesh(geometry, material);
     mesh.position.y = y;
     mesh.userData.bed = bed;
@@ -220,12 +328,24 @@ export async function mountCore(host, data, listRoot) {
     core.add(ring);
   });
 
-  scene.add(new THREE.HemisphereLight(0xffffff, 0x6b5a48, 1.7));
-  const key = new THREE.DirectionalLight(0xffffff, 1.9);
-  key.position.set(-3.0, 4.0, 5.0);
+  /* ---- light --------------------------------------------------------------
+     A cylinder shows its shape only through the gradient across it, so the
+     ambient has to stay low enough for that gradient to exist. The first rig
+     put a hemisphere at 1.7 against a key at 1.9 and the column came out
+     evenly lit from every side — no terminator, no roundness, and the grain
+     flattened into a printed pattern rather than a surface.
+     
+     So: a modest fill, a strong key well round to one side, and a cool rim
+     from behind to lift the silhouette off a dark page. */
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x5b4a3a, 0.85));
+  const key = new THREE.DirectionalLight(0xfff3e2, 2.5);
+  key.position.set(-4.2, 2.6, 3.2);
   scene.add(key);
-  const rim = new THREE.DirectionalLight(0x9fd8ff, 0.8);
-  rim.position.set(3.4, -1.0, -2.0);
+  const fill = new THREE.DirectionalLight(0xbcd8ee, 0.55);
+  fill.position.set(3.0, 0.6, 2.4);
+  scene.add(fill);
+  const rim = new THREE.DirectionalLight(0x9fd8ff, 1.15);
+  rim.position.set(2.6, 1.2, -3.4);
   scene.add(rim);
 
   /* ---- view -------------------------------------------------------------- */
@@ -459,6 +579,7 @@ export async function mountCore(host, data, listRoot) {
     dispose() {
       renderer.dispose();
       beds.forEach((b) => { b.mesh.geometry.dispose(); b.material.dispose(); });
+      textures.forEach((t) => t.dispose());
     },
   };
 }
