@@ -127,12 +127,55 @@ async function getPage(cstart) {
   }
 }
 
+/**
+ * How many times to ask, and how long to wait between asks.
+ *
+ * WHY RETRYING AT ALL
+ * -------------------
+ * Scholar does not block this profile — it blocks the caller. From an ordinary
+ * home or campus connection the page comes back complete every time; from
+ * GitHub's runners, which are datacenter addresses, it usually comes back
+ * without the profile table. "Usually" is the important word: the same workflow
+ * succeeded on 22 and 23 September and was refused on the six runs after it.
+ *
+ * A single attempt per run therefore spends one roll of the dice, twice a day.
+ * Three spaced attempts spend three, which is the cheapest thing that can be
+ * done about an intermittent refusal.
+ *
+ * SPACED, AND FEW
+ * ---------------
+ * Six requests a day at the very most, a minute apart. Retrying hard would be
+ * both rude and counter-productive — the thing being retried against is a rate
+ * limiter, and hammering it is how an intermittent refusal becomes a permanent
+ * one. The waits are long enough to be a different moment, not a burst.
+ */
+const ATTEMPTS = 3;
+const WAIT_MS = [0, 25_000, 60_000];
+
+const pause = (ms) => new Promise((done) => setTimeout(done, ms));
+
 async function main() {
   console.log(`fetch-scholar: reading ${PROFILE_URL}`);
 
-  const first = await getPage(0);
-  const bad = rejectionReason(first);
-  if (bad) abort(bad, 'Open the profile in a browser and try again in a few minutes.');
+  let first = '';
+  let bad = null;
+  for (let attempt = 0; attempt < ATTEMPTS; attempt++) {
+    if (WAIT_MS[attempt]) {
+      console.log(`fetch-scholar: refused; waiting ${WAIT_MS[attempt] / 1000}s and asking again `
+        + `(attempt ${attempt + 1} of ${ATTEMPTS})`);
+      await pause(WAIT_MS[attempt]);
+    }
+    first = await getPage(0);
+    bad = rejectionReason(first);
+    if (!bad) break;
+  }
+  if (bad) {
+    abort(
+      `${bad} — after ${ATTEMPTS} attempts`,
+      'This is almost always the caller being refused rather than the profile being gone: '
+      + 'run `node tools/fetch-scholar.mjs` from an ordinary connection and it will answer.',
+    );
+  }
 
   const metrics = parseMetrics(first);
   if (!metrics) abort('the summary table could not be read — Scholar may have changed its markup.');
