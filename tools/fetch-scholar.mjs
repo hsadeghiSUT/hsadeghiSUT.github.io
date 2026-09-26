@@ -130,27 +130,25 @@ async function getPage(cstart) {
 /**
  * How many times to ask, and how long to wait between asks.
  *
- * WHY RETRYING AT ALL
- * -------------------
- * Scholar does not block this profile — it blocks the caller. From an ordinary
- * home or campus connection the page comes back complete every time; from
- * GitHub's runners, which are datacenter addresses, it usually comes back
- * without the profile table. "Usually" is the important word: the same workflow
- * succeeded on 22 and 23 September and was refused on the six runs after it.
+ * TWO, AND NOT MORE — RETRYING HERE BARELY HELPS
+ * ---------------------------------------------
+ * This was three attempts at first, written against the wrong idea of what
+ * goes wrong. Scholar refuses the CALLER, not the profile, and every attempt
+ * inside one process comes from one machine with one address: if the first is
+ * refused because of where it came from, so are the second and the third.
+ * Retrying here cannot beat that, and pretending otherwise would hide the
+ * problem rather than fix it.
  *
- * A single attempt per run therefore spends one roll of the dice, twice a day.
- * Three spaced attempts spend three, which is the cheapest thing that can be
- * done about an intermittent refusal.
+ * What does beat it is being asked again from somewhere else, which is the
+ * schedule's job — `.github/workflows/refresh-scholar.yml` runs eight times a
+ * day, each on a fresh runner with a fresh address, and asks Scholar only when
+ * the snapshot is not already today's.
  *
- * SPACED, AND FEW
- * ---------------
- * Six requests a day at the very most, a minute apart. Retrying hard would be
- * both rude and counter-productive — the thing being retried against is a rate
- * limiter, and hammering it is how an intermittent refusal becomes a permanent
- * one. The waits are long enough to be a different moment, not a burst.
+ * So two attempts, twenty seconds apart. That covers the one thing a retry can
+ * genuinely fix — a dropped connection or a momentary timeout — and stops.
  */
-const ATTEMPTS = 3;
-const WAIT_MS = [0, 25_000, 60_000];
+const ATTEMPTS = 2;
+const WAIT_MS = [0, 20_000];
 
 const pause = (ms) => new Promise((done) => setTimeout(done, ms));
 

@@ -43,10 +43,36 @@ name: Refresh the Google Scholar snapshot
 
 on:
   schedule:
-    # Twice a day, at minutes that are not on the hour. Cron on GitHub is
-    # best-effort and the on-the-hour slots are the congested ones.
-    - cron: '17 3 * * *'
-    - cron: '43 15 * * *'
+    # EIGHT TIMES A DAY, AND THAT IS FEWER REQUESTS THAN TWICE A DAY WAS.
+    #
+    # Scholar does not refuse this profile, it refuses the CALLER: GitHub's
+    # runners are shared datacenter addresses whose reputation is set by
+    # everyone else using them, and a run either lands on an address Scholar
+    # will answer or it does not. Between 23 and 26 September six consecutive
+    # runs were refused and the site sat three days stale.
+    #
+    # Cutting the frequency cannot help. One run asks twice, so the old
+    # schedule spent four requests a day — nothing next to a rate limit we are
+    # not the cause of. What does help is more DIFFERENT addresses, because
+    # every run gets a fresh runner: the variance is between runs, not within
+    # one, which is also why retrying inside a run is nearly useless.
+    #
+    # So the schedule is eight staggered slots, and the job asks Scholar only
+    # when the snapshot is not already today's. A day that succeeds on the
+    # first slot makes two requests and then seven runs that contact nobody —
+    # HALF the old traffic. A day that keeps being refused gets eight tries
+    # from eight addresses instead of two. Better on both counts.
+    #
+    # Odd minutes, never on the hour: GitHub's cron is best-effort and drops
+    # runs from the congested on-the-hour slots.
+    - cron: '17 1 * * *'
+    - cron: '43 4 * * *'
+    - cron: '11 7 * * *'
+    - cron: '37 10 * * *'
+    - cron: '23 13 * * *'
+    - cron: '49 16 * * *'
+    - cron: '19 19 * * *'
+    - cron: '41 22 * * *'
   # So you can also press the button: Actions → this workflow → Run workflow.
   workflow_dispatch:
 
@@ -80,8 +106,26 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Is the snapshot already today's?
+        id: gate
+        # The whole point of running eight times a day rather than twice. A run
+        # that finds today's date in the file contacts nobody and stops here, so
+        # the extra slots cost nothing on a day that has already worked — they
+        # are there to give a REFUSED day more addresses to try from.
+        run: |
+          have=$(node -e "process.stdout.write(String(require('./data/scholar.json').fetched || ''))")
+          today=$(date -u +%Y-%m-%d)
+          if [ "$have" = "$today" ]; then
+            echo "stale=no" >> "$GITHUB_OUTPUT"
+            echo "::notice title=Already today's::data/scholar.json was fetched $have. Scholar was not contacted this run."
+          else
+            echo "stale=yes" >> "$GITHUB_OUTPUT"
+            echo "Snapshot is from $have, today is $today — asking Scholar."
+          fi
+
       - name: Ask Google Scholar
         id: fetch
+        if: steps.gate.outputs.stale == 'yes'
         run: |
           # `if …; then` and not a bare call: a captcha is an ordinary outcome
           # here, not a broken build. The tool has already left data/scholar.json
