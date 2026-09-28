@@ -82,7 +82,7 @@ icons.
 ├── legacy_index.html          the original home page, kept unmodified (§10)
 │
 ├── .github/workflows/
-│   └── refresh-scholar.yml    refreshes data/scholar.json twice a day, on
+│   └── refresh-scholar.yml    refreshes data/scholar.json when it is stale, on
 │                              GitHub, and commits it only when the numbers
 │                              move. The whole of the automation (§18.2)
 │
@@ -1313,8 +1313,8 @@ the university server so the two stay in step.
 
 **`git pull` first, and it is not optional any more.** The scheduled workflow in
 `.github/workflows/refresh-scholar.yml` commits `data/scholar.json` to `main`
-twice a day (§18.2), so the remote is usually ahead of a local copy that has sat
-for a day, and a push without a pull is rejected. That one file is the only
+when the snapshot is stale (§18.2), so the remote is often ahead of a local copy
+that has sat for a day, and a push without a pull is rejected. That one file is the only
 thing anything automatic ever writes.
 
 **Step 9 has a second half now.** The workflow keeps `hsadeghi.org` current and
@@ -1369,7 +1369,7 @@ git push                              # 4. Pages redeploys in under a minute
 ```
 
 **`git pull` first, and it is not optional.** The scheduled workflow commits
-`data/scholar.json` to `main` twice a day, so the remote is usually ahead of a
+`data/scholar.json` to `main` whenever the snapshot is stale, so the remote is often ahead of a
 local copy that has sat overnight, and a push without a pull is rejected. If
 you forget and the push bounces:
 
@@ -1448,7 +1448,7 @@ The browser never asks Google — it reads `data/scholar.json`, a file, like
 every other file. §18.1 is the argument; this is the procedure.
 
 **On GitHub: nothing to do.** `.github/workflows/refresh-scholar.yml` runs at
-03:17 and 15:43 UTC, fetches the profile, validates it, and commits
+eight staggered slots a day, fetches only when the snapshot is stale, validates it, and commits
 `data/scholar.json` **only if a number moved**. Pages redeploys on that commit.
 
 To force it now: **Actions → Refresh the Google Scholar snapshot → Run
@@ -5242,7 +5242,7 @@ things do, one per copy of the site, and between them nobody has to remember.
 
 | | Keeps current | Runs | Needs |
 |---|---|---|---|
-| **`.github/workflows/refresh-scholar.yml`** | `hsadeghi.org` | twice a day, on GitHub | nothing — it is already in the repository |
+| **`.github/workflows/refresh-scholar.yml`** | `hsadeghi.org` | eight slots a day, fetching only when stale, on GitHub | nothing — it is already in the repository |
 | **`tools/refresh-scholar.ps1`** | the `sharif.edu` mirror, and any copy published by hand | when you run it, or daily if you register it | Node and PowerShell on your own machine |
 
 **Neither can make the figures wrong.** Both end in `check-scholar.mjs`, and
@@ -5254,23 +5254,71 @@ are wrong" and never "the numbers vanished".
 #### On GitHub, automatically
 
 The workflow is already in the repository and starts the first time you push
-it. It runs at 03:17 and 15:43 UTC, fetches the profile, validates what came
-back, and commits `data/scholar.json` **only if something changed**. Pages
-redeploys on the commit, so the site is current within a minute or two of the
-fetch. The commit subject carries the figures, which makes
-`git log --oneline -- data/scholar.json` a readable citation history of the
-profile.
+it. It wakes **eight times a day**, at 01:17, 04:43, 07:11, 10:37, 13:23,
+16:49, 19:19 and 22:41 UTC — odd minutes, never on the hour, because GitHub's
+cron is best-effort and drops runs from the congested on-the-hour slots.
+
+**It does not ask Google eight times.** The first thing each run does is look at
+the `fetched` date already in `data/scholar.json`. If it is today's, the run
+contacts nobody and stops — the log says *"Already today's"* and every later
+step is skipped. Only a run that finds a stale snapshot fetches, validates, and
+commits **if something changed**. Pages redeploys on that commit, so the site is
+current within a minute or two. The commit subject carries the figures, which
+makes `git log --oneline -- data/scholar.json` a readable citation history.
 
 You can also run it by hand: **Actions → Refresh the Google Scholar snapshot →
 Run workflow**.
 
-**It is twice a day rather than once because Google answers a datacentre address
-with a captcha fairly often.** When that happens the run records a notice,
-changes nothing, and **finishes green** — deliberately. A workflow that goes red
+#### Why eight slots is FEWER requests than two was
+
+This schedule replaced a twice-daily one on 2026-09-28, after the site sat
+three days behind. Every run between 23 and 26 September finished green and
+committed nothing, and the log said the same thing each time:
+
+```
+fetch-scholar: the page carries no profile table
+```
+
+The profile was fine. Opened from an ordinary connection that same morning it
+returned in full, with the figures that were eventually committed by hand.
+**Google was refusing the caller, not the profile** — GitHub's runners are
+shared datacentre addresses whose reputation is set by everyone else using
+them, and a run either lands on one Scholar will answer or it does not.
+
+The tempting fix is to ask less often. It cannot work, and the arithmetic says
+so plainly: **one run makes two requests**, so the old schedule spent four
+requests a day. Nothing at that volume is provoking a rate limit. Halving it
+would have bought nothing and made the data staler.
+
+What varies is the *address*, and every run gets a fresh runner. So the useful
+thing is more runs, each asking only when it has something to ask about:
+
+| | requests/day | chances/day |
+|---|---|---|
+| the old schedule | 4 | 2 |
+| a day that succeeds early | **2** | 1, which is all it needs |
+| a day that keeps being refused | ≤ 16, from **8 different addresses** | **8** |
+
+A working day now makes *half* the requests it used to and then seven runs that
+contact nobody at all. A refused day gets four times the chances. Better on
+both counts, which is the only reason to do something that looks like more
+traffic.
+
+**Retrying inside a run barely helps, and `fetch-scholar.mjs` says so.** Every
+attempt in one process comes from one machine with one address: if the first is
+refused for where it came from, so is the second. It makes two attempts twenty
+seconds apart, which covers the one thing a retry genuinely fixes — a dropped
+connection — and stops. The schedule is what supplies new addresses.
+
+**A refused run still finishes green**, deliberately. A workflow that goes red
 for a thing that behaved correctly is a workflow whose red is ignored inside a
-month, and this one has to be believable on the day it means something. Two
-attempts twelve hours apart from different pools of runner addresses turn a
-captcha into a delay rather than a missed day.
+month, and this one has to be believable on the day it means something.
+
+**What to do if it ever sticks.** Run `node tools/fetch-scholar.mjs` from an
+ordinary connection; it will answer, and the commit is an ordinary one. That is
+also the permanent fix if Scholar ever tightens on datacentre ranges for good:
+`tools/refresh-scholar.ps1 -Register` already installs a daily task on a
+personal machine, and it would need extending to commit and push.
 
 **The commit has to ask for its own deploy, and this is why.** A push made with
 the default `GITHUB_TOKEN` cannot start another workflow — GitHub's rule against
@@ -5354,10 +5402,12 @@ load, and delivers when it can. By the time it ran, the manual dispatch had
 already committed the day's change, so it correctly found nothing to do and
 skipped its deploy.
 
-That is the other half of why this workflow runs twice a day rather than once,
-and it is worth knowing before reading a late figure as a broken pipeline. If
-the numbers ever look stale, the Actions tab says whether a run happened, when,
-and what it found — in that order.
+That is one of the reasons the schedule has eight slots rather than two, and it
+is worth knowing before reading a late figure as a broken pipeline. **The
+Actions tab answers in this order: did a run happen, when, and what did it
+find.** A run that says *"Already today's"* asked nothing because there was
+nothing to ask; a run that says *"the page carries no profile table"* was
+refused for its address, which is a different problem with a different fix.
 
 #### On this machine, for the mirror
 
@@ -6329,10 +6379,7 @@ to. **It does not create authority, and authority is most of ranking.**
 These are the things that move the needle, and none of them can be done from
 the repository:
 
-1. **Google Search Console** — verify `hsadeghi.org` *and* `hamedsadeghi.org`,
-   submit `https://hsadeghi.org/sitemap.xml`, then use *URL Inspection →
-   Request indexing* on the home page. This is the single fastest step: it turns
-   "eventually" into "this week". Bing Webmaster Tools imports from it.
+1. ~~**Google Search Console**~~ — **done, 2026-09-25.** See §21.6.
 2. **The university page.** A link from `sharif.edu` — a faculty directory
    entry, a department staff list — is worth more than any number of edits here,
    because it is an authoritative domain confirming the affiliation the
@@ -6415,6 +6462,41 @@ Note that `.visually-hidden` itself stays in `base.css` — it is a legitimate
 accessibility utility, still used for screen-reader labels on JS-built nodes.
 What was wrong here was hiding *keywords*, not hiding text.
 
+### 21.6 Search Console — done, and what it found
+
+Set up on 2026-09-25, and the setting-up turned out to be less interesting than
+what it reported.
+
+**The account had no properties at all.** Search Console had never seen this
+site. That reframes the whole ranking problem in §21: it was not being ranked
+badly so much as being largely absent.
+
+**Ownership verified automatically, by Google Analytics.** The `gtag` already on
+every page was enough — no DNS record, no meta tag, nothing added to the
+repository. Which creates an obligation worth writing down: **removing the
+analytics code would un-verify the property.** `tools/check-trackers.mjs`
+already refuses to let a page lose its tags (§13), and that guard now protects
+more than analytics.
+
+**The sitemap was accepted and all seven pages discovered**, which is the whole
+job of §21.3's `sitemap.xml`.
+
+**The home page was already indexed**, and the inspection reported something
+better: *"Profile page — 1 valid item detected"*. Google is reading the
+`Person` structured data from §21.2. That is the one part of this work that is
+otherwise invisible until a knowledge panel appears.
+
+**And `publications.html` came back "URL is unknown to Google".** Never crawled,
+no last-crawl date, no referring sitemap. The page carrying 130 papers had
+never been in the index at all — which, more than any title tag, explains the
+ranking this section was written about. Its *Request indexing* failed twice with
+Google's generic "something went wrong" (an endpoint that is unreliable on new
+properties); the sitemap is the durable path and it now lists the page.
+
+**Worth re-checking**: inspect `https://hsadeghi.org/publications.html` again a
+few days after a deploy. If it is still unknown, request indexing by hand — that
+one page is worth more to this site than the other six together.
+
 ---
 
 ## 22. "Unsafe", and the headers that answer it
@@ -6473,7 +6555,7 @@ Referrer-Policy: strict-origin-when-cross-origin
 X-Frame-Options: SAMEORIGIN
 Content-Security-Policy: frame-ancestors 'self'
 Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
-Strict-Transport-Security: max-age=63072000; includeSubDomains
+Strict-Transport-Security: max-age=31536000; includeSubDomains
 ```
 
 Confirmed live on `hamedsadeghi.org`. **The two addresses therefore do not
@@ -6498,24 +6580,34 @@ a browser that has already been served the site over HTTPS once; the first
 plain-HTTP request has to be answered with a redirect, and that happens before
 anything in this repository is consulted.
 
-### 22.3 The two settings that are not in this repository
+### 22.3 Always Use HTTPS — done in the dashboard, 2026-09-25
 
-For the **hamedsadeghi.org** zone, in the Cloudflare dashboard:
+`http://hamedsadeghi.org` answered **200** and served the page. It now answers
+**301** to `https://`, because **SSL/TLS → Edge Certificates → Always Use
+HTTPS** is switched on for that zone.
 
-| | |
-|---|---|
-| **SSL/TLS → Edge Certificates → Always Use HTTPS** | on. Answers `http://` with a redirect instead of the page |
-| **Same page → HSTS** | enable, 6–12 months, include subdomains. `hsadeghi.org` already has this — `max-age=31556952` — which is why only one of the two domains had the problem |
+That one had to be the dashboard. A header cannot do it: `_headers` is applied
+to a response the Worker is already producing, and the whole point here is to
+answer the plain-HTTP request with a redirect *instead of* producing one.
 
-These are **zone** settings, not Worker settings, so unlike `workers_dev`
-(§11.6) `wrangler deploy` does not overwrite them and the dashboard is the
-right place for them.
-
-Check afterwards with:
+It is a **zone** setting rather than a Worker setting, so unlike `workers_dev`
+(§11.6) `wrangler deploy` does not overwrite it — the dashboard is the right
+place for it and it stays put.
 
 ```bash
-curl -sI http://hamedsadeghi.org/ | head -1     # want 301, not 200
+curl -sI http://hamedsadeghi.org/ | head -1      # 301, not 200
+curl -sI https://hamedsadeghi.org/ | grep -i strict-transport
 ```
+
+**HSTS is in `_headers`, not in the dashboard**, which is why §22.2 lists it
+with the rest. One source, in the repository, versioned with everything else.
+The zone's own HSTS setting is left off so there is only ever one answer to
+"where does this header come from". `hsadeghi.org` is the other way round — its
+`max-age=31556952` comes from its zone, because GitHub Pages is its origin and
+cannot set headers at all (§22.2).
+
+**There is no second thing outstanding.** The list this section used to hold had
+two rows; both are now either done or deliberately placed elsewhere.
 
 ---
 
@@ -6617,3 +6709,154 @@ modules already pause their animation loop with an `IntersectionObserver`, but
 pausing a loop does not free a context — only `renderer.dispose()` does, and
 coming back then means rebuilding the scene. That is a larger change than this
 one and has not been made.
+
+---
+
+## 24. Two more ways to read the same data — and three that were taken out again
+
+Five 3D views were built in one round on 2026-09-26. Two are in the site; three
+were removed two days later. Both halves are worth writing down, because the
+ones that went did not fail technically — they worked, and were taken out
+anyway, which is the more useful lesson.
+
+### 24.1 The Influence city, coloured by period
+
+The city (§15.8) draws a tower per co-author: height is citations earned,
+footprint is papers written. It says **who** and **how much**. It could not say
+**when**, and on a record running 2008–2026 that is the difference between a
+collaborator whose work is still being read and one whose was read a decade ago.
+
+A toggle beside *Reset view* — **Colour: field / period** — recolours the towers
+by a year ramp, indigo through teal to amber. It appears only on that view.
+
+**The year is the citation-weighted mean, not the plain mean**, and the
+distinction is the whole feature. A plain mean answers "when were they active",
+which the Timeline already shows. Weighting by citations answers "when did the
+work that is *read* happen": a co-author with one 2016 paper carrying 277
+citations and four uncited recent ones is, for this view, a 2016 collaborator.
+A plain average would file them under 2022 and say nothing.
+
+Two towers the same height and different colours are the same amount of
+influence, a decade apart.
+
+Undated people keep their section colour rather than being given a place on a
+ramp they are not on. Inventing a year for them would be the one lie in a view
+built entirely from the record.
+
+**A bug worth remembering.** The first version of this landed in
+`buildGraphScene` instead of `buildInfluenceScene` — the two share an identical
+line, `const hue = palette[dominantSection(person, papers, byId) …]`. The
+explorer stopped mounting entirely (`colourBy is not defined`) and the
+Collaboration view vanished. It was caught because the panel disappeared, not
+because anything was checked. When two functions in one file share a line
+verbatim, a replacement that matches "the first occurrence" is a coin toss.
+
+### 24.2 The Research Team as a root system
+
+**View: cards / roots**, beside *Reset view*. The same fifty-five cards in a
+second arrangement: one root per category leaving a common trunk, people placed
+along it in year order, earliest at the base and newest at the tip.
+
+**Why roots.** "Ecohydrology of the rhizosphere" is one of the five research
+interests on the front page and the laboratory is the Green Geotechnology
+Laboratory. A supervision *tree* is a generic academic metaphor; a root system
+is this group's own subject drawn as its own structure.
+
+**Why it is an arrangement and not a second panel.** The Research Team page
+already carries about thirty canvases against a phone that will hold a dozen
+(§23). A second renderer to show the same fifty-five people would have been the
+most expensive possible way to say the same thing. It is the same meshes, moved
+— so the hover, the click, the filter and the year chips all keep working
+without knowing which arrangement is on screen.
+
+Three things had to be got right, and the first two were wrong at first.
+
+**The cards have to turn to face the camera.** The photograph is on one face of
+the box. The grid gets away with never rotating anything because every card
+faces the same way and the camera is in front of all of them; a root ball does
+not, because it is spread all the way around a trunk. Half the group had its
+back to the viewer showing the blank cell that colours the edges — filtering to
+the PhD students, whose root points away and to the left, produced nine
+invisible cards. They now billboard on the yaw axis only: tilting them to meet a
+camera that also looks down would lean the whole roster backwards, and a wall of
+photographs has to stay upright.
+
+**Position is year ORDER, evenly spaced — not proportional to the year.** The
+proportional version cannot work at this size, and the arithmetic is quick: the
+record spans about ten years on a root under four units long, so one year is
+roughly a third of a unit and a card is over a unit wide. Nine PhD students
+occupied 1.5 units between them and were drawn one on top of another. "Further
+out is later" stays exactly true; "twice as far out is twice as long ago" was
+never true anyway, because a root is not an axis with a scale on it. The readout
+gives the span and every card gives its own year.
+
+**The layout and the card size follow the filter.** Spacing is measured in card
+widths rather than scene units — anything fixed in scene units is correct at one
+count and wrong either side of it — the root grows longer to hold what is on it,
+and the cards are drawn larger when fewer are shown (0.52 units for all
+fifty-five, 1.27 for nine). Filtering becomes the way to *read* the view rather
+than something that happens to it. Measured separation after the change: 1.06×
+card size or better in every single-category filter.
+
+The whole group unfiltered is still dense, at about half a card width. That is
+fifty-five portraits in one root ball and it is left that way deliberately: it
+should read as a shape you then filter into, rather than be shrunk to confetti.
+
+### 24.3 The three that were removed
+
+A career **core sample** on Background (eleven beds, thickness proportional to
+time, click a bed to open its entry), a **soil-water retention surface** on
+Summary, and a **desiccation crack floor** under it. All three were built,
+verified and deployed on 2026-09-26, and removed on 2026-09-28 at the owner's
+request.
+
+They are in the history at `745cd74743` and can be restored from it. What is
+worth keeping is what they cost to get right, because the same problems will
+come back in anything similar:
+
+**A smooth cylinder cannot show its own rotation.** The core sample's drag, its
+idle spin and its arrow keys all worked perfectly and looked like nothing was
+happening — a cylinder is rotationally symmetric, so turning it about its own
+axis renders a pixel-for-pixel identical image. Measured: after a simulated
+140-pixel drag, not one pixel changed. The fix was surface grain, which is
+therefore not decoration but the thing that makes the interaction exist. No
+amount of reading the rotation code would have found it, because the rotation
+code was correct.
+
+**A figure on a researcher's own site has to say whether it is a measurement.**
+The retention surface used the van Genuchten model with parameters that were
+illustrative, not measured, and it said so on the page — with the wording driven
+by a `source` field in its data file, so that filling that field in would have
+switched the caption from "illustrative parameters" to the citation
+automatically. Anything of this kind should be built that way round: the
+provenance is part of the figure, not a footnote to be added later.
+
+**Physics checks are different from code checks.** The retention model was
+tested on behaviour rather than output: full saturation at zero suction,
+monotone decreasing, bounded below by the residual, and — the one that mattered
+— looser packing having the lower air-entry value and holding less water at any
+given suction. One of those checks failed at first, and the model was right: van
+Genuchten approaches the residual as a power law, so at ψ = 10⁹ kPa it is still
+3.7 × 10⁻⁵ above it. The tolerance was wrong, not the physics.
+
+**The `fx` field is load-bearing and must not be borrowed.** The crack floor was
+originally planned as a replacement for the background field on one page. That
+would have been a quiet mistake: the field is not decoration, it is how the site
+answers "which entry am I pointing at" — the lattice rises and takes the
+section's colour while the row picks up the same hue (§6, `fx/highlight.js`).
+Swapping it out on one page would have removed a working interaction from that
+page without anything appearing to break. The cracks went under the retention
+surface instead, where high suction is exactly where a soil cracks.
+
+### 24.4 What removing them touched
+
+Three modules and one data file were deleted rather than left unmounted, so
+there is no dead code to mislead the next reader. Two smaller things went with
+them, and both are the kind that survive a careless removal:
+
+- `.tl__item.is-jumped` in `fx.css` existed only for the core sample's
+  click-to-scroll. With the core gone it had no consumer, so it reverted to the
+  roster's `.person` selector alone.
+- The `load` import in `pages/home.js` *looked* orphaned once the retention
+  block went, and is not: it is used at `.map(load)` — a reference rather than a
+  call, which a search for `load(` does not find.
